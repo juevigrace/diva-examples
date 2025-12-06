@@ -1,0 +1,29 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.compose.hot.reload)
+}
+
+dependencies {
+    implementation(projects.apps.sharedUI)
+    implementation(libs.diva.di)
+
+    implementation(compose.desktop.currentOs)
+}
+
+compose {
+    desktop {
+        application {
+            mainClass = "io.github.juevigrace.diva.app.MainKt"
+
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+                packageName = "io.github.juevigrace.diva.app"
+                packageVersion = libs.versions.app.version.name.get()
+            }
+        }
+    }
+}
