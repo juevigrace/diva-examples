@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.api
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,7 +8,6 @@ plugins {
 
 dependencies {
     implementation(projects.apps.sharedUI)
-    implementation(libs.diva.di)
 }
 
 android {

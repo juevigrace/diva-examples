@@ -36,6 +36,9 @@ include(
     ":apps:androidApp",
     ":apps:desktopApp",
     ":apps:sharedUI",
+    ":apps:server",
     ":core:database",
+    ":core:network",
     ":core:types",
+    ":core:ui"
 )

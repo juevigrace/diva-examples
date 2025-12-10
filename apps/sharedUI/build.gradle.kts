@@ -4,19 +4,25 @@ plugins {
 
 kotlin {
     sourceSets {
+        commonMain.dependencies {
+            implementation(projects.core.database)
+            implementation(projects.core.types)
+            implementation(projects.core.ui)
+
+            api(libs.diva.di)
+
+            api(libs.koin.core)
+            api(libs.koin.compose)
+            api(libs.koin.compose.viewmodel)
+        }
+
         androidMain.dependencies {
             api(libs.koin.android)
             api(libs.koin.androidx.compose)
         }
 
-        commonMain.dependencies {
-            implementation(projects.core.database)
-
-            implementation(libs.kotlinx.serialization.json)
-
-            api(libs.koin.core)
-            api(libs.koin.compose)
-            api(libs.koin.compose.viewmodel)
+        jvmMain.dependencies {
+            api(libs.koin.logger.slf4j)
         }
     }
 }

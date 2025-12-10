@@ -1,16 +1,26 @@
 package io.github.juevigrace.diva.app.di.database
 
-import io.github.juevigrace.diva.core.database.DivaStorage
-import io.github.juevigrace.diva.core.database.DivaStorageImpl
+import io.github.juevigrace.diva.core.database.DivaDB
+import io.github.juevigrace.diva.database.Storage
+import io.github.juevigrace.diva.database.driver.Schema
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 fun databaseModule(): Module {
     return module {
         includes(driverModule())
 
-        singleOf(::DivaStorageImpl) bind DivaStorage::class
+        single<Storage<DivaDB>> {
+            Storage(
+                provider = get(),
+                schema = Schema.Async(DivaDB.Schema),
+                onDriverCreated = { driver ->
+                    DivaDB(driver)
+                },
+                onError = { result ->
+                    error(result.err)
+                }
+            )
+        }
     }
 }

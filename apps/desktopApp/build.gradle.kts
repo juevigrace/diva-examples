@@ -9,7 +9,6 @@ plugins {
 
 dependencies {
     implementation(projects.apps.sharedUI)
-    implementation(libs.diva.di)
 
     implementation(compose.desktop.currentOs)
 }
