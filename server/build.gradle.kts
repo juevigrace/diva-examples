@@ -1,3 +1,6 @@
+import io.ktor.plugin.features.DockerPortMapping
+import io.ktor.plugin.features.DockerPortMappingProtocol
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
@@ -12,6 +15,11 @@ application {
 }
 
 dependencies {
+    implementation(projects.core.database.postgres)
+
+    implementation(projects.auth.api.authApiHandler)
+    implementation(projects.auth.di.authDiServer)
+
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
     implementation(libs.ktor.server.content.negotiation)
@@ -32,10 +40,32 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.config.yaml)
 
+    implementation(libs.kdotenv)
+
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
+}
+
+ktor {
+    docker {
+        jreVersion.set(JavaVersion.VERSION_21)
+        localImageName.set("diva-ktor-server")
+        imageTag.set(libs.versions.app.version.name)
+        portMappings.set(
+            listOf(
+                DockerPortMapping(
+                    outsideDocker = 5000,
+                    insideDocker = 5000,
+                    protocol = DockerPortMappingProtocol.TCP
+                )
+            )
+        )
+    }
+    fatJar {
+        archiveFileName.set("diva-ktor-server.jar")
+    }
 }

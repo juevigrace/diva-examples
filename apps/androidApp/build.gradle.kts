@@ -11,7 +11,7 @@ dependencies {
 }
 
 android {
-    namespace = "io.github.juevigrace.diva.app"
+    namespace = "com.diva.app"
 
     compileSdk =
         libs.versions.android.compileSdk
@@ -28,7 +28,7 @@ android {
                 .get()
                 .toInt()
 
-        applicationId = "io.github.juevigrace.diva.app"
+        applicationId = "com.diva.app"
 
         versionCode = libs.versions.app.version.code.get().toInt()
         versionName = libs.versions.app.version.name.get()

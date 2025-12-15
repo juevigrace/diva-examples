@@ -39,9 +39,7 @@ include(
     ":apps:sharedUI",
 )
 
-include(
-    ":core:ui",
-)
+include(":core:ui")
 
 include(
     ":core:database:sqlite",

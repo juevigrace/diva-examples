@@ -13,6 +13,8 @@ kotlin = "2.2.21"
 kotlinx-serialization = "1.9.0"
 ktor = "3.3.3"
 sqldelight = "2.2.1"
+kdotenv = "6.5.1"
+kbcrypt = "1.0.9"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -86,3 +88,6 @@ ktor-server-caching-headers = { module = "io.ktor:ktor-server-caching-headers", 
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+
+kbcrypt = { group = "com.ToxicBakery.library.bcrypt", name = "bcrypt", version.ref = "kbcrypt" }
+kdotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "kdotenv" }

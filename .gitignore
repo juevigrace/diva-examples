@@ -43,5 +43,7 @@ captures
 .metals
 .bloop
 .env
+.env.prod
+.env.dev
 # Ignore Gradle build output directory
 build
