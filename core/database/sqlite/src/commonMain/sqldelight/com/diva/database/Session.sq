@@ -1,0 +1,23 @@
+findAll:
+SELECT * FROM diva_session;
+
+findById:
+SELECT * FROM diva_session WHERE id = ?;
+
+findByUserId:
+SELECT * FROM diva_session WHERE user_id = ?;
+
+insert:
+INSERT INTO diva_session (id, user_id, access_token, refresh_token, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE diva_session 
+SET access_token = ?, refresh_token = ?, updated_at = ?
+WHERE id = ?;
+
+deleteById:
+DELETE FROM diva_session WHERE id = ?;
+
+deleteByUserId:
+DELETE FROM diva_session WHERE user_id = ?;

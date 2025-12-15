@@ -2,12 +2,17 @@ import divabuild.internal.libs
 
 plugins {
     id("divabuild.kmp-base")
-    id("divabuild.library-android")
-    id("divabuild.targets-ios")
-    id("divabuild.targets-jvm")
-    id("divabuild.targets-web")
 }
 
+val newPath = project.path.split(":").last().replace("-", ".")
+val cleanPath = newPath.let { list ->
+    val mutList = list.split(".").toMutableList()
+    if (mutList.last() == "client" || mutList.last() == "server") {
+        mutList.removeLast()
+    }
+    mutList.joinToString(".")
+}
+group = "com.diva.$cleanPath"
 version = libs.versions.app.version.name
 
 kotlin {
