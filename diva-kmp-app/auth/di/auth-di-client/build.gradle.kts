@@ -10,7 +10,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.auth.api.authApiClient)
 
-            implementation(projects.auth.data.authData)
+            implementation(projects.auth.data.authDataClient)
 
             implementation(projects.auth.database.authDatabaseClient)
 

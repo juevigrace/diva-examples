@@ -1,11 +1,117 @@
+CREATE TYPE visibility_enum AS ENUM ('public', 'private', 'friends');
+CREATE TYPE media_type_enum AS ENUM ('image', 'video');
+
 CREATE TABLE IF NOT EXISTS diva_user(
     id UUID NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL
+    email VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    alias VARCHAR(50) NOT NULL,
+    avatar TEXT NULL,
+    bio TEXT NULL,
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS diva_session(
     id UUID NOT NULL PRIMARY KEY,
     user_id UUID NOT NULL,
-    access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL
+    access_token VARCHAR(500) NOT NULL,
+    refresh_token VARCHAR(500) NOT NULL,
+    device VARCHAR(100) NOT NULL DEFAULT '',
+    status BOOLEAN NOT NULL DEFAULT 0,
+    ip_address VARCHAR(45) NOT NULL DEFAULT '',
+    user_agent TEXT NULL,
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_post(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    caption VARCHAR(255) NULL,
+    description TEXT NULL,
+    visibility visibility_enum NOT NULL DEFAULT 'public',
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_media(
+    id UUID NOT NULL PRIMARY KEY,
+    post_id UUID NOT NULL,
+    url TEXT NOT NULL,
+    alt_text VARCHAR(255) NULL,
+    media_type media_type_enum NOT NULL DEFAULT 'image',
+    file_size BIGINT NULL,
+    width INTEGER NULL,
+    height INTEGER NULL,
+    created_at BIGINT NOT NULL,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_board(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NULL,
+    visibility visibility_enum NOT NULL DEFAULT 'public',
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_board_post(
+    id UUID NOT NULL PRIMARY KEY,
+    board_id UUID NOT NULL,
+    post_id UUID NOT NULL,
+    created_at BIGINT NOT NULL,
+    FOREIGN KEY(board_id) REFERENCES diva_board(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    UNIQUE(board_id, post_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_like(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    post_id UUID NOT NULL,
+    created_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    UNIQUE(user_id, post_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_comment(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    post_id UUID NOT NULL,
+    content TEXT NOT NULL,
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_follow(
+    id UUID NOT NULL PRIMARY KEY,
+    follower_id UUID NOT NULL,
+    following_id UUID NOT NULL,
+    created_at BIGINT NOT NULL,
+    FOREIGN KEY(follower_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(following_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    UNIQUE(follower_id, following_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_save(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    post_id UUID NOT NULL,
+    board_id UUID NULL,
+    created_at BIGINT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    FOREIGN KEY(board_id) REFERENCES diva_board(id) ON DELETE SET NULL,
+    UNIQUE(user_id, post_id)
 );

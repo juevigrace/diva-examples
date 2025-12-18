@@ -8,12 +8,12 @@ findByUserId:
 SELECT * FROM diva_session WHERE user_id = ?;
 
 insert:
-INSERT INTO diva_session (id, user_id, access_token, refresh_token, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO diva_session (id, user_id, access_token, refresh_token, device, status, ip_address, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_session 
-SET access_token = ?, refresh_token = ?, updated_at = ?
+SET access_token = ?, refresh_token = ?, device = ?, status = ?, ip_address = ?, updated_at = ?
 WHERE id = ?;
 
 deleteById:

@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.auth.data.authDataService)
+            implementation(projects.auth.data.authDataServer)
         }
     }
 }

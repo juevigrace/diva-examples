@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.auth.models.authModelsDatabase)
+            api(projects.core.models.modelsDatabase)
         }
     }
 }

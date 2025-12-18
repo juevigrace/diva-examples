@@ -1,17 +1,20 @@
 package com.diva.auth.database.shared
 
-import com.diva.auth.models.database.SessionEntity
+import com.diva.models.database.session.SessionEntity
+import io.github.juevigrace.diva.core.models.DivaError
+import io.github.juevigrace.diva.core.models.DivaResult
+import io.github.juevigrace.diva.core.models.Option
 
 interface AuthStorage {
-    suspend fun saveSession(session: SessionEntity)
+    suspend fun getSession(id: String): DivaResult<Option<SessionEntity>, DivaError>
 
-    suspend fun getSession(sessionId: String): SessionEntity?
+    suspend fun getSessionsByUser(userId: String): DivaResult<List<SessionEntity>, DivaError>
 
-    suspend fun getSessionsByUserId(userId: String): List<SessionEntity>
+    suspend fun saveSession(session: SessionEntity): DivaResult<Unit, DivaError>
 
-    suspend fun updateSession(session: SessionEntity)
+    suspend fun updateSession(session: SessionEntity): DivaResult<Unit, DivaError>
 
-    suspend fun deleteSession(sessionId: String)
+    suspend fun deleteSession(id: String): DivaResult<Unit, DivaError>
 
-    suspend fun deleteSessionsByUserId(userId: String)
+    suspend fun deleteSessionsByUser(userId: String): DivaResult<Unit, DivaError>
 }

@@ -1,6 +1,16 @@
+import kotlin.Boolean;
+
 CREATE TABLE IF NOT EXISTS diva_user(
     id TEXT NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL
+    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    name TEXT NOT NULL,
+    alias TEXT NOT NULL,
+    avatar TEXT NULL,
+    bio TEXT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS diva_session(
@@ -8,7 +18,99 @@ CREATE TABLE IF NOT EXISTS diva_session(
     user_id TEXT NOT NULL,
     access_token TEXT NOT NULL,
     refresh_token TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
+    device TEXT NOT NULL DEFAULT '',
+    status INTEGER AS Boolean NOT NULL DEFAULT 0,
+    ip_address TEXT NOT NULL DEFAULT '',
+    user_agent TEXT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_post(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    caption TEXT NULL,
+    description TEXT NULL,
+    visibility TEXT NOT NULL DEFAULT 'public',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_media(
+    id TEXT NOT NULL PRIMARY KEY,
+    post_id TEXT NOT NULL,
+    url TEXT NOT NULL,
+    alt_text TEXT NULL,
+    media_type TEXT NOT NULL DEFAULT 'image',
+    file_size INTEGER NULL,
+    width INTEGER NULL,
+    height INTEGER NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_board(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NULL,
+    visibility TEXT NOT NULL DEFAULT 'public',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_board_post(
+    id TEXT NOT NULL PRIMARY KEY,
+    board_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(board_id) REFERENCES diva_board(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    UNIQUE(board_id, post_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_like(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    UNIQUE(user_id, post_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_comment(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_follow(
+    id TEXT NOT NULL PRIMARY KEY,
+    follower_id TEXT NOT NULL,
+    following_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(follower_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(following_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    UNIQUE(follower_id, following_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_save(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    board_id TEXT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE,
+    FOREIGN KEY(board_id) REFERENCES diva_board(id) ON DELETE SET NULL,
+    UNIQUE(user_id, post_id)
 );

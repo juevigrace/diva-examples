@@ -1,7 +1,7 @@
 package com.diva.auth.api.client
 
-import com.diva.auth.models.api.dtos.SignInDto
-import com.diva.auth.models.api.response.AuthResponse
+import com.diva.models.auth.dtos.SignInDto
+import com.diva.models.auth.response.AuthResponse
 import com.diva.models.ApiResponse
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaErrorException
@@ -21,7 +21,7 @@ class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClie
                     if (e is DivaErrorException) {
                         e.divaError
                     } else {
-                        DivaError.Companion.exception(
+                        DivaError.exception(
                             e = e,
                             origin = "AuthNetworkClient.signIn",
                         )
@@ -30,13 +30,13 @@ class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClie
             ) {
                 val body: ApiResponse<AuthResponse> = res.body()
                 when (res.status) {
-                    HttpStatusCode.Companion.OK -> {
-                        DivaResult.Companion.success(body.data!!)
+                    HttpStatusCode.OK -> {
+                        DivaResult.success(body.data!!)
                     }
 
                     else -> {
                         throw DivaErrorException(
-                            DivaError.Companion.network(
+                            DivaError.network(
                                 operation = "POST SIGN IN",
                                 url = "/api/auth/signIn",
                                 statusCode = res.status.value,

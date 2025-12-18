@@ -7,7 +7,7 @@ COPY build.gradle.kts gradle.properties settings.gradle.kts ./
 COPY build-logic build-logic
 COPY server server
 COPY auth/api/auth-api-handler auth/api/auth-api-handler
-COPY auth/data/auth-data-service auth/data/auth-data-service
+COPY auth/data/auth-data-server auth/data/auth-data-service
 COPY auth/data/auth-data-shared auth/data/auth-data-shared
 COPY auth/database/auth-database-server auth/database/auth-database-server
 COPY auth/database/auth-database-shared auth/database/auth-database-shared

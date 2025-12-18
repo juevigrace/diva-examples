@@ -7,7 +7,7 @@ android-targetSdk = "36"
 android-minSdk = "24"
 compose-hot-reload = "1.0.0"
 compose-multiplatform = "1.9.3"
-diva-version = "0.0.1"
+diva = "0.0.2"
 koin = "4.1.1"
 kotlin = "2.2.21"
 kotlinx-serialization = "1.9.0"
@@ -34,11 +34,11 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 ######### [DIVA DEPENDENCIES] #########
-diva-core = { group = "io.github.juevigrace", name = "diva-core", version.ref = "diva-version" }
-diva-database = { group = "io.github.juevigrace", name = "diva-database", version.ref = "diva-version" }
-diva-di = { group = "io.github.juevigrace", name = "diva-di", version.ref = "diva-version" }
-diva-network-client = { group = "io.github.juevigrace", name = "diva-network-client", version.ref = "diva-version" }
-diva-ui = { group = "io.github.juevigrace", name = "diva-ui", version.ref = "diva-version" }
+diva-core = { group = "io.github.juevigrace", name = "diva-core", version.ref = "diva" }
+diva-database = { group = "io.github.juevigrace", name = "diva-database", version.ref = "diva" }
+diva-di = { group = "io.github.juevigrace", name = "diva-di", version.ref = "diva" }
+diva-network-client = { group = "io.github.juevigrace", name = "diva-network-client", version.ref = "diva" }
+diva-ui = { group = "io.github.juevigrace", name = "diva-ui", version.ref = "diva" }
 
 ######### [GRADLE DEPENDENCIES] #########
 

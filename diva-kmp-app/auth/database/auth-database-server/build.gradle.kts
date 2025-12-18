@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             api(projects.auth.database.authDatabaseShared)
 
-            implementation(projects.core.database.postgres)
+            api(projects.core.database.postgres)
         }
     }
 }

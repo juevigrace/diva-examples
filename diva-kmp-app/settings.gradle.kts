@@ -27,7 +27,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "diva-app"
+rootProject.name = "diva-kmp-app"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
@@ -50,7 +50,7 @@ if (shouldIncludeClientProjects()) {
 
     include(
         "auth:api:auth-api-client",
-        "auth:data:auth-data",
+        "auth:data:auth-data-client",
         "auth:database:auth-database-client",
         "auth:di:auth-di-client",
         "auth:ui:auth-ui"
@@ -64,7 +64,7 @@ include(":core:database:postgres")
 
 include(
     "auth:api:auth-api-handler",
-    "auth:data:auth-data-service",
+    "auth:data:auth-data-server",
     "auth:database:auth-database-server",
     "auth:di:auth-di-server",
 )
@@ -73,12 +73,10 @@ include(
 include(
     ":core:models",
     ":core:models:models-api",
+    ":core:models:models-database"
 )
 
 include(
     "auth:data:auth-data-shared",
     "auth:database:auth-database-shared",
-    "auth:models:auth-models",
-    "auth:models:auth-models-api",
-    "auth:models:auth-models-database",
 )

@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             api(projects.auth.database.authDatabaseShared)
 
-            implementation(projects.core.database.sqlite)
+            api(projects.core.database.sqlite)
         }
     }
 }

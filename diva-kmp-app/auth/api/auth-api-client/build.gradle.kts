@@ -6,8 +6,6 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.auth.models.authModelsApi)
-
             implementation(projects.core.models.modelsApi)
 
             api(libs.diva.network.client)

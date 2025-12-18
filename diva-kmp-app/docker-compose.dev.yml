@@ -22,13 +22,14 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
       JWT_REALM: ${JWT_REALM}
+      KTOR_ENV: ${KTOR_ENV}
     depends_on:
       diva_db:
         condition: service_healthy
     volumes:
       - ./server:/app/server
       - ./auth/api/auth-api-handler:/app/auth/api/auth-api-handler
-      - ./auth/data/auth-data-service:/app/auth/data/auth-data-service
+      - ./auth/data/auth-data-server:/app/auth/data/auth-data-service
       - ./auth/data/auth-data-shared:/app/auth/data/auth-data-shared
       - ./auth/database/auth-database-server:/app/auth/database/auth-database-server
       - ./auth/database/auth-database-shared:/app/auth/database/auth-database-shared

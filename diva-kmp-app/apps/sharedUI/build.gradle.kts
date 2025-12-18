@@ -8,6 +8,8 @@ kotlin {
             implementation(projects.core.database.sqlite)
             implementation(projects.core.ui)
 
+            implementation(projects.auth.di.authDiClient)
+
             api(libs.diva.di)
         }
 
