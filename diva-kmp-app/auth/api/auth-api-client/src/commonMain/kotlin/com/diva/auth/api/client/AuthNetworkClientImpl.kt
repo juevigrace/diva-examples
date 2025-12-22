@@ -1,7 +1,7 @@
 package com.diva.auth.api.client
 
 import com.diva.models.auth.dtos.SignInDto
-import com.diva.models.auth.response.AuthResponse
+import com.diva.models.auth.response.SessionResponse
 import com.diva.models.ApiResponse
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaErrorException
@@ -14,7 +14,7 @@ import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
 class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClient {
-    override suspend fun signIn(dto: SignInDto): DivaResult<AuthResponse, DivaError> {
+    override suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
         return client.post("/api/auth/signIn", dto).flatMap { res ->
             tryResult(
                 onError = { e ->
@@ -28,7 +28,7 @@ class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClie
                     }
                 },
             ) {
-                val body: ApiResponse<AuthResponse> = res.body()
+                val body: ApiResponse<SessionResponse> = res.body()
                 when (res.status) {
                     HttpStatusCode.OK -> {
                         DivaResult.success(body.data!!)
@@ -47,5 +47,33 @@ class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClie
                 }
             }
         }
+    }
+
+    override suspend fun signUp(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun signOut(): DivaResult<Nothing, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun ping(): DivaResult<Nothing, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refresh(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun passwordResetRequest(dto: SignInDto): DivaResult<Nothing, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun passwordResetConfirm(dto: SignInDto): DivaResult<Nothing, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun passwordReset(dto: SignInDto): DivaResult<Nothing, DivaError> {
+        TODO("Not yet implemented")
     }
 }

@@ -5,7 +5,7 @@ ktor:
             - com.diva.server.ApplicationKt.module
     deployment:
         port: ${PORT:8080}
-        domain: "$DOMAIN:localhost"
+        domain: ${DOMAIN:localhost}
         watch: [ classes, resources ]
 database:
     host: ${DB_HOST:localhost}

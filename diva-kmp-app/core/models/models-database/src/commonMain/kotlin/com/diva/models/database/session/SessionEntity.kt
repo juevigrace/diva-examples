@@ -24,7 +24,7 @@ data class SessionEntity(
             device: String,
             status: Boolean,
             ipAddress: String,
-            userAgent: Option<String> = Option.None,
+            userAgent: String?,
             createdAt: Long,
             updatedAt: Long,
         ): SessionEntity {
@@ -36,7 +36,7 @@ data class SessionEntity(
                 device = device,
                 status = status,
                 ipAddress = ipAddress,
-                userAgent = userAgent,
+                userAgent = Option.of(userAgent),
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )

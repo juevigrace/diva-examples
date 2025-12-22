@@ -1,0 +1,109 @@
+CREATE TYPE post_type_enum AS ENUM (
+    'media',       -- Reference to a media item
+    'collection',  -- Reference to a collection
+    'text'         -- Standalone text post
+);
+
+CREATE TYPE reaction_enum AS ENUM (
+    'like', 'comment', 'bookmark', 'share'
+);
+
+CREATE TYPE moderation_status_enum AS ENUM (
+    'pending', 'approved', 'rejected', 'hidden'
+);
+
+CREATE TYPE share_type_enum AS ENUM (
+    'direct',    -- in-app share
+    'external',  -- social media share
+    'embed',     -- embed code
+    'download'   -- download action
+);
+
+CREATE TYPE notification_type_enum AS ENUM (
+    'like', 'comment', 'reply', 'share', 'follow', 'mention'
+);
+
+CREATE TABLE IF NOT EXISTS diva_follow(
+    follower_id UUID NOT NULL,
+    following_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (follower_id, following_id),
+    FOREIGN KEY(follower_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(following_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    CONSTRAINT no_self_follow CHECK (follower_id != following_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_post(
+    id UUID NOT NULL PRIMARY KEY,
+    author_id UUID NOT NULL,
+    post_type post_type_enum NOT NULL DEFAULT 'media',
+    title VARCHAR(255) NOT NULL DEFAULT '', -- optional for text posts
+    content TEXT NOT NULL DEFAULT '', -- text content or caption
+    media_id UUID NULL, -- reference to diva_media
+    collection_id UUID NULL, -- reference to diva_collection  
+    visibility visibility_enum NOT NULL DEFAULT 'public',
+    edited_at TIMESTAMPTZ NULL, -- for tracking edits
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
+    FOREIGN KEY(author_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE RESTRICT,
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE RESTRICT,
+    CONSTRAINT post_reference_check CHECK (
+        (post_type = 'media' AND media_id IS NOT NULL AND collection_id IS NULL) OR
+        (post_type = 'collection' AND collection_id IS NOT NULL AND media_id IS NULL) OR
+        (post_type = 'text' AND media_id IS NULL AND collection_id IS NULL)
+    )
+);
+
+CREATE TABLE IF NOT EXISTS diva_reaction(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    post_id UUID NOT NULL,
+    reaction_type reaction_enum NOT NULL DEFAULT 'like',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_share(
+    reaction_id UUID NOT NULL PRIMARY KEY,
+    share_type share_type_enum NOT NULL DEFAULT 'direct',
+    caption TEXT DEFAULT '', -- user's comment when sharing
+    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE CASCADE,
+);
+
+CREATE TABLE IF NOT EXISTS diva_comment(
+    reaction_id UUID NOT NULL PRIMARY KEY,
+    reply_to UUID NULL, -- for threaded replies
+    content TEXT NOT NULL,
+    edited_at TIMESTAMPTZ NULL,
+    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE RESTRICT,
+    FOREIGN KEY(reply_to) REFERENCES diva_comment(id) ON DELETE RESTRICT
+);
+
+-- Social Interaction Indexes
+CREATE INDEX idx_diva_follow_follower ON diva_follow(follower_id);
+CREATE INDEX idx_diva_follow_following ON diva_follow(following_id);
+CREATE INDEX idx_diva_follow_created_at ON diva_follow(created_at);
+
+CREATE INDEX idx_diva_post_author ON diva_post(author_id);
+CREATE INDEX idx_diva_post_type ON diva_post(post_type);
+CREATE INDEX idx_diva_post_media_id ON diva_post(media_id);
+CREATE INDEX idx_diva_post_collection_id ON diva_post(collection_id);
+CREATE INDEX idx_diva_post_created_at ON diva_post(created_at);
+CREATE INDEX idx_diva_post_deleted_at ON diva_post(deleted_at);
+CREATE INDEX idx_diva_post_visibility ON diva_post(visibility);
+
+CREATE INDEX idx_diva_reaction_user ON diva_reaction(user_id);
+CREATE INDEX idx_diva_reaction_post ON diva_reaction(post_id);
+CREATE INDEX idx_diva_reaction_type ON diva_reaction(reaction_type);
+CREATE INDEX idx_diva_reaction_created_at ON diva_reaction(created_at);
+CREATE INDEX idx_diva_reaction_deleted_at ON diva_reaction(deleted_at);
+
+CREATE INDEX idx_diva_share_type ON diva_share(share_type);
+
+CREATE INDEX idx_diva_comment_reply_to ON diva_comment(reply_to);
+CREATE INDEX idx_diva_comment_edited_at ON diva_comment(edited_at);

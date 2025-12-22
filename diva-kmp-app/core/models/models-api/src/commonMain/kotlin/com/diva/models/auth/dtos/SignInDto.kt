@@ -9,8 +9,6 @@ data class SignInDto(
     val username: String,
     @SerialName("password")
     val password: String,
-    @SerialName("device")
-    val device: String,
-    @SerialName("ip_address")
-    val ipAddress: String? = null,
+    @SerialName("session_data")
+    val sessionData: SessionDataDto
 )

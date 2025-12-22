@@ -49,24 +49,45 @@ if (shouldIncludeClientProjects()) {
     include(":core:ui")
 
     include(
-        "auth:api:auth-api-client",
-        "auth:data:auth-data-client",
-        "auth:database:auth-database-client",
-        "auth:di:auth-di-client",
-        "auth:ui:auth-ui"
+        ":auth:api:auth-api-client",
+        ":auth:data:auth-data-client",
+        ":auth:di:auth-di-client",
+        ":auth:ui:auth-ui",
+    )
+
+    include(
+        ":session:database:session-database-client",
+    )
+
+    include(
+        ":user:database:user-database-client",
+        ":user:di:user-di-client",
+        ":user:ui:user-ui",
     )
 }
 
 // Server projects
 include(":server")
 
+include(":core:server:util")
+
 include(":core:database:postgres")
 
+include(":core:models-server")
+
 include(
-    "auth:api:auth-api-handler",
-    "auth:data:auth-data-server",
-    "auth:database:auth-database-server",
-    "auth:di:auth-di-server",
+    ":auth:api:auth-api-handler",
+    ":auth:data:auth-data-service",
+    ":auth:di:auth-di-server",
+)
+
+include(
+    ":session:database:session-database-server",
+)
+
+include(
+    ":user:database:user-database-server",
+    ":user:di:user-di-server",
 )
 
 // Shared projects
@@ -77,6 +98,10 @@ include(
 )
 
 include(
-    "auth:data:auth-data-shared",
-    "auth:database:auth-database-shared",
+    ":session:data:session-data",
+    ":session:database:session-database-shared",
+)
+
+include(
+    ":user:database:user-database-shared",
 )

@@ -1,5 +1,6 @@
 package com.diva.models.user.dtos
 
+import com.diva.models.auth.dtos.SessionDataDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,8 +16,6 @@ data class CreateUserDto(
     val alias: String = username,
     @SerialName("avatar")
     val avatar: String? = null,
-    @SerialName("device")
-    val device: String,
-    @SerialName("ip_address")
-    val ipAddress: String? = null,
+    @SerialName("session_data")
+    val sessionData: SessionDataDto
 )

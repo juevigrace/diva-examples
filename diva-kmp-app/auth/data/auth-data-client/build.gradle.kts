@@ -7,7 +7,9 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.auth.api.authApiClient)
 
-            api(projects.auth.data.authDataShared)
+            implementation(projects.session.database.sessionDatabaseShared)
+
+            implementation(projects.core.models)
         }
     }
 }

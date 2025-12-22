@@ -12,7 +12,7 @@ kotlin {
 
             implementation(projects.auth.data.authDataClient)
 
-            implementation(projects.auth.database.authDatabaseClient)
+            implementation(projects.session.database.sessionDatabaseClient)
 
             implementation(libs.koin.core)
         }
