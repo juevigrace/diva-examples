@@ -83,27 +83,3 @@ CREATE TABLE IF NOT EXISTS diva_comment(
     FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE RESTRICT,
     FOREIGN KEY(reply_to) REFERENCES diva_comment(id) ON DELETE RESTRICT
 );
-
--- Social Interaction Indexes
-CREATE INDEX idx_diva_follow_follower ON diva_follow(follower_id);
-CREATE INDEX idx_diva_follow_following ON diva_follow(following_id);
-CREATE INDEX idx_diva_follow_created_at ON diva_follow(created_at);
-
-CREATE INDEX idx_diva_post_author ON diva_post(author_id);
-CREATE INDEX idx_diva_post_type ON diva_post(post_type);
-CREATE INDEX idx_diva_post_media_id ON diva_post(media_id);
-CREATE INDEX idx_diva_post_collection_id ON diva_post(collection_id);
-CREATE INDEX idx_diva_post_created_at ON diva_post(created_at);
-CREATE INDEX idx_diva_post_deleted_at ON diva_post(deleted_at);
-CREATE INDEX idx_diva_post_visibility ON diva_post(visibility);
-
-CREATE INDEX idx_diva_reaction_user ON diva_reaction(user_id);
-CREATE INDEX idx_diva_reaction_post ON diva_reaction(post_id);
-CREATE INDEX idx_diva_reaction_type ON diva_reaction(reaction_type);
-CREATE INDEX idx_diva_reaction_created_at ON diva_reaction(created_at);
-CREATE INDEX idx_diva_reaction_deleted_at ON diva_reaction(deleted_at);
-
-CREATE INDEX idx_diva_share_type ON diva_share(share_type);
-
-CREATE INDEX idx_diva_comment_reply_to ON diva_comment(reply_to);
-CREATE INDEX idx_diva_comment_edited_at ON diva_comment(edited_at);

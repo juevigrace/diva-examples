@@ -1,0 +1,58 @@
+CREATE TABLE IF NOT EXISTS diva_follow(
+    follower_id TEXT NOT NULL,
+    following_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (follower_id, following_id),
+    FOREIGN KEY(follower_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(following_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    CHECK (follower_id != following_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_post(
+    id TEXT NOT NULL PRIMARY KEY,
+    author_id TEXT NOT NULL,
+    post_type TEXT NOT NULL DEFAULT 'media',
+    title TEXT NOT NULL DEFAULT '',
+    content TEXT NOT NULL DEFAULT '',
+    media_id TEXT DEFAULT NULL,
+    collection_id TEXT DEFAULT NULL,
+    visibility TEXT NOT NULL DEFAULT 'public',
+    edited_at INTEGER DEFAULT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(author_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE RESTRICT,
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE RESTRICT,
+    CHECK (
+        (post_type = 'media' AND media_id IS NOT NULL AND collection_id IS NULL) OR
+        (post_type = 'collection' AND collection_id IS NOT NULL AND media_id IS NULL) OR
+        (post_type = 'text' AND media_id IS NULL AND collection_id IS NULL)
+    )
+);
+
+CREATE TABLE IF NOT EXISTS diva_reaction(
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    reaction_type TEXT NOT NULL DEFAULT 'like',
+    created_at TEXT NOT NULL DEFAULT NOW(),
+    updated_at TEXT NOT NULL DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_share(
+    reaction_id TEXT NOT NULL PRIMARY KEY,
+    share_type TEXT NOT NULL DEFAULT 'direct',
+    caption TEXT DEFAULT '',
+    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE CASCADE,
+);
+
+CREATE TABLE IF NOT EXISTS diva_comment(
+    reaction_id TEXT NOT NULL PRIMARY KEY,
+    reply_to TEXT NULL,
+    content TEXT NOT NULL,
+    edited_at TEXT NULL,
+    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE RESTRICT,
+    FOREIGN KEY(reply_to) REFERENCES diva_comment(id) ON DELETE RESTRICT
+);

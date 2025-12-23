@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS diva_user(
     password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(100) NOT NULL,
     alias VARCHAR(50) NOT NULL,
-    avatar TEXT NULL,
-    bio TEXT NULL,
+    avatar TEXT NOT NULL DEFAULT '',
+    bio TEXT NOT NULL DEFAULT '',
     user_verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS diva_session(
     device VARCHAR(100) NOT NULL DEFAULT '',
     status session_status_enum NOT NULL DEFAULT 'active',
     ip_address VARCHAR(45) NOT NULL DEFAULT '',
-    user_agent TEXT NULL,
+    user_agent TEXT NOT NULL DEFAULT '',
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -53,19 +53,17 @@ CREATE TABLE IF NOT EXISTS diva_media(
     visibility visibility_enum NOT NULL DEFAULT 'public',
     sensitive_content BOOLEAN NOT NULL DEFAULT FALSE,
     adult_content BOOLEAN NOT NULL DEFAULT FALSE,
+    published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
     FOREIGN KEY(submitted_by) REFERENCES diva_user(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS diva_media_tag(
-    media_id UUID NOT NULL,
+    id UUID NOT NULL PRIMARY KEY,
     tag_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (media_id, tag_name),
-    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS diva_collection(
@@ -143,31 +141,3 @@ CREATE TABLE IF NOT EXISTS diva_collection_media(
     FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE CASCADE,
     UNIQUE(collection_id, media_id)
 );
-
-CREATE INDEX idx_diva_media_submitted_by ON diva_media(submitted_by);
-CREATE INDEX idx_diva_media_visibility ON diva_media(visibility);
-CREATE INDEX idx_diva_collection_owner ON diva_collection(owner);
-CREATE INDEX idx_diva_collection_type ON diva_collection(collection_type);
-CREATE INDEX idx_diva_session_user_id ON diva_session(user_id);
-CREATE INDEX idx_diva_session_expires_at ON diva_session(expires_at);
-
--- Soft delete + visibility filtering
-CREATE INDEX idx_diva_media_deleted_visibility ON diva_media(deleted_at, visibility);
-CREATE INDEX idx_diva_collection_deleted_visibility ON diva_collection(deleted_at, visibility);
-
--- User queries
-CREATE INDEX idx_diva_user_deleted_at ON diva_user(deleted_at);
-CREATE INDEX idx_diva_user_email_verified ON diva_user(email, user_verified) WHERE deleted_at IS NULL;
-
--- Collection media performance
-CREATE INDEX idx_diva_collection_media_deleted_position ON diva_collection_media(deleted_at, position);
-CREATE INDEX idx_diva_collection_media_added_at ON diva_collection_media(added_at);
-
--- Session management
-CREATE INDEX idx_diva_session_status ON diva_session(status);
-
--- Media queries optimization
-CREATE INDEX idx_diva_media_type_created ON diva_media(media_type, created_at DESC) WHERE deleted_at IS NULL;
-
--- Tag support
-CREATE INDEX idx_diva_media_tag_name ON diva_media_tag(tag_name);
