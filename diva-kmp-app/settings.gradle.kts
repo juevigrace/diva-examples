@@ -93,6 +93,7 @@ include(
 // Shared projects
 include(
     ":core:models",
+    ":core:models:models-shared",
     ":core:models:models-api",
     ":core:models:models-database"
 )

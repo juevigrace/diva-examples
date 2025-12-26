@@ -1,0 +1,30 @@
+insert:
+INSERT INTO diva_interaction (id, user_id, post_id, reaction_type)
+VALUES (?, ?, ?, ?);
+
+delete:
+DELETE FROM diva_interaction
+WHERE id = ?;
+
+findId:
+SELECT * FROM diva_interaction 
+WHERE id = ?;
+
+findAll:
+SELECT * FROM diva_interaction 
+ORDER BY created_at DESC;
+
+findByUser:
+SELECT * FROM diva_interaction 
+WHERE user_id = ?
+ORDER BY created_at DESC;
+
+findByPost:
+SELECT * FROM diva_interaction 
+WHERE post_id = ?
+ORDER BY created_at DESC;
+
+findByType:
+SELECT * FROM diva_interaction 
+WHERE reaction_type = ?
+ORDER BY created_at DESC;

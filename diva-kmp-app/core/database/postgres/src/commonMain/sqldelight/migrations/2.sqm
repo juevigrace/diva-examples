@@ -1,7 +1,7 @@
 CREATE TYPE post_type_enum AS ENUM (
-    'media',       -- Reference to a media item
-    'collection',  -- Reference to a collection
-    'text'         -- Standalone text post
+    'media',
+    'collection',
+    'text'
 );
 
 CREATE TYPE reaction_enum AS ENUM (
@@ -13,39 +13,55 @@ CREATE TYPE moderation_status_enum AS ENUM (
 );
 
 CREATE TYPE share_type_enum AS ENUM (
-    'direct',    -- in-app share
-    'external',  -- social media share
-    'embed',     -- embed code
-    'download'   -- download action
+    'direct',
+    'external',
+    'embed',
+    'download'
 );
 
 CREATE TYPE notification_type_enum AS ENUM (
     'like', 'comment', 'reply', 'share', 'follow', 'mention'
 );
 
+CREATE TYPE chat_type_enum AS ENUM (
+    'direct',
+    'group'
+);
+
+CREATE TYPE participant_role_enum AS ENUM (
+    'admin',
+    'member'
+);
+
+CREATE TYPE message_type_enum AS ENUM (
+    'text',
+    'media',
+    'system'
+);
+
 CREATE TABLE IF NOT EXISTS diva_follow(
-    follower_id UUID NOT NULL,
-    following_id UUID NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (follower_id, following_id),
-    FOREIGN KEY(follower_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    FOREIGN KEY(following_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    CONSTRAINT no_self_follow CHECK (follower_id != following_id)
+    user_id UUID NOT NULL,
+    followed UUID NOT NULL,
+    followed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, followed),
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(followed) REFERENCES diva_user(id) ON DELETE CASCADE,
+    CONSTRAINT no_self_follow CHECK (user_id != followed)
 );
 
 CREATE TABLE IF NOT EXISTS diva_post(
     id UUID NOT NULL PRIMARY KEY,
     author_id UUID NOT NULL,
     post_type post_type_enum NOT NULL DEFAULT 'media',
-    title VARCHAR(255) NOT NULL DEFAULT '', -- optional for text posts
-    content TEXT NOT NULL DEFAULT '', -- text content or caption
-    media_id UUID NULL, -- reference to diva_media
-    collection_id UUID NULL, -- reference to diva_collection  
+    title VARCHAR(255) NOT NULL DEFAULT '',
+    content TEXT NOT NULL DEFAULT '',
+    media_id UUID NULL,
+    collection_id UUID NULL,
     visibility visibility_enum NOT NULL DEFAULT 'public',
-    edited_at TIMESTAMPTZ NULL, -- for tracking edits
+    edited_at TIMESTAMPTZ NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL,
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
     FOREIGN KEY(author_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
     FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE RESTRICT,
     FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE RESTRICT,
@@ -56,30 +72,90 @@ CREATE TABLE IF NOT EXISTS diva_post(
     )
 );
 
-CREATE TABLE IF NOT EXISTS diva_reaction(
+CREATE TABLE IF NOT EXISTS diva_interaction(
     id UUID NOT NULL PRIMARY KEY,
     user_id UUID NOT NULL,
     post_id UUID NOT NULL,
     reaction_type reaction_enum NOT NULL DEFAULT 'like',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL,
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
     FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS diva_share(
-    reaction_id UUID NOT NULL PRIMARY KEY,
+    interaction_id UUID NOT NULL PRIMARY KEY,
     share_type share_type_enum NOT NULL DEFAULT 'direct',
-    caption TEXT DEFAULT '', -- user's comment when sharing
-    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE CASCADE,
+    caption TEXT DEFAULT '',
+    FOREIGN KEY(interaction_id) REFERENCES diva_interaction(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS diva_comment(
-    reaction_id UUID NOT NULL PRIMARY KEY,
-    reply_to UUID NULL, -- for threaded replies
+    interaction_id UUID NOT NULL PRIMARY KEY,
+    reply_to UUID NULL,
     content TEXT NOT NULL,
     edited_at TIMESTAMPTZ NULL,
-    FOREIGN KEY(reaction_id) REFERENCES diva_reaction(id) ON DELETE RESTRICT,
-    FOREIGN KEY(reply_to) REFERENCES diva_comment(id) ON DELETE RESTRICT
+    FOREIGN KEY(interaction_id) REFERENCES diva_interaction(id) ON DELETE RESTRICT,
+    FOREIGN KEY(reply_to) REFERENCES diva_comment(interaction_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS diva_chat(
+    id UUID NOT NULL PRIMARY KEY,
+    created_by UUID NOT NULL,
+    chat_type chat_type_enum NOT NULL DEFAULT 'direct',
+    name VARCHAR(255) NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    avatar TEXT NOT NULL DEFAULT '',
+    last_message_at TIMESTAMPTZ NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
+    FOREIGN KEY(created_by) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    CONSTRAINT chat_name_required CHECK (
+        (chat_type = 'group' AND name != '') OR 
+        (chat_type = 'direct')
+    )
+);
+
+CREATE TABLE IF NOT EXISTS diva_chat_participant(
+    chat_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    role participant_role_enum NOT NULL DEFAULT 'member',
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_read_at TIMESTAMPTZ NULL,
+    muted_until TIMESTAMPTZ NULL,
+    added_by UUID NOT NULL,
+    PRIMARY KEY (chat_id, user_id),
+    FOREIGN KEY(chat_id) REFERENCES diva_chat(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
+    FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    CONSTRAINT no_self_add CHECK (user_id != added_by)
+);
+
+CREATE TABLE IF NOT EXISTS diva_message(
+    id UUID NOT NULL PRIMARY KEY,
+    chat_id UUID NOT NULL,
+    sender_id UUID NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    message_type message_type_enum NOT NULL DEFAULT 'text',
+    reply_to_id UUID NULL,
+    edited_at TIMESTAMPTZ NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
+    FOREIGN KEY(chat_id) REFERENCES diva_chat(id) ON DELETE CASCADE,
+    FOREIGN KEY(sender_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    FOREIGN KEY(reply_to_id) REFERENCES diva_message(id) ON DELETE RESTRICT,
+    CONSTRAINT message_content_check CHECK (
+        (message_type = 'text' AND content != '') OR
+        (message_type IN ('media', 'system'))
+    )
+);
+
+CREATE TABLE IF NOT EXISTS diva_message_media(
+    message_id UUID NOT NULL,
+    media_id UUID NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (message_id, media_id),
+    FOREIGN KEY(message_id) REFERENCES diva_message(id) ON DELETE CASCADE,
+    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE CASCADE
 );

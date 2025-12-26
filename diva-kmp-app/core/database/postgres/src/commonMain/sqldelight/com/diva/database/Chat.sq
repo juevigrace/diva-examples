@@ -1,0 +1,27 @@
+insert:
+INSERT INTO diva_chat (id, created_by, chat_type, name, description, avatar)
+VALUES (?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE diva_chat 
+SET name = ?, description = ?, avatar = ?, last_message_at = ?, updated_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+delete:
+UPDATE diva_chat 
+SET deleted_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+findById:
+SELECT * FROM diva_chat 
+WHERE id = ? AND deleted_at IS NULL;
+
+findAll:
+SELECT * FROM diva_chat 
+WHERE deleted_at IS NULL 
+ORDER BY created_at DESC;
+
+findByType:
+SELECT * FROM diva_chat 
+WHERE chat_type = ? AND deleted_at IS NULL 
+ORDER BY created_at DESC;

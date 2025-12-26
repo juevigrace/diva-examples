@@ -1,2 +1,0 @@
-indAll:
-SELECT * FROM diva_user;

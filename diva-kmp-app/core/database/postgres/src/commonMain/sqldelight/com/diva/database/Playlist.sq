@@ -1,0 +1,33 @@
+insert:
+INSERT INTO diva_playlist_metadata (collection_id, is_collaborative, allow_suggestions)
+VALUES (?, ?, ?);
+
+update:
+UPDATE diva_playlist_metadata 
+SET is_collaborative = ?, allow_suggestions = ? 
+WHERE collection_id = ?;
+
+delete:
+UPDATE diva_collection 
+SET deleted_at = NOW() 
+WHERE id = ? AND collection_type = 'playlist' AND deleted_at IS NULL;
+
+findById:
+SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.id = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL;
+
+findAll:
+SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.collection_type = 'playlist' AND c.deleted_at IS NULL
+ORDER BY c.created_at DESC;
+
+findByOwner:
+SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.owner = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL
+ORDER BY c.created_at DESC;

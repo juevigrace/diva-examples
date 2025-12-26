@@ -1,0 +1,32 @@
+insert:
+INSERT INTO diva_comment (interaction_id, reply_to, content)
+VALUES (?, ?, ?);
+
+update:
+UPDATE diva_comment 
+SET content = ?, edited_at = NOW() 
+WHERE interaction_id = ?;
+
+delete:
+DELETE FROM diva_interaction
+WHERE id = ?;
+
+findById:
+SELECT i.*, c.reply_to, c.content, c.edited_at
+FROM diva_interaction i
+INNER JOIN diva_comment c ON i.id = c.interaction_id
+WHERE i.id = ?;
+
+findAll:
+SELECT i.*, c.reply_to, c.content, c.edited_at
+FROM diva_interaction i
+INNER JOIN diva_comment c ON i.id = c.interaction_id
+WHERE i.reaction_type = 'comment'
+ORDER BY i.created_at DESC;
+
+findByPost:
+SELECT i.*, c.reply_to, c.content, c.edited_at
+FROM diva_interaction i
+INNER JOIN diva_comment c ON i.id = c.interaction_id
+WHERE i.post_id = ? AND i.reaction_type = 'comment'
+ORDER BY i.created_at DESC;

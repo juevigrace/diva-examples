@@ -1,0 +1,32 @@
+insert:
+INSERT INTO diva_media (id, submitted_by, url, alt_text, media_type, file_size, width, height, duration, visibility, sensitive_content, adult_content, published_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE diva_media 
+SET url = ?, alt_text = ?, media_type = ?, file_size = ?, width = ?, height = ?, duration = ?, visibility = ?, sensitive_content = ?, adult_content = ?, published_at = ?, updated_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+delete:
+UPDATE diva_media 
+SET deleted_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+findById:
+SELECT * FROM diva_media 
+WHERE id = ? AND deleted_at IS NULL;
+
+findAll:
+SELECT * FROM diva_media 
+WHERE deleted_at IS NULL 
+ORDER BY created_at DESC;
+
+findByUserId:
+SELECT * FROM diva_media 
+WHERE submitted_by = ? AND deleted_at IS NULL 
+ORDER BY created_at DESC;
+
+findByType:
+SELECT * FROM diva_media 
+WHERE media_type = ? AND deleted_at IS NULL 
+ORDER BY created_at DESC;
