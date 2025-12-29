@@ -1,7 +1,7 @@
 package com.diva.session.database
 
 import com.diva.database.DivaDB
-import com.diva.models.database.session.SessionEntity
+import com.diva.models.database.auth.SessionEntity
 import com.diva.session.database.shared.SessionStorage
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaErrorException
@@ -11,15 +11,16 @@ import io.github.juevigrace.diva.core.models.getOrElse
 import io.github.juevigrace.diva.core.models.isEmpty
 import io.github.juevigrace.diva.core.models.toDivaError
 import io.github.juevigrace.diva.core.models.tryResult
+import io.github.juevigrace.diva.database.DivaDatabase
 import io.github.juevigrace.diva.database.Storage
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class SessionStorageImpl(
-    private val storage: Storage<DivaDB>
+    private val storage: DivaDatabase<DivaDB>
 ) : SessionStorage {
-    override suspend fun getSession(id: String): DivaResult<Option<SessionEntity>, DivaError> {
+    override suspend fun getById(id: String): DivaResult<Option<SessionEntity>, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError(origin = "AuthStorage.getSession") }
         ) {

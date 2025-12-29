@@ -1,0 +1,66 @@
+insert:
+INSERT INTO diva_playlist_metadata (collection_id, is_collaborative, allow_suggestions)
+VALUES (?, ?, ?);
+
+update:
+UPDATE diva_playlist_metadata 
+SET is_collaborative = ?, allow_suggestions = ? 
+WHERE collection_id = ?;
+
+delete:
+UPDATE diva_collection 
+SET deleted_at = (strftime('%s', 'now')) 
+WHERE id = ? AND collection_type = 'playlist' AND deleted_at IS NULL;
+
+findById:
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.id = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL;
+
+findAll:
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.collection_type = 'playlist' AND c.deleted_at IS NULL
+ORDER BY c.created_at DESC;
+
+findByOwner:
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
+FROM diva_collection c
+LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
+WHERE c.owner = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL
+ORDER BY c.created_at DESC;

@@ -1,0 +1,80 @@
+insert:
+INSERT INTO diva_post (id, author_id, post_type, title, content, media_id, collection_id, visibility)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE diva_post 
+SET title = ?, content = ?, visibility = ?, edited_at = (strftime('%s', 'now')), updated_at = (strftime('%s', 'now')) 
+WHERE id = ? AND deleted_at IS NULL;
+
+delete:
+UPDATE diva_post 
+SET deleted_at = (strftime('%s', 'now')) 
+WHERE id = ? AND deleted_at IS NULL;
+
+findById:
+SELECT 
+  id,
+  author_id AS authorId,
+  post_type AS postType,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE id = ? AND deleted_at IS NULL;
+
+findAll:
+SELECT 
+  id,
+  author_id AS authorId,
+  post_type AS postType,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE deleted_at IS NULL
+ORDER BY created_at DESC;
+
+findByAuthor:
+SELECT 
+  id,
+  author_id AS authorId,
+  post_type AS postType,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE author_id = ? AND deleted_at IS NULL
+ORDER BY created_at DESC;
+
+findByType:
+SELECT 
+  id,
+  author_id AS authorId,
+  post_type AS postType,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE post_type = ? AND deleted_at IS NULL
+ORDER BY created_at DESC;

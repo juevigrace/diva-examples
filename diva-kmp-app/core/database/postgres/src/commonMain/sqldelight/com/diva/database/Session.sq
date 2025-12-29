@@ -16,19 +16,67 @@ DELETE FROM diva_session
 WHERE id = ?;
 
 findById:
-SELECT * FROM diva_session 
+SELECT 
+  id,
+  user_id AS userId,
+  access_token AS accessToken,
+  refresh_token AS refreshToken,
+  device,
+  status,
+  ip_address AS ipAddress,
+  user_agent AS userAgent,
+  expires_at AS expiresAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_session 
 WHERE id = ?;
 
 findAll:
-SELECT * FROM diva_session 
+SELECT 
+  id,
+  user_id AS userId,
+  access_token AS accessToken,
+  refresh_token AS refreshToken,
+  device,
+  status,
+  ip_address AS ipAddress,
+  user_agent AS userAgent,
+  expires_at AS expiresAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_session 
 ORDER BY created_at DESC;
 
 findByUserId:
-SELECT * FROM diva_session 
+SELECT 
+  id,
+  user_id AS userId,
+  access_token AS accessToken,
+  refresh_token AS refreshToken,
+  device,
+  status,
+  ip_address AS ipAddress,
+  user_agent AS userAgent,
+  expires_at AS expiresAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_session 
 WHERE user_id = ?
 ORDER BY created_at DESC;
 
 findActiveByUserId:
-SELECT * FROM diva_session 
+SELECT 
+  id,
+  user_id AS userId,
+  access_token AS accessToken,
+  refresh_token AS refreshToken,
+  device,
+  status,
+  ip_address AS ipAddress,
+  user_agent AS userAgent,
+  expires_at AS expiresAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_session 
 WHERE user_id = ? AND status = 'active'
 ORDER BY created_at DESC;

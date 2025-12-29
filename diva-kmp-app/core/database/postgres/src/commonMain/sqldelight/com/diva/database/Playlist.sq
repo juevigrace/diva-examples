@@ -13,20 +13,53 @@ SET deleted_at = NOW()
 WHERE id = ? AND collection_type = 'playlist' AND deleted_at IS NULL;
 
 findById:
-SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
 FROM diva_collection c
 LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
 WHERE c.id = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL;
 
 findAll:
-SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
 FROM diva_collection c
 LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
 WHERE c.collection_type = 'playlist' AND c.deleted_at IS NULL
 ORDER BY c.created_at DESC;
 
 findByOwner:
-SELECT c.*, pm.is_collaborative, pm.allow_suggestions
+SELECT 
+  c.owner,
+  c.cover_media_id AS coverMediaId,
+  c.name,
+  c.description,
+  c.collection_type AS collectionType,
+  c.visibility,
+  c.created_at AS createdAt,
+  c.updated_at AS updatedAt,
+  pm.collection_id AS id,
+  pm.is_collaborative AS isCollaborative,
+  pm.allow_suggestions AS allowSuggestions
 FROM diva_collection c
 LEFT JOIN diva_playlist_metadata pm ON c.id = pm.collection_id
 WHERE c.owner = ? AND c.collection_type = 'playlist' AND c.deleted_at IS NULL

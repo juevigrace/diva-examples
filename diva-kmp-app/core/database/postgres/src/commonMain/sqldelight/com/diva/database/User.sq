@@ -13,19 +13,67 @@ SET deleted_at = NOW()
 WHERE id = ? AND deleted_at IS NULL;
 
 findOneById:
-SELECT * FROM diva_user
+SELECT 
+  id,
+  email,
+  username,
+  password_hash AS passwordHash,
+  name,
+  alias,
+  avatar,
+  bio,
+  user_verified AS userVerified,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_user
 WHERE id = ? AND deleted_at IS NULL;
 
 findAll:
-SELECT * FROM diva_user
+SELECT 
+  id,
+  email,
+  username,
+  password_hash AS passwordHash,
+  name,
+  alias,
+  avatar,
+  bio,
+  user_verified AS userVerified,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_user
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?;
 
 findOneByEmail:
-SELECT * FROM diva_user
+SELECT 
+  id,
+  email,
+  username,
+  password_hash AS passwordHash,
+  name,
+  alias,
+  avatar,
+  bio,
+  user_verified AS userVerified,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_user
 WHERE email = ? AND deleted_at IS NULL;
 
 findOneByUsername:
-SELECT * FROM diva_user
+SELECT 
+  id,
+  email,
+  username,
+  password_hash AS passwordHash,
+  name,
+  alias,
+  avatar,
+  bio,
+  user_verified AS userVerified,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_user
 WHERE username = ? AND deleted_at IS NULL;
