@@ -8,9 +8,10 @@ enum class PostType(
     TEXT("text"),
 }
 
-fun String.toPostType(): PostType =
-    try {
-        PostType.valueOf(this.uppercase())
+fun safePostType(value: String): PostType {
+    return try {
+        PostType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         PostType.MEDIA
     }
+}

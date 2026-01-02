@@ -60,6 +60,8 @@ if (shouldIncludeClientProjects()) {
     )
 
     include(
+        ":user:api:user-api-client",
+        ":user:data:user-data-client",
         ":user:database:user-database-client",
         ":user:di:user-di-client",
         ":user:ui:user-ui",
@@ -86,6 +88,8 @@ include(
 )
 
 include(
+    ":user:api:user-api-handler",
+    ":user:data:user-data-service",
     ":user:database:user-database-server",
     ":user:di:user-di-server",
 )
@@ -95,11 +99,9 @@ include(
     ":core:models",
     ":core:models:models-shared",
     ":core:models:models-api",
-    ":core:models:models-database"
 )
 
 include(
-    ":session:data:session-data",
     ":session:database:session-database-shared",
 )
 

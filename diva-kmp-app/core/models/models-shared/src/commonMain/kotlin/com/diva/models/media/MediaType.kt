@@ -9,9 +9,10 @@ enum class MediaType(
     UNSPECIFIED("unspecified"),
 }
 
-fun String.toMediaType(): MediaType =
-    try {
-        MediaType.valueOf(this.uppercase())
+fun safeMediaType(value: String): MediaType {
+    return  try {
+        MediaType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         MediaType.UNSPECIFIED
     }
+}

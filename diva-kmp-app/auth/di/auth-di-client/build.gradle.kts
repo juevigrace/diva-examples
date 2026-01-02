@@ -7,6 +7,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.koin.android)
         }
+
         commonMain.dependencies {
             implementation(projects.auth.api.authApiClient)
 

@@ -5,8 +5,6 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.auth.api.authApiHandler)
-
             implementation(projects.auth.data.authDataService)
 
             implementation(projects.session.database.sessionDatabaseServer)

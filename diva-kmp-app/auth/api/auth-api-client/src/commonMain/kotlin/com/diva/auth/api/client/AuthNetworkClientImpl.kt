@@ -1,19 +1,19 @@
 package com.diva.auth.api.client
 
-import com.diva.models.auth.dtos.SignInDto
-import com.diva.models.auth.response.SessionResponse
-import com.diva.models.ApiResponse
+import com.diva.models.api.ApiResponse
+import com.diva.models.api.auth.dtos.SignInDto
+import com.diva.models.api.auth.response.SessionResponse
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaErrorException
 import io.github.juevigrace.diva.core.models.DivaResult
 import io.github.juevigrace.diva.core.models.flatMap
 import io.github.juevigrace.diva.core.models.tryResult
-import io.github.juevigrace.diva.network.client.NetworkClient
+import io.github.juevigrace.diva.network.client.DivaClient
 import io.github.juevigrace.diva.network.client.post
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
-class AuthNetworkClientImpl(private val client: NetworkClient) : AuthNetworkClient {
+class AuthNetworkClientImpl(private val client: DivaClient) : AuthNetworkClient {
     override suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
         return client.post("/api/auth/signIn", dto).flatMap { res ->
             tryResult(

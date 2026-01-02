@@ -9,9 +9,10 @@ enum class VisibilityType(
     UNSPECIFIED("unspecified"),
 }
 
-fun String.toVisibilityType(): VisibilityType =
-    try {
-        VisibilityType.valueOf(this.uppercase())
+fun safeVisibilityType(value: String): VisibilityType {
+    return try {
+        VisibilityType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         VisibilityType.UNSPECIFIED
     }
+}

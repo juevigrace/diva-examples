@@ -1,7 +1,9 @@
 package com.diva.server.di.database
 
+import app.cash.sqldelight.db.SqlDriver
 import com.diva.database.DivaDB
-import io.github.juevigrace.diva.database.Storage
+import io.github.juevigrace.diva.core.models.getOrThrow
+import io.github.juevigrace.diva.database.DivaDatabase
 import io.github.juevigrace.diva.database.driver.DriverProvider
 import io.github.juevigrace.diva.database.driver.Schema
 import io.github.juevigrace.diva.database.driver.configuration.DriverConf
@@ -28,11 +30,16 @@ fun databaseModule(config: ApplicationConfig): Module {
             ).create()
         }
 
-        single<Storage<DivaDB>> {
-            Storage(
-                provider = get(),
-                schema = Schema.Async(DivaDB.Schema),
-                onDriverCreated = { driver -> DivaDB(driver) }
+        single<SqlDriver> {
+            val provider: DriverProvider = get()
+            provider.createDriver(Schema.Async(DivaDB.Schema)).getOrThrow()
+        }
+
+        single<DivaDatabase<DivaDB>> {
+            val driver: SqlDriver = get()
+            DivaDatabase(
+                driver = driver,
+                db = DivaDB(driver),
             )
         }
     }

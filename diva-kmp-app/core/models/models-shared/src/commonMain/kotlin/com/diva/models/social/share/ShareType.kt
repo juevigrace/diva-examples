@@ -9,9 +9,10 @@ enum class ShareType(
     DOWNLOAD("download"),
 }
 
-fun String.toShareType(): ShareType =
-    try {
-        ShareType.valueOf(this.uppercase())
+fun safeShareType(value: String): ShareType {
+    return try {
+        ShareType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         ShareType.DIRECT
     }
+}

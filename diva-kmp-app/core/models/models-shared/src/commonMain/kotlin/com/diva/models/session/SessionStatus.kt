@@ -8,9 +8,10 @@ enum class SessionStatus(
     CLOSED("closed"),
 }
 
-fun String.toSessionStatus(): SessionStatus =
-    try {
-        SessionStatus.valueOf(this.uppercase())
+fun safeSessionStatus(value: String): SessionStatus {
+    return try {
+        SessionStatus.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         SessionStatus.ACTIVE
     }
+}

@@ -1,10 +1,10 @@
 package com.diva.auth.data
 
 import com.diva.auth.api.client.AuthNetworkClient
-import com.diva.models.auth.dtos.PasswordResetConfirmDto
-import com.diva.models.auth.dtos.PasswordResetRequestDto
-import com.diva.models.auth.dtos.SessionDataDto
-import com.diva.models.auth.dtos.SignInDto
+import com.diva.models.api.auth.dtos.PasswordResetConfirmDto
+import com.diva.models.api.auth.dtos.PasswordResetRequestDto
+import com.diva.models.api.auth.dtos.SessionDataDto
+import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.session.database.shared.SessionStorage
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaResult

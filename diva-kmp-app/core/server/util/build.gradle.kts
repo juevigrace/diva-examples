@@ -7,6 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.modelsServer)
 
+            implementation(libs.ktor.server.core)
             implementation(libs.ktor.server.auth.jwt)
             implementation(libs.kbcrypt)
         }

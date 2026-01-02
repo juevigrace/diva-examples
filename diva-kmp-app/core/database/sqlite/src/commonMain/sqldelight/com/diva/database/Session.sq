@@ -15,7 +15,7 @@ delete:
 DELETE FROM diva_session
 WHERE id = ?;
 
-findById:
+findOneById:
 SELECT 
   id,
   user_id AS userId,

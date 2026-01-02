@@ -11,9 +11,10 @@ enum class CollectionType(
     TRENDING("trending"),
 }
 
-fun String.toCollectionType(): CollectionType =
-    try {
-        CollectionType.valueOf(this.uppercase())
+fun safeCollectionType(value: String): CollectionType {
+    return try {
+        CollectionType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         CollectionType.ALBUM
     }
+}

@@ -17,12 +17,15 @@ application {
 dependencies {
     implementation(projects.core.server.util)
     implementation(projects.core.database.postgres)
-    implementation(projects.core.models)
+    implementation(projects.core.modelsServer)
 
     implementation(projects.auth.api.authApiHandler)
     implementation(projects.auth.di.authDiServer)
 
-    implementation(projects.session.data.sessionData)
+    implementation(projects.user.api.userApiHandler)
+    implementation(projects.user.di.userDiServer)
+
+    implementation(projects.session.database.sessionDatabaseServer)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)

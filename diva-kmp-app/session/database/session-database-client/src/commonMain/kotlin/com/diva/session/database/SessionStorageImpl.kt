@@ -1,115 +1,132 @@
 package com.diva.session.database
 
 import com.diva.database.DivaDB
-import com.diva.models.database.session.SessionEntity
+import com.diva.models.auth.Session
+import com.diva.models.session.safeSessionStatus
 import com.diva.session.database.shared.SessionStorage
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaResult
 import io.github.juevigrace.diva.core.models.Option
-import io.github.juevigrace.diva.core.models.toDivaError
-import io.github.juevigrace.diva.core.models.tryResult
-import io.github.juevigrace.diva.database.Storage
+import io.github.juevigrace.diva.database.DivaDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class SessionStorageImpl(
-    private val storage: Storage<DivaDB>
+    private val db: DivaDatabase<DivaDB>
 ) : SessionStorage {
-    override suspend fun getSession(id: String): DivaResult<Option<SessionEntity>, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.getSession") }
-        ) {
-            storage.withDb {
-                getOne(
-                    db.sessionQueries.findById(
-                        id,
-                        mapper = SessionEntity::clientEntity
-                    )
+    override suspend fun getAll(limit: Int, offset: Int): DivaResult<List<Session>, DivaError> {
+        return db.getList { sessionQueries.findAll(mapper = ::mapToEntity) }
+    }
+
+    override suspend fun getAllFlow(limit: Int, offset: Int): Flow<DivaResult<List<Session>, DivaError>> {
+        return db.getListAsFlow { sessionQueries.findAll(mapper = ::mapToEntity) }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError> {
+        return db.getOne { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError>> {
+        return db.getOneAsFlow { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError> {
+        return db.getList { sessionQueries.findByUserId(userId.toString(), mapper = ::mapToEntity) }
+    }
+
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    override suspend fun insert(item: Session): DivaResult<Unit, DivaError> {
+        return db.use {
+            transaction {
+                sessionQueries.insert(
+                    id = item.id.toString(),
+                    user_id = item.userId.toString(),
+                    access_token = item.accessToken,
+                    refresh_token = item.refreshToken,
+                    device = item.device,
+                    status = item.status.value,
+                    ip_address = item.ipAddress,
+                    user_agent = item.userAgent,
+                    expires_at = item.expiresAt.toEpochMilliseconds(),
                 )
             }
+            return@use DivaResult.success(Unit)
         }
     }
 
-    override suspend fun getSessionsByUser(userId: String): DivaResult<List<SessionEntity>, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.getSessionsByUser") }
-        ) {
-            storage.withDb {
-                getList(
-                    db.sessionQueries.findByUserId(
-                        userId,
-                        mapper = SessionEntity::clientEntity
-                    )
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    override suspend fun update(item: Session): DivaResult<Unit, DivaError> {
+        return db.use {
+            transaction {
+                sessionQueries.update(
+                    id = item.id.toString(),
+                    access_token = item.accessToken,
+                    refresh_token = item.refreshToken,
+                    device = item.device,
+                    status = item.status.value,
+                    ip_address = item.ipAddress,
+                    user_agent = item.userAgent,
+                    expires_at = item.expiresAt.toEpochMilliseconds(),
                 )
             }
+            return@use DivaResult.success(Unit)
         }
     }
 
-    override suspend fun saveSession(session: SessionEntity): DivaResult<Unit, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.saveSession") }
-        ) {
-            storage.withDb {
-                val result = db.transaction {
-                    db.sessionQueries.insert(
-                        id = session.id,
-                        user_id = session.userId,
-                        access_token = session.accessToken,
-                        refresh_token = session.refreshToken,
-                        device = session.device,
-                        status = session.status,
-                        ip_address = session.ipAddress,
-                        created_at = session.createdAt,
-                        updated_at = session.updatedAt
-                    )
-                }
-                DivaResult.success(result)
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
+        return db.use {
+            transaction {
+                sessionQueries.delete(id.toString())
             }
+            return@use DivaResult.success(Unit)
         }
     }
 
-    override suspend fun updateSession(session: SessionEntity): DivaResult<Unit, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.updateSession") }
-        ) {
-            storage.withDb {
-                val result = db.transaction {
-                    db.sessionQueries.update(
-                        access_token = session.accessToken,
-                        refresh_token = session.refreshToken,
-                        device = session.device,
-                        status = session.status,
-                        ip_address = session.ipAddress,
-                        updated_at = session.updatedAt,
-                        id = session.id
-                    )
-                }
-                DivaResult.success(result)
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError> {
+        return db.use {
+            transaction {
+                sessionQueries.deleteByUserId(userId.toString())
             }
+            return@use DivaResult.success(Unit)
         }
     }
 
-    override suspend fun deleteSession(id: String): DivaResult<Unit, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.updateSession") }
-        ) {
-            storage.withDb {
-                val result = db.transaction {
-                    db.sessionQueries.deleteById(id)
-                }
-                DivaResult.success(result)
-            }
-        }
-    }
-
-    override suspend fun deleteSessionsByUser(userId: String): DivaResult<Unit, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError(origin = "SessionStorage.updateSession") }
-        ) {
-            storage.withDb {
-                val result = db.transaction {
-                    db.sessionQueries.deleteByUserId(userId)
-                }
-                DivaResult.success(result)
-            }
-        }
+    @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
+    private fun mapToEntity(
+        id: String,
+        userId: String,
+        accessToken: String,
+        refreshToken: String,
+        device: String,
+        status: String,
+        ipAddress: String,
+        userAgent: String,
+        expiresAt: Long,
+        createdAt: Long,
+        updatedAt: Long
+    ): Session {
+        return Session(
+            id = Uuid.parse(id),
+            userId = Uuid.parse(userId),
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            device = device,
+            status = safeSessionStatus(status),
+            ipAddress = ipAddress,
+            userAgent = userAgent,
+            expiresAt = Instant.fromEpochMilliseconds(expiresAt),
+            expired = expiresAt < Clock.System.now().toEpochMilliseconds(),
+            createdAt = Instant.fromEpochMilliseconds(createdAt),
+            updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        )
     }
 }

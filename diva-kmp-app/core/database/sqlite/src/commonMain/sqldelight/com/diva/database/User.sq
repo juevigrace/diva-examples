@@ -1,10 +1,10 @@
 insert:
-INSERT INTO diva_user (id, email, username, password_hash, name, alias, avatar, bio, user_verified)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO diva_user (id, email, username, alias, avatar, bio, user_verified)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
-SET email = ?, username = ?, name = ?, alias = ?, avatar = ?, bio = ?, user_verified = ?, updated_at = (strftime('%s', 'now')) 
+SET email = ?, username = ?, alias = ?, avatar = ?, bio = ?, updated_at = (strftime('%s', 'now'))
 WHERE id = ? AND deleted_at IS NULL;
 
 delete:
@@ -17,14 +17,13 @@ SELECT
   id,
   email,
   username,
-  password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
 WHERE id = ? AND deleted_at IS NULL;
 
@@ -33,47 +32,29 @@ SELECT
   id,
   email,
   username,
-  password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?;
-
-findOneByEmail:
-SELECT 
-  id,
-  email,
-  username,
-  password_hash AS passwordHash,
-  name,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_user
-WHERE email = ? AND deleted_at IS NULL;
 
 findOneByUsername:
 SELECT 
   id,
   email,
   username,
-  password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
 WHERE username = ? AND deleted_at IS NULL;

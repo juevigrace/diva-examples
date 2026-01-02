@@ -9,9 +9,10 @@ enum class ReactionType(
     SHARE("share"),
 }
 
-fun String.toReactionType(): ReactionType =
-    try {
-        ReactionType.valueOf(this.uppercase())
+fun safeReactionType(value: String): ReactionType {
+    return try {
+        ReactionType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         ReactionType.LIKE
     }
+}

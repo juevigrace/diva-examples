@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.diva.models.auth.Session
 import io.github.juevigrace.diva.core.models.DivaError
-import io.github.juevigrace.diva.core.models.DivaErrorException
 import io.github.juevigrace.diva.core.models.DivaResult
 import io.github.juevigrace.diva.core.models.Option
 import io.github.juevigrace.diva.core.models.fold
@@ -15,8 +14,6 @@ import io.github.juevigrace.diva.core.models.toDivaError
 import io.github.juevigrace.diva.core.models.tryResult
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.util.AttributeKey
-import sun.jvm.hotspot.HelloWorld.e
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -90,7 +87,7 @@ class JwtHelper(
                     val parsedId = UUID.fromString(sessionId)
                     sessionCallBack(parsedId).fold(
                         onFailure = { err ->
-                            throw DivaErrorException(err)
+                            error(err.message)
                         },
                         onSuccess = { option ->
                             if (option.isEmpty()) {

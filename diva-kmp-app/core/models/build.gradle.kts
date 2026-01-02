@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.models.modelsShared)
+            api(projects.core.models.modelsShared)
         }
     }
 }

@@ -4,21 +4,24 @@ import com.diva.models.collection.Collection
 import com.diva.models.social.interaction.share.Share
 import com.diva.models.social.post.Post
 import io.github.juevigrace.diva.core.models.Option
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
+@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 data class User(
     val id: Uuid,
     val email: String,
     val username: String,
-    val name: String,
+    val passwordHash: Option<String> = Option.None,
     val alias: String,
     val avatar: String,
     val bio: String,
-    val createdAt: Long,
-    val updatedAt: Long,
-    val deletedAt: Option<Long> = Option.None,
+    val userVerified: Boolean = false,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val deletedAt: Option<Instant> = Option.None,
     val followers: List<User> = emptyList(),
     val following: List<User> = emptyList(),
     val posts: List<Post> = emptyList(),

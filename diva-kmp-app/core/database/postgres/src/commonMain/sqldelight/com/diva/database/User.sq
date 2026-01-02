@@ -1,10 +1,20 @@
 insert:
-INSERT INTO diva_user (id, email, username, password_hash, name, alias, avatar, bio, user_verified)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO diva_user (id, email, username, password_hash, alias, avatar, bio, user_verified)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
-SET email = ?, username = ?, name = ?, alias = ?, avatar = ?, bio = ?, user_verified = ?, updated_at = NOW() 
+SET email = ?, username = ?, alias = ?, avatar = ?, bio = ?, updated_at = NOW()
+WHERE id = ? AND deleted_at IS NULL;
+
+updateVerified:
+UPDATE diva_user
+SET user_verified = ?
+WHERE id = ? AND deleted_at IS NULL;
+
+updatePassword:
+UPDATE diva_user
+SET password_hash = ?
 WHERE id = ? AND deleted_at IS NULL;
 
 delete:
@@ -18,15 +28,15 @@ SELECT
   email,
   username,
   password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
-WHERE id = ? AND deleted_at IS NULL;
+WHERE id = ? ;
 
 findAll:
 SELECT 
@@ -34,13 +44,13 @@ SELECT
   email,
   username,
   password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
@@ -52,15 +62,15 @@ SELECT
   email,
   username,
   password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
-WHERE email = ? AND deleted_at IS NULL;
+WHERE email = ? ;
 
 findOneByUsername:
 SELECT 
@@ -68,12 +78,12 @@ SELECT
   email,
   username,
   password_hash AS passwordHash,
-  name,
   alias,
   avatar,
   bio,
   user_verified AS userVerified,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_user
-WHERE username = ? AND deleted_at IS NULL;
+WHERE username = ? ;

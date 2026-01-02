@@ -1,7 +1,7 @@
 package com.diva.auth.api.client
 
-import com.diva.models.auth.dtos.SignInDto
-import com.diva.models.auth.response.SessionResponse
+import com.diva.models.api.auth.dtos.SignInDto
+import com.diva.models.api.auth.response.SessionResponse
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaResult
 
