@@ -1,0 +1,94 @@
+package com.diva.user.api.handler
+
+import com.diva.models.api.ApiResponse
+import com.diva.models.api.user.dtos.CreateUserDto
+import com.diva.models.api.user.dtos.UpdateUserDto
+import com.diva.models.api.user.dtos.UpdateUserEmailDto
+import com.diva.models.auth.Session
+import com.diva.models.server.AUTH_JWT_KEY
+import com.diva.models.server.SESSION_KEY
+import com.diva.user.data.UserService
+import com.diva.util.respond
+import com.diva.verification.data.VerificationService
+import io.github.juevigrace.diva.core.models.map
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.patch
+import io.ktor.server.routing.post
+import io.ktor.server.routing.put
+import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
+import kotlin.uuid.ExperimentalUuidApi
+
+@OptIn(ExperimentalUuidApi::class)
+fun Routing.userApiHandler() {
+    val service: UserService by inject()
+    val verificationService: VerificationService by inject()
+
+    route("/user") {
+        get("/") {
+            service.getUsers(50, 0)
+        }
+
+        get("/{id}") {
+            val idStr: String = call.parameters["id"] ?: return@get call.respond(
+                HttpStatusCode.BadRequest,
+                ApiResponse<Nothing>(message = "Missing id")
+            )
+            service.getUser(idStr).respond(call)
+        }
+
+        authenticate(AUTH_JWT_KEY) {
+            // todo: block access with permissions
+            post("/") {
+                val dto: CreateUserDto = call.receive()
+                service.createUser(dto) { id ->
+                    verificationService.createVerification(id).map { _ ->
+                        // todo: send email
+                    }
+                }.map { id -> ApiResponse(data = id.toString(), message = "User created") }.respond(call)
+            }
+
+            put {
+                val session: Session = call.attributes.getOrNull(SESSION_KEY)
+                    ?: return@put call.respond(
+                        status = HttpStatusCode.Unauthorized,
+                        message = ApiResponse<Nothing>(message = "You are not authenticated")
+                    )
+                val dto: UpdateUserDto = call.receive()
+                service.updateUser(dto, session).respond(call)
+            }
+
+            route("/update") {
+                route("/email") {
+                    post("/request") {
+                        call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
+                    }
+
+                    post("/confirm") {
+                        call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
+                    }
+
+                    patch("/") {
+                        val dto: UpdateUserEmailDto = call.receive()
+                        service.updateEmail(dto).respond(call)
+                    }
+                }
+            }
+
+            delete {
+                val session: Session = call.attributes.getOrNull(SESSION_KEY)
+                    ?: return@delete call.respond(
+                        status = HttpStatusCode.Unauthorized,
+                        message = ApiResponse<Nothing>(message = "You are not authenticated")
+                    )
+                service.deleteUser(session.id).respond(call)
+            }
+        }
+    }
+}

@@ -11,6 +11,4 @@ data class SessionDataDto(
     val ipAddress: String? = null,
     @SerialName("user_agent")
     val userAgent: String? = null,
-    @SerialName("fingerprint")
-    val fingerprint: String? = null,
 )

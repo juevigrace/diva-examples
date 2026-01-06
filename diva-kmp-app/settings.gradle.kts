@@ -49,22 +49,22 @@ if (shouldIncludeClientProjects()) {
     include(":core:ui")
 
     include(
-        ":auth:api:auth-api-client",
-        ":auth:data:auth-data-client",
-        ":auth:di:auth-di-client",
-        ":auth:ui:auth-ui",
+        ":features:auth:api:auth-api-client",
+        ":features:auth:data:auth-data-client",
+        ":features:auth:di:auth-di-client",
+        ":features:auth:ui:auth-ui",
     )
 
     include(
-        ":session:database:session-database-client",
+        ":features:session:database:session-database-client",
     )
 
     include(
-        ":user:api:user-api-client",
-        ":user:data:user-data-client",
-        ":user:database:user-database-client",
-        ":user:di:user-di-client",
-        ":user:ui:user-ui",
+        ":features:user:api:user-api-client",
+        ":features:user:data:user-data-client",
+        ":features:user:database:user-database-client",
+        ":features:user:di:user-di-client",
+        ":features:user:ui:user-ui",
     )
 }
 
@@ -78,20 +78,26 @@ include(":core:database:postgres")
 include(":core:models-server")
 
 include(
-    ":auth:api:auth-api-handler",
-    ":auth:data:auth-data-service",
-    ":auth:di:auth-di-server",
+    ":features:auth:api:auth-api-handler",
+    ":features:auth:data:auth-data-service",
+    ":features:auth:di:auth-di-server",
 )
 
 include(
-    ":session:database:session-database-server",
+    ":features:session:database:session-database-server",
 )
 
 include(
-    ":user:api:user-api-handler",
-    ":user:data:user-data-service",
-    ":user:database:user-database-server",
-    ":user:di:user-di-server",
+    ":features:user:api:user-api-handler",
+    ":features:user:data:user-data-service",
+    ":features:user:database:user-database-server",
+    ":features:user:di:user-di-server",
+)
+
+include(
+    ":features:verification:data:verification-data",
+    ":features:verification:database:verification-database",
+    ":features:verification:di:verification-di",
 )
 
 // Shared projects
@@ -102,9 +108,9 @@ include(
 )
 
 include(
-    ":session:database:session-database-shared",
+    ":features:session:database:session-database-shared",
 )
 
 include(
-    ":user:database:user-database-shared",
+    ":features:user:database:user-database-shared",
 )

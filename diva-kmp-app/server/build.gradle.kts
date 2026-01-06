@@ -19,13 +19,15 @@ dependencies {
     implementation(projects.core.database.postgres)
     implementation(projects.core.modelsServer)
 
-    implementation(projects.auth.api.authApiHandler)
-    implementation(projects.auth.di.authDiServer)
+    implementation(projects.features.auth.api.authApiHandler)
+    implementation(projects.features.auth.di.authDiServer)
 
-    implementation(projects.user.api.userApiHandler)
-    implementation(projects.user.di.userDiServer)
+    implementation(projects.features.session.database.sessionDatabaseServer)
 
-    implementation(projects.session.database.sessionDatabaseServer)
+    implementation(projects.features.user.api.userApiHandler)
+    implementation(projects.features.user.di.userDiServer)
+
+    implementation(projects.features.verification.di.verificationDi)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
