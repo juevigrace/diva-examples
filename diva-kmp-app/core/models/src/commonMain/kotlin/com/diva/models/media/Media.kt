@@ -2,7 +2,7 @@ package com.diva.models.media
 
 import com.diva.models.VisibilityType
 import com.diva.models.user.User
-import io.github.juevigrace.diva.core.models.Option
+import io.github.juevigrace.diva.core.Option
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

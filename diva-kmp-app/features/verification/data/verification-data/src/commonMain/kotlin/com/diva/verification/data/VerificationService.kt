@@ -1,8 +1,8 @@
 package com.diva.verification.data
 
 import com.diva.models.server.UserVerification
-import io.github.juevigrace.diva.core.models.DivaError
-import io.github.juevigrace.diva.core.models.DivaResult
+import io.github.juevigrace.diva.core.DivaResult
+import io.github.juevigrace.diva.core.errors.DivaError
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

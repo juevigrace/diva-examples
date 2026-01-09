@@ -16,67 +16,43 @@ DELETE FROM diva_session
 WHERE id = ?;
 
 findOneById:
-SELECT 
-  id,
-  user_id AS userId,
-  access_token AS accessToken,
-  refresh_token AS refreshToken,
-  device,
-  status,
-  ip_address AS ipAddress,
-  user_agent AS userAgent,
-  expires_at AS expiresAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_session 
-WHERE id = ?;
-
-findAll:
-SELECT 
-  id,
-  user_id AS userId,
-  access_token AS accessToken,
-  refresh_token AS refreshToken,
-  device,
-  status,
-  ip_address AS ipAddress,
-  user_agent AS userAgent,
-  expires_at AS expiresAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_session 
-ORDER BY created_at DESC;
+SELECT
+  s.id,
+  s.access_token AS accessToken,
+  s.refresh_token AS refreshToken,
+  s.device,
+  s.status,
+  s.ip_address AS ipAddress,
+  s.user_agent AS userAgent,
+  s.expires_at AS expiresAt,
+  s.created_at AS createdAt,
+  s.updated_at AS updatedAt,
+  u.id AS userId,
+  u.email,
+  u.username,
+  u.created_at AS uCreatedAt,
+  u.updated_at AS uUpdatedAt
+FROM diva_session s
+JOIN diva_user u ON s.user_id = u.id
+WHERE s.id = ? AND u.deleted_at IS NULL;
 
 findByUserId:
-SELECT 
-  id,
-  user_id AS userId,
-  access_token AS accessToken,
-  refresh_token AS refreshToken,
-  device,
-  status,
-  ip_address AS ipAddress,
-  user_agent AS userAgent,
-  expires_at AS expiresAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_session 
-WHERE user_id = ?
-ORDER BY created_at DESC;
-
-findActiveByUserId:
-SELECT 
-  id,
-  user_id AS userId,
-  access_token AS accessToken,
-  refresh_token AS refreshToken,
-  device,
-  status,
-  ip_address AS ipAddress,
-  user_agent AS userAgent,
-  expires_at AS expiresAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_session 
-WHERE user_id = ? AND status = 'active'
-ORDER BY created_at DESC;
+SELECT
+  s.id,
+  s.access_token AS accessToken,
+  s.refresh_token AS refreshToken,
+  s.device,
+  s.status,
+  s.ip_address AS ipAddress,
+  s.user_agent AS userAgent,
+  s.expires_at AS expiresAt,
+  s.created_at AS createdAt,
+  s.updated_at AS updatedAt,
+  u.id AS userId,
+  u.email,
+  u.username,
+  u.created_at AS uCreatedAt,
+  u.updated_at AS uUpdatedAt
+FROM diva_session s
+JOIN diva_user u ON s.user_id = u.id
+WHERE s.id = ? AND u.deleted_at IS NULL;

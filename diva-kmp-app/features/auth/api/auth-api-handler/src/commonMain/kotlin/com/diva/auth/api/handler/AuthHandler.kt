@@ -6,14 +6,14 @@ import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.models.api.auth.dtos.SignUpDto
-import com.diva.models.api.user.dtos.VerifyEmailDto
+import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.auth.Session
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
 import com.diva.user.data.UserService
 import com.diva.util.respond
 import com.diva.verification.data.VerificationService
-import io.github.juevigrace.diva.core.models.map
+import io.github.juevigrace.diva.core.map
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -83,39 +83,47 @@ fun Routing.authApiHandler() {
                         status = HttpStatusCode.Unauthorized,
                         message = ApiResponse<Nothing>(message = "You are not authenticated")
                     )
-                val dto: VerifyEmailDto = call.receive()
+                val dto: EmailTokenDto = call.receive()
                 service.verifyUser(
                     onVerify = {
                         verificationService.verify(dto.token)
                     },
                     onVerified = {
-                        userService.updateVerified(session.userId)
+                        userService.updateVerified(session.user.id)
                     }
                 ).respond(call)
             }
         }
 
-        route("/password/reset") {
-            post("/request") {
-                call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
-            }
+        route("/forgot") {
+            route("/password") {
+                post("/request") {
+                    call.respond(
+                        HttpStatusCode.NotImplemented,
+                        ApiResponse<Nothing>(message = "Not implemented")
+                    )
+                }
 
-            post("/confirm") {
-                call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
-            }
+                post("/confirm") {
+                    call.respond(
+                        HttpStatusCode.NotImplemented,
+                        ApiResponse<Nothing>(message = "Not implemented")
+                    )
+                }
 
-            authenticate(AUTH_JWT_KEY) {
-                patch("/") {
-                    val session: Session = call.attributes.getOrNull(SESSION_KEY)
-                        ?: return@patch call.respond(
-                            status = HttpStatusCode.Unauthorized,
-                            message = ApiResponse<Nothing>(message = "You are not authenticated")
-                        )
+                authenticate(AUTH_JWT_KEY) {
+                    patch("/") {
+                        val session: Session = call.attributes.getOrNull(SESSION_KEY)
+                            ?: return@patch call.respond(
+                                status = HttpStatusCode.Unauthorized,
+                                message = ApiResponse<Nothing>(message = "You are not authenticated")
+                            )
 
-                    val dto: PasswordUpdateDto = call.receive()
-                    service.passwordReset(dto) { hash ->
-                        userService.updatePassword(session.userId, hash)
-                    }.respond(call)
+                        val dto: PasswordUpdateDto = call.receive()
+                        service.passwordReset(dto) { hash ->
+                            userService.updatePassword(session.user.id, hash)
+                        }.respond(call)
+                    }
                 }
             }
         }

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VerifyEmailDto(
+data class EmailTokenDto(
     @SerialName("token")
     val token: String,
 )

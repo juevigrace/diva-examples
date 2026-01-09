@@ -14,5 +14,7 @@ data class CreateUserDto(
     @SerialName("alias")
     val alias: String = username,
     @SerialName("avatar")
-    val avatar: String? = null,
+    val avatar: String = "",
+    @SerialName("bio")
+    val bio: String = "",
 )

@@ -9,6 +9,8 @@ data class UpdateUserDto(
     val username: String,
     @SerialName("alias")
     val alias: String = username,
+    @SerialName("bio")
+    val bio: String = "",
     @SerialName("avatar")
-    val avatar: String? = null
+    val avatar: String = ""
 )

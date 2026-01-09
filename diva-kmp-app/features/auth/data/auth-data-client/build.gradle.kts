@@ -10,6 +10,7 @@ kotlin {
             implementation(projects.features.session.database.sessionDatabaseShared)
 
             implementation(projects.core.models)
+            implementation(projects.core.models.modelsApi)
         }
     }
 }

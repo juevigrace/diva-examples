@@ -1,3 +1,6 @@
+count:
+SELECT COUNT(*) FROM diva_user;
+
 insert:
 INSERT INTO diva_user (id, email, username, alias, avatar, bio, user_verified)
 VALUES (?, ?, ?, ?, ?, ?, ?);

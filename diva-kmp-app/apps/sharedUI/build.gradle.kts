@@ -9,7 +9,9 @@ kotlin {
             implementation(projects.core.ui)
 
             implementation(projects.features.auth.di.authDiClient)
+            implementation(projects.features.user.di.userDiClient)
 
+            implementation(libs.diva.network.client)
             api(libs.diva.di)
         }
 

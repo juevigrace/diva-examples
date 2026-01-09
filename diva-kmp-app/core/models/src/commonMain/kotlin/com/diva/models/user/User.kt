@@ -3,7 +3,7 @@ package com.diva.models.user
 import com.diva.models.collection.Collection
 import com.diva.models.social.interaction.share.Share
 import com.diva.models.social.post.Post
-import io.github.juevigrace.diva.core.models.Option
+import io.github.juevigrace.diva.core.Option
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
@@ -15,9 +15,9 @@ data class User(
     val email: String,
     val username: String,
     val passwordHash: Option<String> = Option.None,
-    val alias: String,
-    val avatar: String,
-    val bio: String,
+    val alias: String = username,
+    val avatar: String = "",
+    val bio: String = "",
     val userVerified: Boolean = false,
     val createdAt: Instant,
     val updatedAt: Instant,

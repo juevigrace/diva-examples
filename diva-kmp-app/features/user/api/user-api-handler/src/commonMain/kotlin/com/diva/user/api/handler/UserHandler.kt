@@ -3,14 +3,14 @@ package com.diva.user.api.handler
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.api.user.dtos.UpdateUserDto
-import com.diva.models.api.user.dtos.UpdateUserEmailDto
+import com.diva.models.api.user.dtos.UserEmailDto
 import com.diva.models.auth.Session
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
 import com.diva.user.data.UserService
 import com.diva.util.respond
 import com.diva.verification.data.VerificationService
-import io.github.juevigrace.diva.core.models.map
+import io.github.juevigrace.diva.core.map
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -32,11 +32,13 @@ fun Routing.userApiHandler() {
 
     route("/user") {
         get("/") {
-            service.getUsers(50, 0)
+            val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
+            service.getUsers(page, pageSize).respond(call)
         }
 
         get("/{id}") {
-            val idStr: String = call.parameters["id"] ?: return@get call.respond(
+            val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
                 HttpStatusCode.BadRequest,
                 ApiResponse<Nothing>(message = "Missing id")
             )
@@ -75,8 +77,13 @@ fun Routing.userApiHandler() {
                     }
 
                     patch("/") {
-                        val dto: UpdateUserEmailDto = call.receive()
-                        service.updateEmail(dto).respond(call)
+                        val session: Session = call.attributes.getOrNull(SESSION_KEY)
+                            ?: return@patch call.respond(
+                                status = HttpStatusCode.Unauthorized,
+                                message = ApiResponse<Nothing>(message = "You are not authenticated")
+                            )
+                        val dto: UserEmailDto = call.receive()
+                        service.updateEmail(dto, session).respond(call)
                     }
                 }
             }

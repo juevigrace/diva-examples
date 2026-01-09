@@ -1,6 +1,7 @@
 package com.diva.server.router
 
 import com.diva.auth.api.handler.authApiHandler
+import com.diva.user.api.handler.userApiHandler
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
@@ -35,6 +36,7 @@ fun Routing.applicationRoutes() {
         }
         route("/api") {
             authApiHandler()
+            userApiHandler()
         }
     }
 }

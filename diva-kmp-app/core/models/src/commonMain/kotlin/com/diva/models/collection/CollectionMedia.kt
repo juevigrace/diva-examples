@@ -2,7 +2,7 @@ package com.diva.models.collection
 
 import com.diva.models.media.Media
 import com.diva.models.user.User
-import io.github.juevigrace.diva.core.models.Option
+import io.github.juevigrace.diva.core.Option
 
 data class CollectionMedia(
     val media: Media,

@@ -1,6 +1,6 @@
 package com.diva.verification.data
 
-import com.diva.models.api.user.dtos.VerifyEmailDto
+import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.verification.database.VerificationStorage
 import io.github.juevigrace.diva.core.models.DivaError
 import io.github.juevigrace.diva.core.models.DivaResult
@@ -15,7 +15,7 @@ class VerificationServiceImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun verify(dto: VerifyEmailDto): DivaResult<Unit, DivaError> {
+    override suspend fun verify(dto: EmailTokenDto): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 }

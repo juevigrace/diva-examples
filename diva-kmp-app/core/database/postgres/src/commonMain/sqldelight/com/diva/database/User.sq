@@ -1,3 +1,6 @@
+count:
+SELECT COUNT(*) FROM diva_user;
+
 insert:
 INSERT INTO diva_user (id, email, username, password_hash, alias, avatar, bio, user_verified)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);
@@ -17,10 +20,33 @@ UPDATE diva_user
 SET password_hash = ?
 WHERE id = ? AND deleted_at IS NULL;
 
+updateEmail:
+UPDATE diva_user
+SET email = ?
+WHERE id = ? AND deleted_at IS NULL;
+
 delete:
 UPDATE diva_user 
 SET deleted_at = NOW() 
 WHERE id = ? AND deleted_at IS NULL;
+
+findAll:
+SELECT
+  id,
+  email,
+  username,
+  password_hash AS passwordHash,
+  alias,
+  avatar,
+  bio,
+  user_verified AS userVerified,
+  created_at AS createdAt,
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
+FROM diva_user
+WHERE deleted_at IS NULL
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
 
 findOneById:
 SELECT 
@@ -37,24 +63,6 @@ SELECT
   deleted_at AS deletedAt
 FROM diva_user
 WHERE id = ? ;
-
-findAll:
-SELECT 
-  id,
-  email,
-  username,
-  password_hash AS passwordHash,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC
-LIMIT ? OFFSET ?;
 
 findOneByEmail:
 SELECT 

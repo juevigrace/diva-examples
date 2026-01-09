@@ -3,11 +3,12 @@ package com.diva.user.database
 import com.diva.database.DivaDB
 import com.diva.models.user.User
 import com.diva.user.database.shared.UserStorage
-import io.github.juevigrace.diva.core.models.DivaError
-import io.github.juevigrace.diva.core.models.DivaErrorException
-import io.github.juevigrace.diva.core.models.DivaResult
-import io.github.juevigrace.diva.core.models.Option
-import io.github.juevigrace.diva.core.models.isEmpty
+import io.github.juevigrace.diva.core.DivaResult
+import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.database.DatabaseAction
+import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.DivaErrorException
+import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
@@ -22,65 +23,64 @@ import kotlin.uuid.toKotlinUuid
 class UserStorageImpl(
     private val db: DivaDatabase<DivaDB>
 ) : UserStorage {
-    override suspend fun getAll(limit: Int, offset: Int): DivaResult<List<User>, DivaError> {
+    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+        return db.use { DivaResult.success(userQueries.count().executeAsOne()) }
+    }
+
+    override suspend fun getAll(limit: Int, offset: Int): DivaResult<List<User>, DivaError.DatabaseError> {
         return db.getList { userQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
-    override suspend fun getAllFlow(limit: Int, offset: Int): Flow<DivaResult<List<User>, DivaError>> {
+    override suspend fun getAllFlow(limit: Int, offset: Int): Flow<DivaResult<List<User>, DivaError.DatabaseError>> {
         return db.getListAsFlow { userQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getById(id: Uuid): DivaResult<Option<User>, DivaError> {
+    override suspend fun getById(id: Uuid): DivaResult<Option<User>, DivaError.DatabaseError> {
         return db.getOne { userQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<User>, DivaError>> {
+    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<User>, DivaError.DatabaseError>> {
         return db.getOneAsFlow { userQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
     }
 
-    override suspend fun getByEmail(email: String): DivaResult<Option<User>, DivaError> {
+    override suspend fun getByEmail(email: String): DivaResult<Option<User>, DivaError.DatabaseError> {
         return db.getOne { userQueries.findOneByEmail(email, mapper = ::mapToEntity) }
     }
 
-    override suspend fun getByUsername(username: String): DivaResult<Option<User>, DivaError> {
+    override suspend fun getByUsername(username: String): DivaResult<Option<User>, DivaError.DatabaseError> {
         return db.getOne { userQueries.findOneByUsername(username, mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun insert(item: User): DivaResult<Unit, DivaError> {
+    override suspend fun insert(item: User): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            when {
-                item.passwordHash.isEmpty() -> {
-                    throw DivaErrorException(
-                        DivaError.validation(
-                            "passwordHash",
-                            "required",
-                            "Password is not present"
-                        )
-                    )
-                }
-                (item.passwordHash as Option.Some<String>).value.isEmpty() -> {
-                    throw DivaErrorException(
-                        DivaError.validation(
-                            "passwordHash",
-                            "required",
-                            "Password is empty"
-                        )
-                    )
-                }
-            }
-            transaction {
+            val rows: Long = transactionWithResult {
+                val password: String = item.passwordHash.fold(
+                    onNone = {
+                        rollback(-1)
+                    },
+                    onSome = { value -> value }
+                )
                 userQueries.insert(
                     id = item.id.toJavaUuid(),
                     email = item.email,
                     username = item.username,
-                    password_hash = (item.passwordHash as Option.Some<String>).value,
+                    password_hash = password,
                     alias = item.alias,
                     avatar = item.avatar,
                     bio = item.bio,
                     user_verified = false,
+                )
+            }
+            if (rows.toInt() == -1 || rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.INSERT,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
                 )
             }
             return@use DivaResult.success(Unit)
@@ -88,9 +88,9 @@ class UserStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun update(item: User): DivaResult<Unit, DivaError> {
+    override suspend fun update(item: User): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.update(
                     email = item.email,
                     username = item.username,
@@ -100,17 +100,60 @@ class UserStorageImpl(
                     id = item.id.toJavaUuid()
                 )
             }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.UPDATE,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
+                )
+            }
             return@use DivaResult.success(Unit)
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateVerified(id: Uuid, verified: Boolean): DivaResult<Unit, DivaError> {
+    override suspend fun updateEmail(
+        id: Uuid,
+        email: String
+    ): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
-                userQueries.updateVerified(
-                    user_verified = verified,
+            val rows: Long = transactionWithResult {
+                userQueries.updateEmail(
+                    email = email,
                     id = id.toJavaUuid()
+                )
+            }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.UPDATE,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
+                )
+            }
+            return@use DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updateVerified(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userQueries.updateVerified(
+                    user_verified = true,
+                    id = id.toJavaUuid()
+                )
+            }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.UPDATE,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
                 )
             }
             return@use DivaResult.success(Unit)
@@ -121,12 +164,21 @@ class UserStorageImpl(
     override suspend fun updatePassword(
         id: Uuid,
         passwordHash: String
-    ): DivaResult<Unit, DivaError> {
+    ): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.updatePassword(
                     password_hash = passwordHash,
                     id = id.toJavaUuid()
+                )
+            }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.UPDATE,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
                 )
             }
             return@use DivaResult.success(Unit)
@@ -134,10 +186,19 @@ class UserStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.delete(id.toJavaUuid())
+            }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        operation = DatabaseAction.DELETE,
+                        table = "diva_user",
+                        details = "No rows affected"
+                    )
+                )
             }
             return@use DivaResult.success(Unit)
         }
