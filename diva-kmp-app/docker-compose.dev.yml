@@ -22,26 +22,44 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
       JWT_REALM: ${JWT_REALM}
-      KTOR_ENV: ${KTOR_ENV}
     depends_on:
       diva_db:
         condition: service_healthy
     volumes:
+      # Base files
       - ./server:/app/server
-      - ./auth/api/auth-api-handler:/app/auth/api/auth-api-handler
-      - ./auth/data/auth-data-server:/app/auth/data/auth-data-service
-      - ./auth/data/auth-data-shared:/app/auth/data/auth-data-shared
-      - ./auth/database/auth-database-server:/app/auth/database/auth-database-server
-      - ./auth/database/auth-database-shared:/app/auth/database/auth-database-shared
-      - ./auth/di/auth-di-server:/app/auth/di/auth-di-server
-      - ./auth/models:/app/auth/models
-      - ./core/models:/app/core/models
-      - ./core/database/postgres:/app/core/database/postgres
       - ./build-logic:/app/build-logic
       - ./build.gradle.kts:/app/build.gradle.kts
       - ./settings.gradle.kts:/app/settings.gradle.kts
       - ./gradle.properties:/app/gradle.properties
       - ./gradle:/app/gradle
+      
+      # Core server modules
+      - ./core/server/util:/app/core/server/util
+      - ./core/models-server:/app/core/models-server
+      - ./core/models:/app/core/models
+      - ./core/database/postgres:/app/core/database/postgres
+      
+      # Auth modules (corrected paths)
+      - ./features/auth/api/auth-api-handler:/app/features/auth/api/auth-api-handler
+      - ./features/auth/data/auth-data-service:/app/features/auth/data/auth-data-service
+      - ./features/auth/di/auth-di-server:/app/features/auth/di/auth-di-server
+      
+      # Session modules
+      - ./features/session/database/session-database-server:/app/features/session/database/session-database-server
+      - ./features/session/database/session-database-shared:/app/features/session/database/session-database-shared
+      
+      # User modules
+      - ./features/user/api/user-api-handler:/app/features/user/api/user-api-handler
+      - ./features/user/data/user-data-service:/app/features/user/data/user-data-service
+      - ./features/user/database/user-database-server:/app/features/user/database/user-database-server
+      - ./features/user/database/user-database-shared:/app/features/user/database/user-database-shared
+      - ./features/user/di/user-di-server:/app/features/user/di/user-di-server
+      
+      # Verification modules
+      - ./features/verification/data/verification-data:/app/features/verification/data/verification-data
+      - ./features/verification/database/verification-database:/app/features/verification/database/verification-database
+      - ./features/verification/di/verification-di:/app/features/verification/di/verification-di
     networks:
       - net
   diva_db:

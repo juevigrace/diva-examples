@@ -2,12 +2,8 @@ plugins {
     id("divabuild.library-server")
 }
 
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            api(projects.features.session.database.sessionDatabaseShared)
+dependencies {
+    api(projects.features.session.database.sessionDatabaseShared)
 
-            api(projects.core.database.postgres)
-        }
-    }
+    api(projects.core.database.postgres)
 }

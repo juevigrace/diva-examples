@@ -15,9 +15,7 @@ import io.ktor.server.websocket.timeout
 import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureRouting() {
-    install(StatusPages) {
-
-    }
+    install(StatusPages) {}
     install(SSE)
     install(WebSockets) {
         pingPeriod = 15.seconds

@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod
+      target: runtime
     command: ["java", "-jar", "./bin/diva-ktor-server.jar"]
     restart: unless-stopped
     ports:

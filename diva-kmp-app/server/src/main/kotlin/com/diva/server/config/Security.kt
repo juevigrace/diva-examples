@@ -6,11 +6,11 @@ import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
 import com.diva.session.database.shared.SessionStorage
 import com.diva.util.JwtHelper
-import io.github.juevigrace.diva.core.models.DivaError
-import io.github.juevigrace.diva.core.models.DivaResult
-import io.github.juevigrace.diva.core.models.Option
-import io.github.juevigrace.diva.core.models.isEmpty
-import io.github.juevigrace.diva.core.models.onSuccess
+import io.github.juevigrace.diva.core.DivaResult
+import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.isEmpty
+import io.github.juevigrace.diva.core.onSuccess
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authentication
@@ -18,6 +18,7 @@ import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.response.respond
 import org.koin.core.parameter.parametersOf
 import org.koin.ktor.ext.inject
+import kotlin.getValue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toKotlinUuid
 

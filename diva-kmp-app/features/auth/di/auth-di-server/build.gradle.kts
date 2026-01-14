@@ -2,14 +2,10 @@ plugins {
     id("divabuild.library-server")
 }
 
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            implementation(projects.features.auth.data.authDataService)
+dependencies {
+    implementation(projects.features.auth.data.authDataService)
 
-            implementation(projects.features.session.database.sessionDatabaseServer)
+    implementation(projects.features.session.database.sessionDatabaseServer)
 
-            implementation(libs.koin.core)
-        }
-    }
+    implementation(libs.koin.core)
 }

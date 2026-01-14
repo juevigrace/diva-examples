@@ -5,7 +5,9 @@ import com.diva.models.user.User
 import com.diva.user.database.shared.UserStorage
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.ExperimentalTime
@@ -41,7 +43,7 @@ class UserStorageImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun insert(item: User): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.insert(
                     id = item.id.toString(),
                     email = item.email,
@@ -52,6 +54,15 @@ class UserStorageImpl(
                     user_verified = item.userVerified,
                 )
             }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        DatabaseAction.INSERT,
+                        "diva_user",
+                        "Failed to insert"
+                    )
+                )
+            }
             return@use DivaResult.success(Unit)
         }
     }
@@ -59,7 +70,7 @@ class UserStorageImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun update(item: User): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.update(
                     email = item.email,
                     username = item.username,
@@ -69,6 +80,15 @@ class UserStorageImpl(
                     id = item.id.toString()
                 )
             }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        DatabaseAction.UPDATE,
+                        "diva_user",
+                        "Failed to update"
+                    )
+                )
+            }
             return@use DivaResult.success(Unit)
         }
     }
@@ -76,8 +96,17 @@ class UserStorageImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
-            transaction {
+            val rows: Long = transactionWithResult {
                 userQueries.delete(id.toString())
+            }
+            if (rows.toInt() == 0) {
+                throw DivaErrorException(
+                    DivaError.DatabaseError(
+                        DatabaseAction.DELETE,
+                        "diva_user",
+                        "Failed to delete"
+                    )
+                )
             }
             return@use DivaResult.success(Unit)
         }

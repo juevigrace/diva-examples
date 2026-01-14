@@ -3,19 +3,15 @@ plugins {
     alias(libs.plugins.sqldelight)
 }
 
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            api(libs.diva.database)
-        }
-    }
+dependencies {
+    api(libs.diva.database)
 }
 
 sqldelight {
     databases {
         create("DivaDB") {
             packageName.set("com.diva.database")
-            schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
+            schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
             dialect(libs.sqldelight.postgres.dialect)
             generateAsync.set(true)
             deriveSchemaFromMigrations.set(true)

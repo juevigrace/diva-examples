@@ -1,4 +1,11 @@
+import divabuild.internal.libs
+
 plugins {
     id("divabuild.library-base")
-    id("divabuild.targets-jvm")
+    id("org.jetbrains.kotlin.jvm")
+    `java-library`
+}
+
+dependencies {
+    implementation(libs.diva.core)
 }

@@ -21,6 +21,27 @@ import kotlin.uuid.Uuid
 class SessionStorageImpl(
     private val db: DivaDatabase<DivaDB>
 ) : SessionStorage {
+    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+        return db.use {
+            val value: Long = sessionQueries.count().executeAsOne()
+            DivaResult.success(value)
+        }
+    }
+
+    override suspend fun getAll(
+        limit: Int,
+        offset: Int
+    ): DivaResult<List<Session>, DivaError.DatabaseError> {
+        return db.getList { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
+    }
+
+    override suspend fun getAllFlow(
+        limit: Int,
+        offset: Int
+    ): Flow<DivaResult<List<Session>, DivaError.DatabaseError>> {
+        return db.getListAsFlow { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
+    }
+
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError.DatabaseError> {
         return db.getOne { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
@@ -143,20 +164,26 @@ class SessionStorageImpl(
         expiresAt: Long,
         createdAt: Long,
         updatedAt: Long,
-        userId: String,
-        email: String,
-        username: String,
-        uCreatedAt: Long,
-        uUpdatedAt: Long
+        userId: String?,
+        email: String?,
+        username: String?,
+        uCreatedAt: Long?,
+        uUpdatedAt: Long?
     ): Session {
+        require(userId != null) { "User ID cannot be null" }
+        require(email != null) { "Email cannot be null" }
+        require(username != null) { "Username cannot be null" }
+        require(uCreatedAt != null) { "User created at cannot be null" }
+        require(uUpdatedAt != null) { "User updated at cannot be null" }
+
         return Session(
             id = Uuid.parse(id),
             user = User(
                 id = Uuid.parse(userId),
                 email = email,
                 username = username,
-                createdAt = Instant.fromEpochMilliseconds(uCreatedAt.toLong()),
-                updatedAt = Instant.fromEpochMilliseconds(uUpdatedAt.toLong())
+                createdAt = Instant.fromEpochMilliseconds(uCreatedAt),
+                updatedAt = Instant.fromEpochMilliseconds(uUpdatedAt)
             ),
             accessToken = accessToken,
             refreshToken = refreshToken,
@@ -164,10 +191,10 @@ class SessionStorageImpl(
             status = safeSessionStatus(status),
             ipAddress = ipAddress,
             userAgent = userAgent,
-            expiresAt = Instant.fromEpochMilliseconds(expiresAt.toLong()),
+            expiresAt = Instant.fromEpochMilliseconds(expiresAt),
             expired = expiresAt < Clock.System.now().toEpochMilliseconds(),
-            createdAt = Instant.fromEpochMilliseconds(createdAt.toLong()),
-            updatedAt = Instant.fromEpochMilliseconds(updatedAt.toLong()),
+            createdAt = Instant.fromEpochMilliseconds(createdAt),
+            updatedAt = Instant.fromEpochMilliseconds(updatedAt),
         )
     }
 }

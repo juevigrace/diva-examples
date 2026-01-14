@@ -2,19 +2,15 @@ plugins {
     id("divabuild.library-server")
 }
 
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            implementation(projects.features.user.data.userDataService)
-            implementation(projects.features.verification.data.verificationData)
+dependencies {
+    implementation(projects.features.user.data.userDataService)
+    implementation(projects.features.verification.data.verificationData)
 
-            implementation(projects.core.modelsServer)
-            implementation(projects.core.server.util)
+    implementation(projects.core.modelsServer)
+    implementation(projects.core.server.util)
 
-            implementation(libs.ktor.server.auth)
-            implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.core)
 
-            implementation(libs.koin.ktor)
-        }
-    }
+    implementation(libs.koin.ktor)
 }
