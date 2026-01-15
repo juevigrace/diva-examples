@@ -12,6 +12,7 @@ import io.github.juevigrace.diva.core.isPresent
 import io.github.juevigrace.diva.core.map
 import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.tryResult
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
@@ -22,7 +23,7 @@ class VerificationServiceImpl(
     private val storage: VerificationStorage
 ) : VerificationService {
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    override suspend fun createVerification(userId: Uuid): DivaResult<UserVerification, DivaError> {
+    override suspend fun createVerificationCode(userId: Uuid): DivaResult<UserVerification, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -32,6 +33,7 @@ class VerificationServiceImpl(
                 expiresAt = Clock.System.now().plus(15.minutes),
                 createdAt = Clock.System.now(),
             )
+
             storage.insert(item).onFailure { err -> throw DivaErrorException(err) }
             storage.getById(userId)
                 .onFailure { err -> throw DivaErrorException(err) }
@@ -100,6 +102,11 @@ class VerificationServiceImpl(
     }
 
     private fun generateToken(): String {
-        return ""
+        return Random.nextInt(LOWER_BOUND, UPPER_BOUND).toString()
+    }
+
+    companion object {
+        private const val LOWER_BOUND = 100000
+        private const val UPPER_BOUND = 999999
     }
 }

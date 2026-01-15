@@ -28,6 +28,10 @@ class SessionStorageImpl(
         }
     }
 
+    override suspend fun getCurrentSession(): DivaResult<Option<Session>, DivaError.DatabaseError> {
+        return db.getOne { sessionQueries.findCurrent(mapper = ::mapToEntity) }
+    }
+
     override suspend fun getAll(
         limit: Int,
         offset: Int
@@ -35,7 +39,7 @@ class SessionStorageImpl(
         return db.getList { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
-    override suspend fun getAllFlow(
+    override fun getAllFlow(
         limit: Int,
         offset: Int
     ): Flow<DivaResult<List<Session>, DivaError.DatabaseError>> {
@@ -48,7 +52,7 @@ class SessionStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError.DatabaseError>> {
         return db.getOneAsFlow { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 

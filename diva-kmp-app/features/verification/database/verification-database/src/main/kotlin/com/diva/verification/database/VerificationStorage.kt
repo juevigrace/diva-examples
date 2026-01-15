@@ -24,7 +24,7 @@ interface VerificationStorage : Storage<UserVerification> {
         return DivaResult.Failure(DivaError.DatabaseError(DatabaseAction.SELECT, details = "Action not available"))
     }
 
-    override suspend fun getAllFlow(
+    override fun getAllFlow(
         limit: Int,
         offset: Int
     ): Flow<DivaResult<List<UserVerification>, DivaError.DatabaseError>> {

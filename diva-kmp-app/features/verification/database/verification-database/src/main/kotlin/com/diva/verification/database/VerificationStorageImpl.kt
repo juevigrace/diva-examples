@@ -30,7 +30,7 @@ class VerificationStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<UserVerification>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<UserVerification>, DivaError.DatabaseError>> {
         return db.getOneAsFlow {
             emailVerificationTokensQueries.findOneByUserId(id.toJavaUuid(), mapper = ::mapToEntity)
         }

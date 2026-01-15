@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
     implementation(projects.core.modelsServer)
-    api(projects.core.server.mail)
 
     implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.auth.jwt)
-    implementation(libs.kbcrypt)
+    implementation(libs.ktor.server.html)
+
+    implementation(libs.resend)
 }

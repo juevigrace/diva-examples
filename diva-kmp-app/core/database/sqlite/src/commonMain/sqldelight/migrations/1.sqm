@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS diva_session(
     access_token TEXT NOT NULL,
     refresh_token TEXT NOT NULL,
     device TEXT NOT NULL DEFAULT '',
+    is_current INTEGER AS Boolean NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'closed')),
     ip_address TEXT NOT NULL DEFAULT '',
     user_agent TEXT NOT NULL DEFAULT '',

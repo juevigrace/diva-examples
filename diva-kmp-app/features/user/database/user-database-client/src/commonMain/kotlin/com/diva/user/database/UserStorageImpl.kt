@@ -26,7 +26,7 @@ class UserStorageImpl(
         return db.getList { userQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
-    override suspend fun getAllFlow(limit: Int, offset: Int): Flow<DivaResult<List<User>, DivaError.DatabaseError>> {
+    override fun getAllFlow(limit: Int, offset: Int): Flow<DivaResult<List<User>, DivaError.DatabaseError>> {
         return db.getListAsFlow { userQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
@@ -36,7 +36,7 @@ class UserStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<User>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<User>, DivaError.DatabaseError>> {
         return db.getOneAsFlow { userQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 

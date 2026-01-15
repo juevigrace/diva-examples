@@ -6,9 +6,10 @@ import io.github.juevigrace.diva.core.errors.DivaError
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+// TODO: create multiple verification methods?
 interface VerificationService {
     @OptIn(ExperimentalUuidApi::class)
-    suspend fun createVerification(userId: Uuid): DivaResult<UserVerification, DivaError>
+    suspend fun createVerificationCode(userId: Uuid): DivaResult<UserVerification, DivaError>
 
     // TODO: should this need a session?
     @OptIn(ExperimentalUuidApi::class)

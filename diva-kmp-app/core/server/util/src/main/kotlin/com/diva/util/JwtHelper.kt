@@ -78,16 +78,17 @@ class JwtHelper(
 
             val principal: JWTPrincipal? = when {
                 sessionId == null -> {
-                    error("Session id is null")
+                    null
                 }
                 userId == null -> {
-                    error("User id is null")
+                    null
                 }
                 else -> {
                     val parsedId = UUID.fromString(sessionId)
                     sessionCallBack(parsedId).fold(
                         onFailure = { err ->
-                            error(err.message)
+                            println(err.toString())
+                            null
                         },
                         onSuccess = { option ->
                             if (option.isEmpty()) {

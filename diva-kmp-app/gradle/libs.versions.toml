@@ -15,7 +15,7 @@ ktor = "3.3.3"
 sqldelight = "2.2.1"
 kdotenv = "6.5.1"
 kbcrypt = "1.0.9"
-kmail = "1.4.0"
+resend = "4.11.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -83,6 +83,7 @@ ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = 
 ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor" }
 ktor-server-forwarded-header = { module = "io.ktor:ktor-server-forwarded-header", version.ref = "ktor" }
 ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers", version.ref = "ktor" }
+ktor-server-html = { module = "io.ktor:ktor-server-html-builder", version.ref = "ktor" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.ref = "ktor" }
 ktor-server-caching-headers = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
@@ -92,6 +93,5 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 
 kbcrypt = { group = "com.ToxicBakery.library.bcrypt", name = "bcrypt", version.ref = "kbcrypt" }
 kdotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "kdotenv" }
-kmail-core = { group = "net.axay", name = "simplekotlinmail-core", version.ref = "kmail" }
-kmail-client = { group = "net.axay", name = "simplekotlinmail-client", version.ref = "kmail" }
-kmail-html = { group = "net.axay", name = "simplekotlinmail-html", version.ref = "kmail" }
+
+resend = { group = "com.resend", name = "resend-java", version.ref = "resend" }

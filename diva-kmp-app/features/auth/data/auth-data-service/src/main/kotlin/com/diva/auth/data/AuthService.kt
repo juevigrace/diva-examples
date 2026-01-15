@@ -8,6 +8,7 @@ import com.diva.models.api.auth.dtos.SignUpDto
 import com.diva.models.api.auth.response.SessionResponse
 import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.auth.Session
+import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
 import kotlin.uuid.ExperimentalUuidApi
@@ -27,7 +28,10 @@ interface AuthService {
         dto: SessionDataDto,
         session: Session
     ): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError>
-    suspend fun signIn(dto: SignInDto): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError>
+    suspend fun signIn(
+        dto: SignInDto,
+        onUserSearch: suspend (username: String) -> DivaResult<User, DivaError>
+    ): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError>
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun signUp(

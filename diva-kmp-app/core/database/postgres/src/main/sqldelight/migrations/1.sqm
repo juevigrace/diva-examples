@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS diva_user(
 
 CREATE TABLE diva_email_verification_tokens (
     user_id UUID NOT NULL PRIMARY KEY,
-    token TEXT NOT NULL UNIQUE,
+    token TEXT NOT NULL,
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     used_at TIMESTAMPTZ DEFAULT NULL,

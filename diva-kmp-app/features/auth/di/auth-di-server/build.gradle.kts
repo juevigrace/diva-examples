@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation(projects.core.server.util)
+
     implementation(projects.features.auth.data.authDataService)
 
     implementation(projects.features.session.database.sessionDatabaseServer)

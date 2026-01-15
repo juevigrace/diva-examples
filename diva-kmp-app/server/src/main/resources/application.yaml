@@ -19,3 +19,6 @@ jwt:
     issuer: ${JWT_ISSUER}
     audience: ${JWT_AUDIENCE}
     realm: ${JWT_REALM}
+mail:
+    apiKey: ${RESEND_API_KEY}
+    fromEmail: ${RESEND_FROM_EMAIL}

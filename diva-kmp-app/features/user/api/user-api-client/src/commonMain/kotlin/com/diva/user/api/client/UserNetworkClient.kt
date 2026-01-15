@@ -2,9 +2,9 @@ package com.diva.user.api.client
 
 import com.diva.models.api.PaginationResponse
 import com.diva.models.api.user.dtos.CreateUserDto
+import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.dtos.UpdateUserDto
 import com.diva.models.api.user.dtos.UserEmailDto
-import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.response.UserResponse
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError

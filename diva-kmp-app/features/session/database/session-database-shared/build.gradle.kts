@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             api(projects.core.models)
 
-            implementation(libs.diva.database)
+            api(libs.diva.database)
         }
     }
 }

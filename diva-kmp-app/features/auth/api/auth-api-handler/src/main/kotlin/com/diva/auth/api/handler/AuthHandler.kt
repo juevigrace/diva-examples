@@ -1,6 +1,8 @@
 package com.diva.auth.api.handler
 
 import com.diva.auth.data.AuthService
+import com.diva.mail.KMail
+import com.diva.mail.buildCodeVerificationEmail
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.auth.dtos.SessionDataDto
@@ -30,19 +32,24 @@ fun Routing.authApiHandler() {
     val service: AuthService by inject()
     val userService: UserService by inject()
     val verificationService: VerificationService by inject()
+    val kMail: KMail by inject()
 
     route("/auth") {
         post("/signIn") {
             val dto: SignInDto = call.receive()
-            service.signIn(dto).respond(call)
+            service.signIn(dto, onUserSearch = userService::getUserByUsername).respond(call)
         }
 
         post("/signUp") {
             val dto: SignUpDto = call.receive()
             service.signUp(dto) { userDto ->
                 userService.createUser(userDto) { id ->
-                    verificationService.createVerification(id).map { _ ->
-                        // todo: send email
+                    verificationService.createVerificationCode(id).map { v ->
+                        kMail.sendEmail(
+                            to = userDto.email,
+                            subject = "Email Verification",
+                            html = buildCodeVerificationEmail(v)
+                        )
                     }
                 }
             }.respond(call)

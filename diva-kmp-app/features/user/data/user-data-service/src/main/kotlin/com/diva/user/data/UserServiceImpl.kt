@@ -220,8 +220,6 @@ class UserServiceImpl(
                 avatar = dto.avatar,
                 bio = dto.bio,
                 userVerified = false,
-                createdAt = Clock.System.now(),
-                updatedAt = Clock.System.now(),
             )
             storage
                 .insert(user)

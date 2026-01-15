@@ -1,5 +1,7 @@
 package com.diva.user.api.handler
 
+import com.diva.mail.KMail
+import com.diva.mail.buildCodeVerificationEmail
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.api.user.dtos.UpdateUserDto
@@ -8,6 +10,7 @@ import com.diva.models.auth.Session
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
 import com.diva.user.data.UserService
+import com.diva.util.Encryption
 import com.diva.util.respond
 import com.diva.verification.data.VerificationService
 import io.github.juevigrace.diva.core.errors.asNetworkError
@@ -33,6 +36,7 @@ import kotlin.uuid.ExperimentalUuidApi
 fun Routing.userApiHandler() {
     val service: UserService by inject()
     val verificationService: VerificationService by inject()
+    val kMail: KMail by inject()
 
     route("/user") {
         get("/") {
@@ -53,11 +57,16 @@ fun Routing.userApiHandler() {
             // todo: block access with permissions
             post("/") {
                 val dto: CreateUserDto = call.receive()
-                service.createUser(dto) { id ->
-                    verificationService.createVerification(id).map { _ ->
-                        // todo: send email
+                service
+                    .createUser(dto.copy(password = Encryption.hashPassword(dto.password))) { id ->
+                        verificationService.createVerificationCode(id).map { v ->
+                            kMail.sendEmail(
+                                to = dto.email,
+                                subject = "Email Verification",
+                                html = buildCodeVerificationEmail(v)
+                            )
+                        }
                     }
-                }
                     .map { id -> ApiResponse(data = id.toString(), message = "User created") }
                     .mapError { err ->
                         err.asNetworkError(

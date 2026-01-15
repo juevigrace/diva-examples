@@ -72,6 +72,7 @@ if (shouldIncludeClientProjects()) {
 include(":server")
 
 include(":core:server:util")
+include(":core:server:mail")
 
 include(":core:database:postgres")
 

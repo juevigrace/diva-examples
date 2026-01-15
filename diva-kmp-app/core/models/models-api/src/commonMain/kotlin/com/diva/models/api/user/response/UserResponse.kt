@@ -23,4 +23,6 @@ data class UserResponse(
     val createdAt: Long,
     @SerialName("updatedAt")
     val updatedAt: Long,
+    @SerialName("deletedAt")
+    val deletedAt: Long? = null
 )
