@@ -58,11 +58,39 @@ services:
       - ./features/user/database/user-database-shared:/app/features/user/database/user-database-shared
       - ./features/user/di/user-di-server:/app/features/user/di/user-di-server
       
-      # Verification modules
-      - ./features/verification/data/verification-data:/app/features/verification/data/verification-data
-      - ./features/verification/database/verification-database:/app/features/verification/database/verification-database
-      - ./features/verification/di/verification-di:/app/features/verification/di/verification-di
-    networks:
+       # Verification modules
+       - ./features/verification/data/verification-data:/app/features/verification/data/verification-data
+       - ./features/verification/database/verification-database:/app/features/verification/database/verification-database
+       - ./features/verification/di/verification-di:/app/features/verification/di/verification-di
+
+      # Media modules
+      - ./features/media/api/media-api-handler:/app/features/media/api/media-api-handler
+      - ./features/media/data/media-data-service:/app/features/media/data/media-data-service
+      - ./features/media/database/media-database-server:/app/features/media/database/media-database-server
+      - ./features/media/database/media-database-shared:/app/features/media/database/media-database-shared
+      - ./features/media/di/media-di-server:/app/features/media/di/media-di-server
+
+      # Collection modules
+      - ./features/collection/api/collection-api-handler:/app/features/collection/api/collection-api-handler
+      - ./features/collection/data/collection-data-service:/app/features/collection/data/collection-data-service
+      - ./features/collection/database/collection-database-server:/app/features/collection/database/collection-database-server
+      - ./features/collection/database/collection-database-shared:/app/features/collection/database/collection-database-shared
+      - ./features/collection/di/collection-di-server:/app/features/collection/di/collection-di-server
+
+      # Chat modules
+      - ./features/chat/api/chat-api-handler:/app/features/chat/api/chat-api-handler
+      - ./features/chat/data/chat-data-service:/app/features/chat/data/chat-data-service
+      - ./features/chat/database/chat-database-server:/app/features/chat/database/chat-database-server
+      - ./features/chat/database/chat-database-shared:/app/features/chat/database/chat-database-shared
+      - ./features/chat/di/chat-di-server:/app/features/chat/di/chat-di-server
+
+      # Social modules
+      - ./features/social/api/social-api-handler:/app/features/social/api/social-api-handler
+      - ./features/social/data/social-data-service:/app/features/social/data/social-data-service
+      - ./features/social/database/social-database-server:/app/features/social/database/social-database-server
+      - ./features/social/database/social-database-shared:/app/features/social/database/social-database-shared
+      - ./features/social/di/social-di-server:/app/features/social/di/social-di-server
+     networks:
       - net
   diva_db:
     container_name: diva_db_dev

@@ -66,6 +66,62 @@ if (shouldIncludeClientProjects()) {
         ":features:user:di:user-di-client",
         ":features:user:ui:user-ui",
     )
+
+    include(
+        ":features:app:home:data:home-data",
+        ":features:app:home:di:home-di",
+        ":features:app:home:ui:home-ui",
+    )
+
+    include(
+        ":features:app:library:data:library-data",
+        ":features:app:library:di:library-di",
+        ":features:app:library:ui:library-ui",
+    )
+
+    include(
+        ":features:app:profile:data:profile-data",
+        ":features:app:profile:di:profile-di",
+        ":features:app:profile:ui:profile-ui",
+    )
+
+    include(
+        ":features:app:settings:data:settings-data",
+        ":features:app:settings:di:settings-di",
+        ":features:app:settings:ui:settings-ui",
+    )
+
+    include(
+        ":features:media:api:media-api-client",
+        ":features:media:data:media-data-client",
+        ":features:media:database:media-database-client",
+        ":features:media:di:media-di-client",
+        ":features:media:ui:media-ui",
+    )
+
+    include(
+        ":features:collection:api:collection-api-client",
+        ":features:collection:data:collection-data-client",
+        ":features:collection:database:collection-database-client",
+        ":features:collection:di:collection-di-client",
+        ":features:collection:ui:collection-ui",
+    )
+
+    include(
+        ":features:chat:api:chat-api-client",
+        ":features:chat:data:chat-data-client",
+        ":features:chat:database:chat-database-client",
+        ":features:chat:di:chat-di-client",
+        ":features:chat:ui:chat-ui",
+    )
+
+    include(
+        ":features:social:api:social-api-client",
+        ":features:social:data:social-data-client",
+        ":features:social:database:social-database-client",
+        ":features:social:di:social-di-client",
+        ":features:social:ui:social-ui",
+    )
 }
 
 // Server projects
@@ -101,6 +157,34 @@ include(
     ":features:verification:di:verification-di",
 )
 
+include(
+    ":features:media:api:media-api-handler",
+    ":features:media:data:media-data-service",
+    ":features:media:database:media-database-server",
+    ":features:media:di:media-di-server",
+)
+
+include(
+    ":features:collection:api:collection-api-handler",
+    ":features:collection:data:collection-data-service",
+    ":features:collection:database:collection-database-server",
+    ":features:collection:di:collection-di-server",
+)
+
+include(
+    ":features:chat:api:chat-api-handler",
+    ":features:chat:data:chat-data-service",
+    ":features:chat:database:chat-database-server",
+    ":features:chat:di:chat-di-server",
+)
+
+include(
+    ":features:social:api:social-api-handler",
+    ":features:social:data:social-data-service",
+    ":features:social:database:social-database-server",
+    ":features:social:di:social-di-server",
+)
+
 // Shared projects
 include(
     ":core:models",
@@ -114,4 +198,20 @@ include(
 
 include(
     ":features:user:database:user-database-shared",
+)
+
+include(
+    ":features:media:database:media-database-shared",
+)
+
+include(
+    ":features:collection:database:collection-database-shared",
+)
+
+include(
+    ":features:chat:database:chat-database-shared",
+)
+
+include(
+    ":features:social:database:social-database-shared",
 )

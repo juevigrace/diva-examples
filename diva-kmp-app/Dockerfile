@@ -33,6 +33,35 @@ COPY features/user/di/user-di-server features/user/di/user-di-server
 COPY features/verification/data/verification-data features/verification/data/verification-data
 COPY features/verification/database/verification-database features/verification/database/verification-database
 COPY features/verification/di/verification-di features/verification/di/verification-di
+
+# Media modules
+COPY features/media/api/media-api-handler features/media/api/media-api-handler
+COPY features/media/data/media-data-service features/media/data/media-data-service
+COPY features/media/database/media-database-server features/media/database/media-database-server
+COPY features/media/database/media-database-shared features/media/database/media-database-shared
+COPY features/media/di/media-di-server features/media/di/media-di-server
+
+# Collection modules
+COPY features/collection/api/collection-api-handler features/collection/api/collection-api-handler
+COPY features/collection/data/collection-data-service features/collection/data/collection-data-service
+COPY features/collection/database/collection-database-server features/collection/database/collection-database-server
+COPY features/collection/database/collection-database-shared features/collection/database/collection-database-shared
+COPY features/collection/di/collection-di-server features/collection/di/collection-di-server
+
+# Chat modules
+COPY features/chat/api/chat-api-handler features/chat/api/chat-api-handler
+COPY features/chat/data/chat-data-service features/chat/data/chat-data-service
+COPY features/chat/database/chat-database-server features/chat/database/chat-database-server
+COPY features/chat/database/chat-database-shared features/chat/database/chat-database-shared
+COPY features/chat/di/chat-di-server features/chat/di/chat-di-server
+
+# Social modules
+COPY features/social/api/social-api-handler features/social/api/social-api-handler
+COPY features/social/data/social-data-service features/social/data/social-data-service
+COPY features/social/database/social-database-server features/social/database/social-database-server
+COPY features/social/database/social-database-shared features/social/database/social-database-shared
+COPY features/social/di/social-di-server features/social/di/social-di-server
+
 RUN gradle dependencies -PexcludeCompose=true --no-daemon
 
 # Stage 2: Build Application
