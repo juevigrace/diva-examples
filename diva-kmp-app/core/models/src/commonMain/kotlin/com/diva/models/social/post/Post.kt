@@ -12,7 +12,6 @@ import kotlin.uuid.Uuid
 data class Post(
     val id: Uuid,
     val author: User,
-    val type: PostType,
     val title: String,
     val content: String,
     val media: Option<Media>,
