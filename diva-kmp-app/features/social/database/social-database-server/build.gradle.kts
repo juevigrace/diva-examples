@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.features.social.database.socialDatabaseShared)
+    api(projects.core.database.databaseShared)
 
-    api(projects.core.database.postgres)
+    api(projects.core.database.databaseServer)
 }

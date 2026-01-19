@@ -1,16 +1,14 @@
 package com.diva.auth.data
 
 import com.diva.auth.api.client.AuthNetworkClient
+import com.diva.database.session.SessionStorage
 import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.auth.dtos.SessionDataDto
-import com.diva.models.api.auth.dtos.SignInDto
-import com.diva.models.api.auth.dtos.SignUpDto
 import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.dtos.UserEmailDto
 import com.diva.models.auth.Session
 import com.diva.models.auth.SignInForm
 import com.diva.models.auth.SignUpForm
-import com.diva.session.database.shared.SessionStorage
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.onFailure

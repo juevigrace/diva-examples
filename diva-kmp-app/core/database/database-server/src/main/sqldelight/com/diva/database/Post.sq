@@ -1,0 +1,60 @@
+insert:
+INSERT INTO diva_post (id, author_id, title, content, media_id, collection_id, visibility)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE diva_post 
+SET title = ?, content = ?, visibility = ?, edited_at = NOW(), updated_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+delete:
+UPDATE diva_post 
+SET deleted_at = NOW() 
+WHERE id = ? AND deleted_at IS NULL;
+
+findById:
+SELECT 
+  id,
+  author_id AS authorId,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE id = ? AND deleted_at IS NULL;
+
+findAll:
+SELECT 
+  id,
+  author_id AS authorId,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE deleted_at IS NULL
+ORDER BY created_at DESC;
+
+findByAuthor:
+SELECT 
+  id,
+  author_id AS authorId,
+  title,
+  content,
+  media_id AS mediaId,
+  collection_id AS collectionId,
+  visibility,
+  edited_at AS editedAt,
+  created_at AS createdAt,
+  updated_at AS updatedAt
+FROM diva_post
+WHERE author_id = ? AND deleted_at IS NULL
+ORDER BY created_at DESC;

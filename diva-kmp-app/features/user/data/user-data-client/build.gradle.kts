@@ -7,8 +7,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.features.user.api.userApiClient)
 
-            implementation(projects.features.user.database.userDatabaseShared)
-            implementation(projects.features.session.database.sessionDatabaseShared)
+            implementation(projects.core.database.databaseShared)
+            implementation(projects.core.database.databaseShared)
 
             implementation(projects.core.models)
         }

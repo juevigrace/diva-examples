@@ -15,8 +15,10 @@ application {
 }
 
 dependencies {
+    implementation(libs.diva.core)
+
     implementation(projects.core.server.util)
-    implementation(projects.core.database.postgres)
+    implementation(projects.core.database.databaseServer)
     implementation(projects.core.modelsServer)
 
     implementation(projects.features.auth.api.authApiHandler)

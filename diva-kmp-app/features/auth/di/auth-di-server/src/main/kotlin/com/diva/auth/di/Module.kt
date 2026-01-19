@@ -2,8 +2,8 @@ package com.diva.auth.di
 
 import com.diva.auth.data.AuthService
 import com.diva.auth.data.AuthServiceImpl
+import com.diva.database.session.SessionStorage
 import com.diva.session.database.SessionStorageImpl
-import com.diva.session.database.shared.SessionStorage
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf

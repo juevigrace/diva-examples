@@ -1,5 +1,6 @@
 package com.diva.auth.data
 
+import com.diva.database.session.SessionStorage
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.auth.dtos.SessionDataDto
@@ -10,7 +11,6 @@ import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.auth.Session
 import com.diva.models.session.SessionStatus
 import com.diva.models.user.User
-import com.diva.session.database.shared.SessionStorage
 import com.diva.util.Encryption
 import com.diva.util.JwtHelper
 import io.github.juevigrace.diva.core.DivaResult
@@ -24,8 +24,6 @@ import io.github.juevigrace.diva.core.map
 import io.github.juevigrace.diva.core.mapError
 import io.github.juevigrace.diva.core.network.HttpRequestMethod
 import io.github.juevigrace.diva.core.network.HttpStatusCodes
-import io.github.juevigrace.diva.core.onFailure
-import io.github.juevigrace.diva.core.onSuccess
 import io.github.juevigrace.diva.core.tryResult
 import kotlin.time.Clock
 import kotlin.time.Duration

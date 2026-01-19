@@ -5,9 +5,9 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.features.media.database.mediaDatabaseShared)
+            api(projects.core.database.databaseShared)
 
-            api(projects.core.database.sqlite)
+            api(projects.core.database.databaseClient)
         }
     }
 }

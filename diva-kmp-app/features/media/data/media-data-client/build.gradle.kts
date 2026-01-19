@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.features.media.api.mediaApiClient)
 
-            implementation(projects.features.media.database.mediaDatabaseShared)
+            implementation(projects.core.database.databaseShared)
 
             implementation(projects.core.models)
         }

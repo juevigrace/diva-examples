@@ -1,14 +1,14 @@
 package com.diva.user.data
 
+import com.diva.database.session.SessionStorage
+import com.diva.database.user.UserStorage
 import com.diva.models.Pagination
 import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.dtos.UpdateUserDto
 import com.diva.models.api.user.dtos.UserEmailDto
 import com.diva.models.auth.SignUpForm
 import com.diva.models.user.User
-import com.diva.session.database.shared.SessionStorage
 import com.diva.user.api.client.UserNetworkClient
-import com.diva.user.database.shared.UserStorage
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.fold

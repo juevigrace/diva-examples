@@ -1,12 +1,12 @@
 [versions]
 app-version-name = "1.0.0"
 app-version-code = "1"
-agp = "8.13.2"
+agp = "9.0.0"
 android-compileSdk = "36"
 android-targetSdk = "36"
 android-minSdk = "24"
 compose-hot-reload = "1.0.0"
-compose-multiplatform = "1.9.3"
+compose-multiplatform = "1.10.0"
 diva = "0.0.5"
 koin = "4.1.1"
 kotlin = "2.2.21"
@@ -23,7 +23,6 @@ android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

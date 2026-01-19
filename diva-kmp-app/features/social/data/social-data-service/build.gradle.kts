@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.features.social.database.socialDatabaseShared)
+    implementation(projects.core.database.databaseShared)
 
     implementation(projects.core.modelsServer)
 }

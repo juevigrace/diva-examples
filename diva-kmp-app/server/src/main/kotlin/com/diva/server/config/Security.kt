@@ -1,10 +1,10 @@
 package com.diva.server.config
 
+import com.diva.database.session.SessionStorage
 import com.diva.models.api.ApiResponse
 import com.diva.models.auth.Session
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
-import com.diva.session.database.shared.SessionStorage
 import com.diva.util.JwtHelper
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option

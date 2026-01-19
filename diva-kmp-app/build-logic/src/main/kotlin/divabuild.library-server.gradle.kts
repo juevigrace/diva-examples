@@ -1,7 +1,7 @@
 import divabuild.internal.libs
 
 plugins {
-    id("divabuild.library-base")
+    id("divabuild.app-package")
     id("org.jetbrains.kotlin.jvm")
     `java-library`
 }

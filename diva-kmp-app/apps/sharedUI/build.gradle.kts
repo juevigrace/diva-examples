@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.database.sqlite)
+            implementation(projects.core.database.databaseClient)
             implementation(projects.core.ui)
 
             implementation(projects.features.auth.di.authDiClient)

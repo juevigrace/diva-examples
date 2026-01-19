@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.features.chat.database.chatDatabaseShared)
+    implementation(projects.core.database.databaseShared)
 
     implementation(projects.core.modelsServer)
 }

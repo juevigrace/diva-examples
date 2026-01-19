@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
 }
 
@@ -13,10 +12,13 @@ dependencies {
 android {
     namespace = "com.diva.app"
 
-    compileSdk =
-        libs.versions.android.compileSdk
+    compileSdk {
+        version = release(
+            libs.versions.android.compileSdk
             .get()
             .toInt()
+        )
+    }
 
     defaultConfig {
         minSdk =
@@ -71,8 +73,6 @@ android {
         create("prod")
 
         create("dev")
-
-        create("mock")
 
         all {
             dimension = "environment"

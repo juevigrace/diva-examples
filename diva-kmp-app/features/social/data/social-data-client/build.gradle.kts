@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.features.social.api.socialApiClient)
 
-            implementation(projects.features.social.database.socialDatabaseShared)
+            implementation(projects.core.database.databaseShared)
 
             implementation(projects.core.models)
         }

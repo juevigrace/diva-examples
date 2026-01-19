@@ -1,10 +1,10 @@
 package com.diva.session.database
 
 import com.diva.database.DivaDB
+import com.diva.database.session.SessionStorage
 import com.diva.models.auth.Session
 import com.diva.models.session.safeSessionStatus
 import com.diva.models.user.User
-import com.diva.session.database.shared.SessionStorage
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction

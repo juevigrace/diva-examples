@@ -44,7 +44,7 @@ if (shouldIncludeClientProjects()) {
         ":apps:sharedUI",
     )
 
-    include(":core:database:sqlite")
+    include(":core:database:database-client")
 
     include(":core:ui")
 
@@ -130,7 +130,7 @@ include(":server")
 include(":core:server:util")
 include(":core:server:mail")
 
-include(":core:database:postgres")
+include(":core:database:database-server")
 
 include(":core:models-server")
 
@@ -187,31 +187,11 @@ include(
 
 // Shared projects
 include(
+    ":core:database:database-shared"
+)
+
+include(
     ":core:models",
     ":core:models:models-shared",
     ":core:models:models-api",
-)
-
-include(
-    ":features:session:database:session-database-shared",
-)
-
-include(
-    ":features:user:database:user-database-shared",
-)
-
-include(
-    ":features:media:database:media-database-shared",
-)
-
-include(
-    ":features:collection:database:collection-database-shared",
-)
-
-include(
-    ":features:chat:database:chat-database-shared",
-)
-
-include(
-    ":features:social:database:social-database-shared",
 )

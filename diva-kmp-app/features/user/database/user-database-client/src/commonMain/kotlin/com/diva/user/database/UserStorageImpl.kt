@@ -1,8 +1,8 @@
 package com.diva.user.database
 
 import com.diva.database.DivaDB
+import com.diva.database.user.UserStorage
 import com.diva.models.user.User
-import com.diva.user.database.shared.UserStorage
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction

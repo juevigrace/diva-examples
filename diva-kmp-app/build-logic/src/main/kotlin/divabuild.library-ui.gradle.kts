@@ -1,6 +1,7 @@
 import divabuild.internal.libs
 
 plugins {
+    id("divabuild.library-kmp-base")
     id("divabuild.library-targets")
     id("divabuild.setup-compose-multiplatform")
     id("divabuild.serialization")

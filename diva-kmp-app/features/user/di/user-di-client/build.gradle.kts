@@ -9,6 +9,8 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.core.database.databaseShared)
+
             implementation(projects.features.user.api.userApiClient)
 
             implementation(projects.features.user.database.userDatabaseClient)
