@@ -31,6 +31,21 @@ dependencies {
 
     implementation(projects.features.verification.di.verificationDi)
 
+    implementation(projects.features.chat.api.chatApiHandler)
+    implementation(projects.features.chat.di.chatDiServer)
+
+    implementation(projects.features.collection.api.collectionApiHandler)
+    implementation(projects.features.collection.di.collectionDiServer)
+
+    implementation(projects.features.media.api.mediaApiHandler)
+    implementation(projects.features.media.di.mediaDiServer)
+
+    implementation(projects.features.permissions.api.permissionsApiHandler)
+    implementation(projects.features.permissions.di.permissionsDiServer)
+
+    implementation(projects.features.social.api.socialApiHandler)
+    implementation(projects.features.social.di.socialDiServer)
+
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
     implementation(libs.ktor.server.content.negotiation)

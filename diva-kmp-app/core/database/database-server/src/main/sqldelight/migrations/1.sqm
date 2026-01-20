@@ -25,15 +25,6 @@ CREATE TABLE IF NOT EXISTS diva_user(
     deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
-CREATE TABLE diva_email_verification_tokens (
-    user_id UUID NOT NULL PRIMARY KEY,
-    token TEXT NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    used_at TIMESTAMPTZ DEFAULT NULL,
-    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS diva_session(
     id UUID NOT NULL PRIMARY KEY,
     user_id UUID NOT NULL,
@@ -46,6 +37,15 @@ CREATE TABLE IF NOT EXISTS diva_session(
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE diva_email_verification_tokens (
+    user_id UUID NOT NULL PRIMARY KEY,
+    token TEXT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    used_at TIMESTAMPTZ DEFAULT NULL,
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
 );
 

@@ -16,11 +16,11 @@ dependencies {
 compose {
     desktop {
         application {
-            mainClass = "io.github.juevigrace.diva.app.MainKt"
+            mainClass = "com.diva.app.MainKt"
 
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-                packageName = "io.github.juevigrace.diva.app"
+                packageName = "com.diva.app"
                 packageVersion = libs.versions.app.version.name.get()
             }
         }

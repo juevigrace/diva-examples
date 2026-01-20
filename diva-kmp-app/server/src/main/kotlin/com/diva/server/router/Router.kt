@@ -1,6 +1,11 @@
 package com.diva.server.router
 
 import com.diva.auth.api.handler.authApiHandler
+import com.diva.chat.api.handler.chatApiHandler
+import com.diva.collection.api.handler.collectionApiHandler
+import com.diva.media.api.handler.mediaApiHandler
+import com.diva.media.api.handler.tagApiHandler
+import com.diva.social.api.handler.socialApiHandler
 import com.diva.user.api.handler.userApiHandler
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
@@ -36,6 +41,11 @@ fun Routing.applicationRoutes() {
         }
         route("/api") {
             authApiHandler()
+            chatApiHandler()
+            collectionApiHandler()
+            tagApiHandler()
+            mediaApiHandler()
+            socialApiHandler()
             userApiHandler()
         }
     }
