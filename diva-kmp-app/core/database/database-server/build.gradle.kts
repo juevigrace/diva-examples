@@ -4,6 +4,9 @@ plugins {
 }
 
 dependencies {
+    api(projects.core.database.databaseShared)
+    api(projects.core.modelsServer)
+
     api(libs.diva.database)
 }
 

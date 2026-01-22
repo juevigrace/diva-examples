@@ -45,12 +45,15 @@ fun Routing.userApiHandler() {
             service.getUsers(page, pageSize).respond(call)
         }
 
-        get("/{id}") {
-            val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
-                HttpStatusCode.BadRequest,
-                ApiResponse<Nothing>(message = "Missing id")
-            )
-            service.getUser(idStr).respond(call)
+        route("/{id}") {
+            get("/") {
+                val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    ApiResponse<Nothing>(message = "Missing id")
+                )
+                service.getUser(idStr).respond(call)
+            }
+            userPermissionsHandler()
         }
 
         authenticate(AUTH_JWT_KEY) {

@@ -2,6 +2,7 @@ package com.diva.server.di.database
 
 import app.cash.sqldelight.db.SqlDriver
 import com.diva.database.DivaDB
+import com.diva.server.database.Seed
 import io.github.juevigrace.diva.core.getOrThrow
 import io.github.juevigrace.diva.database.DivaDatabase
 import io.github.juevigrace.diva.database.driver.DriverProvider
@@ -41,6 +42,10 @@ fun databaseModule(config: ApplicationConfig): Module {
                 driver = driver,
                 db = DivaDB(driver),
             )
+        }
+
+        single<Seed> {
+            Seed(get())
         }
     }
 }

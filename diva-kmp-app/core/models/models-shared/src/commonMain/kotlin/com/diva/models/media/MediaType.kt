@@ -10,7 +10,7 @@ enum class MediaType(
 }
 
 fun safeMediaType(value: String): MediaType {
-    return  try {
+    return try {
         MediaType.valueOf(value.uppercase())
     } catch (_: IllegalArgumentException) {
         MediaType.UNSPECIFIED

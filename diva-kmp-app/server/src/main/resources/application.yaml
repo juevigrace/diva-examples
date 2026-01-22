@@ -22,3 +22,7 @@ jwt:
 mail:
     apiKey: ${RESEND_API_KEY}
     fromEmail: ${RESEND_FROM_EMAIL}
+root:
+    username: ${ROOT_USERNAME}
+    email: ${ROOT_EMAIL}
+    password: ${ROOT_PASSWORD}

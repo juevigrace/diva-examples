@@ -11,6 +11,8 @@ CREATE TYPE collection_enum AS ENUM (
 CREATE TYPE media_type_enum AS ENUM ('image', 'video', 'audio');
 CREATE TYPE session_status_enum AS ENUM ('active', 'expired', 'closed');
 
+CREATE TYPE role_enum AS ENUM ('admin', 'user', 'moderator');
+
 CREATE TABLE IF NOT EXISTS diva_user(
     id UUID NOT NULL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS diva_user(
     avatar TEXT NOT NULL DEFAULT '',
     bio TEXT NOT NULL DEFAULT '',
     user_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    role role_enum NOT NULL DEFAULT 'user',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ DEFAULT NULL
@@ -38,6 +41,30 @@ CREATE TABLE IF NOT EXISTS diva_session(
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_permissions(
+    id UUID NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE DEFAULT,
+    description VARCHAR(255) NOT NULL DEFAULT '',
+    role_level role_enum NOT NULL DEFAULT 'admin',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS diva_user_permissions(
+    permission_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    granted_by UUID NOT NULL,
+    granted BOOLEAN NOT NULL DEFAULT FALSE,
+    granted_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP DEFAULT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (permission_id, user_id),
+    FOREIGN KEY (permission_id) REFERENCES diva_permissions(id),
+    FOREIGN KEY (granted_by) REFERENCES diva_user(id),
+    FOREIGN KEY (user_id) REFERENCES diva_user(id)
 );
 
 CREATE TABLE diva_email_verification_tokens (
@@ -152,3 +179,6 @@ CREATE TABLE IF NOT EXISTS diva_collection_media(
     FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE CASCADE,
     PRIMARY KEY (collection_id, media_id)
 );
+
+CREATE INDEX idx_diva_user_permissions_user_id ON diva_user_permissions (user_id);
+CREATE INDEX idx_diva_user_permissions_permission_id ON diva_user_permissions (permission_id);

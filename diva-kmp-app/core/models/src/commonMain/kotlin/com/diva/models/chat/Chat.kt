@@ -1,4 +1,4 @@
-package com.diva.models.social.chat
+package com.diva.models.chat
 
 import com.diva.models.api.social.chat.response.ChatResponse
 import com.diva.models.social.ChatType

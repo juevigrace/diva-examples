@@ -25,6 +25,9 @@ services:
       JWT_REALM: ${JWT_REALM}
       RESEND_API_KEY: ${RESEND_API_KEY}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      ROOT_USERNAME: ${ROOT_USERNAME}
+      ROOT_PASSWORD: ${ROOT_PASSWORD}
+      ROOT_EMAIL: ${ROOT_EMAIL}
     depends_on:
       diva_db:
         condition: service_healthy

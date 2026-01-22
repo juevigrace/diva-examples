@@ -1,6 +1,7 @@
 package com.diva.server
 
 import com.diva.server.config.configureAdministration
+import com.diva.server.config.configureDatabase
 import com.diva.server.config.configureFrameworks
 import com.diva.server.config.configureHTTP
 import com.diva.server.config.configureRouting
@@ -20,4 +21,5 @@ fun Application.module() {
     configureSecurity()
     configureHTTP()
     configureRouting()
+    configureDatabase()
 }

@@ -25,6 +25,7 @@ dependencies {
     implementation(projects.features.auth.di.authDiServer)
 
     implementation(projects.features.session.database.sessionDatabaseServer)
+    implementation(projects.features.user.database.userDatabaseServer)
 
     implementation(projects.features.user.api.userApiHandler)
     implementation(projects.features.user.di.userDiServer)

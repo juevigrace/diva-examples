@@ -2,6 +2,8 @@ package com.diva.user.database
 
 import com.diva.database.DivaDB
 import com.diva.database.user.UserStorage
+import com.diva.models.roles.Role
+import com.diva.models.roles.safeRole
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -75,6 +77,7 @@ class UserStorageImpl(
                     avatar = item.avatar,
                     bio = item.bio,
                     user_verified = false,
+                    role = Role.USER.name
                 )
             }
             if (rows.toInt() == -1 || rows.toInt() == 0) {
@@ -217,6 +220,7 @@ class UserStorageImpl(
         avatar: String,
         bio: String,
         userVerified: Boolean,
+        role: String,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
@@ -230,6 +234,7 @@ class UserStorageImpl(
             avatar = avatar,
             bio = bio,
             userVerified = userVerified,
+            role = safeRole(role),
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

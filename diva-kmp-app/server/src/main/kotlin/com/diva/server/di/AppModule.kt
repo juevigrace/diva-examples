@@ -13,6 +13,15 @@ import org.koin.dsl.module
 
 fun appModule(): Module {
     return module {
-        includes(authModule(), chatModule(), collectionModule(), mediaModule(), permissionsModule(), socialModule(), userModule(), verificationModule())
+        includes(
+            authModule(),
+            chatModule(),
+            collectionModule(),
+            mediaModule(),
+            permissionsModule(),
+            socialModule(),
+            userModule(),
+            verificationModule()
+        )
     }
 }

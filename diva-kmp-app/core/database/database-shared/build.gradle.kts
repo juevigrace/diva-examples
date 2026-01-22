@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.core.models)
+            implementation(projects.core.models)
 
             api(libs.diva.database)
         }

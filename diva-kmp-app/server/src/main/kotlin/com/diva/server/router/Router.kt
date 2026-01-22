@@ -5,6 +5,7 @@ import com.diva.chat.api.handler.chatApiHandler
 import com.diva.collection.api.handler.collectionApiHandler
 import com.diva.media.api.handler.mediaApiHandler
 import com.diva.media.api.handler.tagApiHandler
+import com.diva.permissions.api.handler.permissionsApiHandler
 import com.diva.social.api.handler.socialApiHandler
 import com.diva.user.api.handler.userApiHandler
 import io.ktor.http.HttpStatusCode
@@ -43,9 +44,10 @@ fun Routing.applicationRoutes() {
             authApiHandler()
             chatApiHandler()
             collectionApiHandler()
-            tagApiHandler()
             mediaApiHandler()
+            permissionsApiHandler()
             socialApiHandler()
+            tagApiHandler()
             userApiHandler()
         }
     }

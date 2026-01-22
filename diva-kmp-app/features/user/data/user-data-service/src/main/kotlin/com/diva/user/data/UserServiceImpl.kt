@@ -23,7 +23,6 @@ import io.github.juevigrace.diva.core.network.HttpRequestMethod
 import io.github.juevigrace.diva.core.network.HttpStatusCodes
 import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.tryResult
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

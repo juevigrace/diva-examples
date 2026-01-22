@@ -2,8 +2,8 @@ count:
 SELECT COUNT(*) FROM diva_user;
 
 insert:
-INSERT INTO diva_user (id, email, username, password_hash, alias, avatar, bio, user_verified)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO diva_user (id, email, username, password_hash, alias, avatar, bio, user_verified, role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
@@ -32,40 +32,41 @@ WHERE id = ? AND deleted_at IS NULL;
 
 findAll:
 SELECT
-  id,
-  email,
-  username,
-  password_hash AS passwordHash,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC
+  u.id,
+  u.email,
+  u.username,
+  u.password_hash AS passwordHash,
+  u.alias,
+  u.avatar,
+  u.bio,
+  u.user_verified AS userVerified,
+  u.role,
+  u.created_at AS createdAt,
+  u.updated_at AS updatedAt,
+  u.deleted_at AS deletedAt
+FROM diva_user u
+WHERE u.deleted_at IS NULL
 LIMIT ? OFFSET ?;
 
 findOneById:
-SELECT 
-  id,
-  email,
-  username,
-  password_hash AS passwordHash,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE id = ? ;
+SELECT
+  u.id,
+  u.email,
+  u.username,
+  u.password_hash AS passwordHash,
+  u.alias,
+  u.avatar,
+  u.bio,
+  u.user_verified AS userVerified,
+  u.role,
+  u.created_at AS createdAt,
+  u.updated_at AS updatedAt,
+  u.deleted_at AS deletedAt
+FROM diva_user u
+WHERE u.id = ?;
 
 findOneByEmail:
-SELECT 
+SELECT
   id,
   email,
   username,
@@ -74,6 +75,7 @@ SELECT
   avatar,
   bio,
   user_verified AS userVerified,
+  role,
   created_at AS createdAt,
   updated_at AS updatedAt,
   deleted_at AS deletedAt
@@ -81,7 +83,7 @@ FROM diva_user
 WHERE email = ? ;
 
 findOneByUsername:
-SELECT 
+SELECT
   id,
   email,
   username,
@@ -90,6 +92,7 @@ SELECT
   avatar,
   bio,
   user_verified AS userVerified,
+  role,
   created_at AS createdAt,
   updated_at AS updatedAt,
   deleted_at AS deletedAt

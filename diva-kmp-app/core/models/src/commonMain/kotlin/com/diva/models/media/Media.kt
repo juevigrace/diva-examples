@@ -1,6 +1,7 @@
 package com.diva.models.media
 
 import com.diva.models.VisibilityType
+import com.diva.models.media.tag.Tag
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.Option
 import kotlin.uuid.ExperimentalUuidApi
@@ -24,5 +25,5 @@ data class Media(
     val createdAt: Long,
     val updatedAt: Long,
     val deletedAt: Option<Long> = Option.None,
-    val tags: List<MediaTag> = emptyList(),
+    val tags: List<Tag> = emptyList(),
 )
