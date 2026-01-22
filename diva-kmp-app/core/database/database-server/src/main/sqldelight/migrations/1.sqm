@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS diva_session(
 
 CREATE TABLE IF NOT EXISTS diva_permissions(
     id UUID NOT NULL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE DEFAULT,
+    name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255) NOT NULL DEFAULT '',
     role_level role_enum NOT NULL DEFAULT 'admin',
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

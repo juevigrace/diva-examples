@@ -15,7 +15,9 @@ import com.diva.models.server.SESSION_KEY
 import com.diva.user.data.UserService
 import com.diva.util.respond
 import com.diva.verification.data.VerificationService
+import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.map
+import io.github.juevigrace.diva.core.onFailure
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -96,6 +98,9 @@ fun Routing.authApiHandler() {
                         verificationService.verify(dto.token)
                     },
                     onVerified = {
+                        verificationService.deleteToken(dto.token).onFailure { err ->
+                            return@verifyUser DivaResult.failure(err)
+                        }
                         userService.updateVerified(session.user.id)
                     }
                 ).respond(call)

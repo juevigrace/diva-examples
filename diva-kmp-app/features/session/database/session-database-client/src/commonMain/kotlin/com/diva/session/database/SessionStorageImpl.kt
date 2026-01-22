@@ -9,7 +9,6 @@ import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
@@ -78,7 +77,7 @@ class SessionStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.INSERT,
                         "diva_session",
@@ -86,7 +85,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -106,7 +105,7 @@ class SessionStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.UPDATE,
                         "diva_session",
@@ -114,7 +113,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -125,7 +124,7 @@ class SessionStorageImpl(
                 sessionQueries.delete(id.toString())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_session",
@@ -133,7 +132,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -144,7 +143,7 @@ class SessionStorageImpl(
                 sessionQueries.deleteByUserId(userId.toString())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_session",
@@ -152,7 +151,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 

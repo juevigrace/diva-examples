@@ -9,10 +9,9 @@ import com.diva.models.api.user.dtos.UserEmailDto
 import com.diva.models.api.user.response.UserResponse
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.core.errors.asNetworkError
 import io.github.juevigrace.diva.core.errors.toDivaError
-import io.github.juevigrace.diva.core.map
+import io.github.juevigrace.diva.core.flatMap
 import io.github.juevigrace.diva.core.network.HttpRequestMethod
 import io.github.juevigrace.diva.core.tryResult
 import io.github.juevigrace.diva.network.client.DivaClient
@@ -35,19 +34,20 @@ class UserNetworkClientImpl(
         return tryResult(
             onError = { e -> e.toDivaError().asNetworkError(HttpRequestMethod.GET, "/api/user") }
         ) {
-            client.get(path = "/api/user").map { response ->
+            client.get(path = "/api/user").flatMap { response ->
                 val body: ApiResponse<PaginationResponse<UserResponse>> = response.body()
                 when (response.status) {
-                    HttpStatusCode.OK -> body.data ?: throw DivaErrorException(
-                        DivaError.NetworkError(
-                            method = HttpRequestMethod.GET,
-                            url = "/api/user",
-                            statusCode = response.status.toHttpStatusCodes(),
-                            details = "Data is null: ${body.message}",
+                    HttpStatusCode.OK -> body.data?.let { data -> DivaResult.success(data) }
+                        ?: DivaResult.failure(
+                            DivaError.NetworkError(
+                                method = HttpRequestMethod.GET,
+                                url = "/api/user",
+                                statusCode = response.status.toHttpStatusCodes(),
+                                details = "Data is null: ${body.message}",
+                            )
                         )
-                    )
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.GET,
                                 url = "/api/user",
@@ -65,19 +65,20 @@ class UserNetworkClientImpl(
         return tryResult(
             onError = { e -> e.toDivaError().asNetworkError(HttpRequestMethod.GET, "/api/user/{id}") }
         ) {
-            client.get(path = "/api/user/$id").map { response ->
+            client.get(path = "/api/user/$id").flatMap { response ->
                 val body: ApiResponse<UserResponse> = response.body()
                 when (response.status) {
-                    HttpStatusCode.OK -> body.data ?: throw DivaErrorException(
-                        DivaError.NetworkError(
-                            method = HttpRequestMethod.GET,
-                            url = "/api/user/{id}",
-                            statusCode = response.status.toHttpStatusCodes(),
-                            details = "Data is null: ${body.message}",
+                    HttpStatusCode.OK -> body.data?.let { data -> DivaResult.success(data) }
+                        ?: DivaResult.failure(
+                            DivaError.NetworkError(
+                                method = HttpRequestMethod.GET,
+                                url = "/api/user/{id}",
+                                statusCode = response.status.toHttpStatusCodes(),
+                                details = "Data is null: ${body.message}",
+                            )
                         )
-                    )
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.GET,
                                 url = "/api/user/{id}",
@@ -102,19 +103,20 @@ class UserNetworkClientImpl(
                 path = "/api/user",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<String> = response.body()
                 when (response.status) {
-                    HttpStatusCode.Created -> body.data ?: throw DivaErrorException(
-                        DivaError.NetworkError(
-                            method = HttpRequestMethod.POST,
-                            url = "/api/user",
-                            statusCode = response.status.toHttpStatusCodes(),
-                            details = "Data is null: ${body.message}",
+                    HttpStatusCode.Created -> body.data?.let { data -> DivaResult.success(data) }
+                        ?: DivaResult.failure(
+                            DivaError.NetworkError(
+                                method = HttpRequestMethod.POST,
+                                url = "/api/user",
+                                statusCode = response.status.toHttpStatusCodes(),
+                                details = "Data is null: ${body.message}",
+                            )
                         )
-                    )
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.POST,
                                 url = "/api/user",
@@ -139,12 +141,12 @@ class UserNetworkClientImpl(
                 path = "/api/user/update/email/request",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.OK -> return@map
+                    HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.POST,
                                 url = "/api/user/update/email/request",
@@ -169,12 +171,12 @@ class UserNetworkClientImpl(
                 path = "/api/user/update/email/confirm",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.OK -> return@map
+                    HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.POST,
                                 url = "/api/user/update/email/confirm",
@@ -199,12 +201,12 @@ class UserNetworkClientImpl(
                 path = "/api/user",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.Accepted -> return@map
+                    HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.PUT,
                                 url = "/api/user",
@@ -229,12 +231,12 @@ class UserNetworkClientImpl(
                 path = "/api/user/update/email",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.Accepted -> return@map
+                    HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.PATCH,
                                 url = "/api/user/update/email",
@@ -255,12 +257,12 @@ class UserNetworkClientImpl(
             client.delete(
                 path = "/api/user",
                 headers = mapOf("Authorization" to "Bearer $token")
-            ).map { response ->
+            ).flatMap { response ->
                 val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.NoContent -> return@map
+                    HttpStatusCode.NoContent -> DivaResult.success(Unit)
                     else -> {
-                        throw DivaErrorException(
+                        DivaResult.failure(
                             DivaError.NetworkError(
                                 method = HttpRequestMethod.PATCH,
                                 url = "/api/user",

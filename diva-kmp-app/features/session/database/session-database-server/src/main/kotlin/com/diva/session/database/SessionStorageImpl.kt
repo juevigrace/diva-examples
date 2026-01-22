@@ -3,13 +3,15 @@ package com.diva.session.database
 import com.diva.database.DivaDB
 import com.diva.database.session.SessionStorage
 import com.diva.models.auth.Session
+import com.diva.models.roles.Role
+import com.diva.models.roles.safeRole
+import com.diva.models.session.SessionStatus
 import com.diva.models.session.safeSessionStatus
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
@@ -84,7 +86,7 @@ class SessionStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.INSERT,
                         "diva_session",
@@ -92,7 +94,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -116,7 +118,7 @@ class SessionStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.UPDATE,
                         "diva_session",
@@ -124,7 +126,32 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updateStatus(
+        sessionId: Uuid,
+        status: SessionStatus
+    ): DivaResult<Unit, DivaError.DatabaseError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                sessionQueries.updateStatus(
+                    status = status.value,
+                    id = sessionId.toJavaUuid()
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError.DatabaseError(
+                        DatabaseAction.UPDATE,
+                        "diva_session",
+                        "Failed to update"
+                    )
+                )
+            }
+            DivaResult.success(Unit)
         }
     }
 
@@ -135,7 +162,7 @@ class SessionStorageImpl(
                 sessionQueries.delete(id.toJavaUuid())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_session",
@@ -143,7 +170,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -154,7 +181,7 @@ class SessionStorageImpl(
                 sessionQueries.deleteByUserId(userId.toJavaUuid())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_session",
@@ -162,7 +189,7 @@ class SessionStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -181,6 +208,8 @@ class SessionStorageImpl(
         userId: UUID?,
         email: String?,
         username: String?,
+        userVerified: Boolean?,
+        role: String?,
         uCreatedAt: OffsetDateTime?,
         uUpdatedAt: OffsetDateTime?,
     ): Session {
@@ -196,6 +225,8 @@ class SessionStorageImpl(
                 id = userId.toKotlinUuid(),
                 username = username,
                 email = email,
+                userVerified = userVerified ?: false,
+                role = role?.let { r -> safeRole(r) } ?: Role.USER,
                 createdAt = uCreatedAt.toInstant().toKotlinInstant(),
                 updatedAt = uUpdatedAt.toInstant().toKotlinInstant()
             ),

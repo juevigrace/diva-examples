@@ -6,13 +6,11 @@ import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
@@ -56,7 +54,7 @@ class VerificationStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.INSERT,
                         "diva_email_verification_tokens",
@@ -64,11 +62,10 @@ class VerificationStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
-    // TODO: logic
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     override suspend fun update(item: UserVerification): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
@@ -76,7 +73,7 @@ class VerificationStorageImpl(
                 emailVerificationTokensQueries.update(item.userId.toJavaUuid())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.UPDATE,
                         "diva_email_verification_tokens",
@@ -84,7 +81,7 @@ class VerificationStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -95,7 +92,7 @@ class VerificationStorageImpl(
                 emailVerificationTokensQueries.delete(id.toJavaUuid())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_email_verification_tokens",
@@ -103,7 +100,7 @@ class VerificationStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -113,7 +110,7 @@ class VerificationStorageImpl(
                 emailVerificationTokensQueries.deleteByToken(token)
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_email_verification_tokens",
@@ -121,7 +118,7 @@ class VerificationStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 

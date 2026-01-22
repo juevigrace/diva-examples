@@ -12,16 +12,14 @@ import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.core.errors.asNetworkError
 import io.github.juevigrace.diva.core.errors.toDivaError
+import io.github.juevigrace.diva.core.flatMap
 import io.github.juevigrace.diva.core.fold
-import io.github.juevigrace.diva.core.getOrThrow
 import io.github.juevigrace.diva.core.map
 import io.github.juevigrace.diva.core.mapError
 import io.github.juevigrace.diva.core.network.HttpRequestMethod
 import io.github.juevigrace.diva.core.network.HttpStatusCodes
-import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.tryResult
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
@@ -34,57 +32,44 @@ class UserServiceImpl(
         page: Int,
         pageSize: Int
     ): DivaResult<ApiResponse<PaginationResponse<User>>, DivaError.NetworkError> {
-        return tryResult(
-            onError = { e ->
-                e.toDivaError().asNetworkError(
-                    method = HttpRequestMethod.GET,
-                    url = "/api/user",
-                )
+        return storage
+            .getAll(pageSize, (page - 1) * pageSize)
+            .mapError { err -> err.asNetworkError(HttpRequestMethod.GET, "/api/user") }
+            .flatMap { users ->
+                storage.count()
+                    .mapError { err -> err.asNetworkError(HttpRequestMethod.GET, "/api/user") }
+                    .map { count ->
+                        ApiResponse(
+                            data = PaginationResponse(
+                                items = users,
+                                totalItems = count.toInt(),
+                                totalPages = ((count / pageSize) + 1).toInt(),
+                                currentPage = page,
+                                pageSize = pageSize,
+                            ),
+                            message = "Users retrieved"
+                        )
+                    }
             }
-        ) {
-            storage
-                .getAll(pageSize, (page - 1) * pageSize)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { users ->
-                    val count: Long = storage.count().getOrThrow(onThrow = { err -> throw DivaErrorException(err) })
-                    ApiResponse(
-                        data = PaginationResponse(
-                            items = users,
-                            totalItems = count.toInt(),
-                            totalPages = ((count / pageSize) + 1).toInt(),
-                            currentPage = page,
-                            pageSize = pageSize,
-                        ),
-                        message = "Users retrieved"
-                    )
-                }
-        }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getUser(id: String): DivaResult<ApiResponse<User>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    method = HttpRequestMethod.GET,
-                    url = "/api/user/{id}",
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.GET, "/api/user/{id}")
             }
         ) {
             val parsedId: Uuid = Uuid.parse(id)
             storage
                 .getById(parsedId)
-                .mapError { err -> throw DivaErrorException(err) }
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.GET, "/api/user/{id}") }
                 .map { option ->
                     option.fold(
                         onNone = {
-                            throw DivaErrorException(
-                                DivaError.NetworkError(
-                                    method = HttpRequestMethod.GET,
-                                    url = "/api/user/{id}",
-                                    statusCode = HttpStatusCodes.NotFound,
-                                    details = "User not found"
-                                )
+                            ApiResponse(
+                                statusCode = HttpStatusCodes.NotFound.code,
+                                message = "User not found",
                             )
                         },
                         onSome = { value -> ApiResponse(data = value, message = "User retrieved") }
@@ -98,30 +83,21 @@ class UserServiceImpl(
         dto: UpdateUserDto,
         session: Session
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
-        return tryResult(
-            onError = { e ->
-                e.toDivaError().asNetworkError(
-                    method = HttpRequestMethod.PUT,
-                    url = "/api/user",
-                )
-            }
-        ) {
-            val user = User(
-                id = session.user.id,
-                username = dto.username,
-                alias = dto.alias,
-                avatar = dto.avatar,
-                bio = dto.bio,
-                email = session.user.email,
-                userVerified = session.user.userVerified,
-                createdAt = session.user.createdAt,
-                updatedAt = session.user.updatedAt,
-            )
-            storage
-                .update(user)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { _ -> ApiResponse<Nothing>(message = "User updated") }
-        }
+        val user = User(
+            id = session.user.id,
+            username = dto.username,
+            alias = dto.alias,
+            avatar = dto.avatar,
+            bio = dto.bio,
+            email = session.user.email,
+            userVerified = session.user.userVerified,
+            createdAt = session.user.createdAt,
+            updatedAt = session.user.updatedAt,
+        )
+        return storage
+            .update(user)
+            .mapError { err -> err.asNetworkError(HttpRequestMethod.PUT, "/api/user") }
+            .map { ApiResponse<Nothing>(message = "User updated") }
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -132,12 +108,9 @@ class UserServiceImpl(
         return storage
             .updateEmail(session.user.id, dto.email)
             .mapError { err ->
-                err.asNetworkError(
-                    method = HttpRequestMethod.PUT,
-                    url = "/api/user/email",
-                )
+                err.asNetworkError(HttpRequestMethod.PUT, "/api/user/email")
             }
-            .map { _ -> ApiResponse<Nothing>(message = "User updated") }
+            .map { ApiResponse<Nothing>(message = "User updated") }
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -145,60 +118,47 @@ class UserServiceImpl(
         return storage
             .delete(id)
             .mapError { err ->
-                err.asNetworkError(
-                    method = HttpRequestMethod.DELETE,
-                    url = "/api/user",
-                )
+                err.asNetworkError(HttpRequestMethod.DELETE, "/api/user")
             }
-            .map { _ -> ApiResponse<Nothing>(message = "User deleted") }
+            .map { ApiResponse<Nothing>(message = "User deleted") }
     }
 
     override suspend fun getUserByUsername(username: String): DivaResult<User, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError() }
-        ) {
-            storage
-                .getByUsername(username)
-                .onFailure { err -> throw DivaErrorException(err) }
-                .map { option ->
-                    option.fold(
-                        onNone = {
-                            throw DivaErrorException(
-                                DivaError.DatabaseError(
-                                    operation = DatabaseAction.SELECT,
-                                    table = "diva_users",
-                                    details = "User not found"
-                                )
+        return storage
+            .getByUsername(username)
+            .flatMap { option ->
+                option.fold(
+                    onNone = {
+                        DivaResult.failure(
+                            DivaError.DatabaseError(
+                                operation = DatabaseAction.SELECT,
+                                table = "diva_users",
+                                details = "User not found"
                             )
-                        },
-                        onSome = { value -> value }
-                    )
-                }
-        }
+                        )
+                    },
+                    onSome = { value -> DivaResult.success(value) }
+                )
+            }
     }
 
     override suspend fun getUserByEmail(email: String): DivaResult<User, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError() }
-        ) {
-            storage
-                .getByEmail(email)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { option ->
-                    option.fold(
-                        onNone = {
-                            throw DivaErrorException(
-                                DivaError.DatabaseError(
-                                    operation = DatabaseAction.SELECT,
-                                    table = "diva_users",
-                                    details = "User not found"
-                                )
+        return storage
+            .getByEmail(email)
+            .flatMap { option ->
+                option.fold(
+                    onNone = {
+                        DivaResult.failure(
+                            DivaError.DatabaseError(
+                                operation = DatabaseAction.SELECT,
+                                table = "diva_users",
+                                details = "User not found"
                             )
-                        },
-                        onSome = { value -> value }
-                    )
-                }
-        }
+                        )
+                    },
+                    onSome = { value -> DivaResult.success(value) }
+                )
+            }
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
@@ -222,15 +182,7 @@ class UserServiceImpl(
             )
             storage
                 .insert(user)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { _ ->
-                    onVerification(id).onFailure { err ->
-                        // TODO: this might not be correct
-                        storage.delete(id).onFailure { err -> throw DivaErrorException(err) }
-                        throw DivaErrorException(err)
-                    }
-                    id
-                }
+                .flatMap { onVerification(id).map { id } }
         }
     }
 

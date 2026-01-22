@@ -14,4 +14,6 @@ interface VerificationService {
     // TODO: should this need a session?
     @OptIn(ExperimentalUuidApi::class)
     suspend fun verify(token: String): DivaResult<Unit, DivaError>
+
+    suspend fun deleteToken(token: String): DivaResult<Unit, DivaError>
 }

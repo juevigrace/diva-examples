@@ -7,7 +7,6 @@ import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.ExperimentalTime
@@ -55,7 +54,7 @@ class UserStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.INSERT,
                         "diva_user",
@@ -63,7 +62,7 @@ class UserStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -81,7 +80,7 @@ class UserStorageImpl(
                 )
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.UPDATE,
                         "diva_user",
@@ -89,7 +88,7 @@ class UserStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 
@@ -100,7 +99,7 @@ class UserStorageImpl(
                 userQueries.delete(id.toString())
             }
             if (rows.toInt() == 0) {
-                throw DivaErrorException(
+                return@use DivaResult.failure(
                     DivaError.DatabaseError(
                         DatabaseAction.DELETE,
                         "diva_user",
@@ -108,7 +107,7 @@ class UserStorageImpl(
                     )
                 )
             }
-            return@use DivaResult.success(Unit)
+            DivaResult.success(Unit)
         }
     }
 

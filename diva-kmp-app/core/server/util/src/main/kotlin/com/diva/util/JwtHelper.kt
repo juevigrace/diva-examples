@@ -4,13 +4,13 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.diva.models.auth.Session
+import com.diva.models.session.SessionStatus
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.toDivaError
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.getOrNull
-import io.github.juevigrace.diva.core.isEmpty
 import io.github.juevigrace.diva.core.tryResult
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -66,7 +66,8 @@ class JwtHelper(
 
     suspend fun validate(
         credential: JWTCredential,
-        sessionCallBack: suspend (sessionId: UUID) -> DivaResult<Option<Session>, DivaError>
+        sessionCallBack: suspend (sessionId: UUID) -> DivaResult<Option<Session>, DivaError>,
+        onFound: suspend (session: Session) -> Unit,
     ): JWTPrincipal? {
         return tryResult(
             onError = { e ->
@@ -77,12 +78,8 @@ class JwtHelper(
             val userId: String? = credential.payload.getClaim(USER_ID_CLAIM_KEY).asString()
 
             val principal: JWTPrincipal? = when {
-                sessionId == null -> {
-                    null
-                }
-                userId == null -> {
-                    null
-                }
+                sessionId == null -> null
+                userId == null -> null
                 else -> {
                     val parsedId = UUID.fromString(sessionId)
                     sessionCallBack(parsedId).fold(
@@ -91,10 +88,21 @@ class JwtHelper(
                             null
                         },
                         onSuccess = { option ->
-                            if (option.isEmpty()) {
-                                return@fold null
-                            }
-                            JWTPrincipal(credential.payload)
+                            option.fold(
+                                onNone = { null },
+                                onSome = { session ->
+                                    if (!session.user.userVerified) {
+                                        return null
+                                    }
+                                    when (session.status) {
+                                        SessionStatus.ACTIVE -> {
+                                            onFound(session)
+                                            JWTPrincipal(credential.payload)
+                                        }
+                                        else -> null
+                                    }
+                                }
+                            )
                         }
                     )
                 }

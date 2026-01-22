@@ -15,10 +15,9 @@ import com.diva.util.Encryption
 import com.diva.util.JwtHelper
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.core.errors.asNetworkError
 import io.github.juevigrace.diva.core.errors.toDivaError
-import io.github.juevigrace.diva.core.fold
+import io.github.juevigrace.diva.core.flatMap
 import io.github.juevigrace.diva.core.getOrElse
 import io.github.juevigrace.diva.core.map
 import io.github.juevigrace.diva.core.mapError
@@ -42,17 +41,13 @@ class AuthServiceImpl(
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.PATCH,
-                    "/api/auth/forgot/password",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.PATCH, "/api/auth/forgot/password")
             }
         ) {
-            val hash = Encryption.hashPassword(dto.newPassword)
+            val hash: String = Encryption.hashPassword(dto.newPassword)
             onUpdatePassword(hash)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { _ -> ApiResponse(message = "Password updated") }
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.PATCH, "/api/auth/forgot/password") }
+                .map { ApiResponse(message = "Password updated") }
         }
     }
 
@@ -60,11 +55,7 @@ class AuthServiceImpl(
     override suspend fun ping(sessionId: Uuid): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/ping",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/ping")
             }
         ) {
             DivaResult.success(ApiResponse(message = "Pong"))
@@ -78,36 +69,30 @@ class AuthServiceImpl(
     ): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/refresh",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/refresh")
             }
         ) {
-            val newAccessToken = jwtHelper.createAccessToken(
-                userId = session.user.id.toString(),
-                sessionId = session.id.toString()
-            )
-            val newRefreshToken = jwtHelper.createRefreshToken(
-                userId = session.user.id.toString(),
-                sessionId = session.id.toString()
-            )
+            if (session.device != dto.device || session.userAgent != dto.userAgent) {
+                storage.delete(session.id)
+                    .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/refresh") }
+                return DivaResult.failure(
+                    DivaError.NetworkError(
+                        method = HttpRequestMethod.POST,
+                        url = "/api/auth/refresh",
+                        statusCode = HttpStatusCodes.Unauthorized,
+                        details = "Invalid session",
+                    )
+                )
+            }
 
-            // TODO: make checks with the received session data
-            val updatedSession: Session = session.copy(
-                accessToken = newAccessToken,
-                refreshToken = newRefreshToken,
-                status = SessionStatus.ACTIVE,
-                device = dto.device,
-                ipAddress = dto.ipAddress ?: "",
-                userAgent = dto.userAgent ?: "",
-                updatedAt = Clock.System.now()
-            )
+            val updatedSession: Session = createSession(session.id, session.user.id, dto)
+                .copy(
+                    createdAt = session.createdAt,
+                )
 
             storage
                 .update(updatedSession)
-                .mapError { err -> throw DivaErrorException(err) }
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/refresh") }
                 .map {
                     ApiResponse(
                         data = updatedSession.toResponse(),
@@ -124,16 +109,12 @@ class AuthServiceImpl(
     ): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/refresh",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/signIn")
             }
         ) {
-            onUserSearch(dto.username).fold(
-                onFailure = { err -> throw DivaErrorException(err) },
-                onSuccess = { user ->
+            onUserSearch(dto.username)
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signIn") }
+                .flatMap { user ->
                     when {
                         !Encryption.verifyPassword(dto.password, user.passwordHash.getOrElse { "" }) -> {
                             DivaResult.success(
@@ -143,6 +124,7 @@ class AuthServiceImpl(
                                 )
                             )
                         }
+                        // TODO: this should be placed in the authentication check too
                         !user.userVerified -> {
                             DivaResult.success(
                                 ApiResponse(
@@ -153,43 +135,18 @@ class AuthServiceImpl(
                         }
                         else -> {
                             val sessionId: Uuid = Uuid.random()
-                            val accessToken: String = jwtHelper.createAccessToken(
-                                userId = user.id.toString(),
-                                sessionId = sessionId.toString()
-                            )
-                            val refreshToken: String = jwtHelper.createRefreshToken(
-                                userId = user.id.toString(),
-                                sessionId = sessionId.toString()
-                            )
-
-                            val now: Instant = Clock.System.now()
-                            val newSession = Session(
-                                id = sessionId,
-                                user = user,
-                                accessToken = accessToken,
-                                refreshToken = refreshToken,
-                                device = dto.sessionData.device,
-                                status = SessionStatus.ACTIVE,
-                                // TODO: GET IP
-                                ipAddress = dto.sessionData.ipAddress ?: "",
-                                userAgent = dto.sessionData.userAgent ?: "",
-                                expiresAt = now.plus(Duration.parse("86400000ms")), // 24 hours
-                                createdAt = now,
-                                updatedAt = now
-                            )
-
-                            storage.insert(newSession)
-                                .mapError { err -> throw DivaErrorException(err) }
+                            val session: Session = createSession(sessionId, user.id, dto.sessionData)
+                            storage.insert(session)
+                                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signIn") }
                                 .map {
                                     ApiResponse(
-                                        data = newSession.toResponse(),
+                                        data = session.toResponse(),
                                         message = "Sign in successful"
                                     )
                                 }
                         }
                     }
                 }
-            )
         }
     }
 
@@ -200,53 +157,23 @@ class AuthServiceImpl(
     ): DivaResult<ApiResponse<SessionResponse>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/signUp",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp")
             }
         ) {
             onCreateUser(dto.user.copy(password = Encryption.hashPassword(dto.user.password)))
-                .fold(
-                    onFailure = { err -> throw DivaErrorException(err) },
-                    onSuccess = { userId ->
-                        val sessionId: Uuid = Uuid.random()
-                        val accessToken: String = jwtHelper.createAccessToken(
-                            userId = userId.toString(),
-                            sessionId = sessionId.toString()
-                        )
-                        val refreshToken: String = jwtHelper.createRefreshToken(
-                            userId = userId.toString(),
-                            sessionId = sessionId.toString()
-                        )
-
-                        val now: Instant = Clock.System.now()
-                        val newSession = Session(
-                            id = sessionId,
-                            user = User(id = userId),
-                            accessToken = accessToken,
-                            refreshToken = refreshToken,
-                            device = dto.sessionData.device,
-                            status = SessionStatus.ACTIVE,
-                            // TODO: GET IP
-                            ipAddress = dto.sessionData.ipAddress ?: "",
-                            userAgent = dto.sessionData.userAgent ?: "",
-                            expiresAt = now.plus(Duration.parse("86400000ms")), // 24 hours
-                            createdAt = now,
-                            updatedAt = now
-                        )
-
-                        storage.insert(newSession)
-                            .mapError { err -> throw DivaErrorException(err) }
-                            .map {
-                                ApiResponse(
-                                    data = newSession.toResponse(),
-                                    message = "Sign up successful"
-                                )
-                            }
-                    }
-                )
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp") }
+                .flatMap { userId ->
+                    val sessionId: Uuid = Uuid.random()
+                    val session: Session = createSession(sessionId, userId, dto.sessionData)
+                    storage.insert(session)
+                        .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp") }
+                        .map {
+                            ApiResponse(
+                                data = session.toResponse(),
+                                message = "Sign up successful"
+                            )
+                        }
+                }
         }
     }
 
@@ -254,18 +181,14 @@ class AuthServiceImpl(
     override suspend fun signOut(sessionId: Uuid): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/signUp",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp")
             }
         ) {
             // TODO: this should just update instead?
             storage
-                .delete(sessionId)
-                .mapError { err -> throw DivaErrorException(err) }
-                .map { _ -> ApiResponse<Nothing>(message = "Sign out successful") }
+                .updateStatus(sessionId, SessionStatus.CLOSED)
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp") }
+                .map { ApiResponse(message = "Sign out successful") }
         }
     }
 
@@ -275,21 +198,48 @@ class AuthServiceImpl(
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
         return tryResult(
             onError = { e ->
-                e.toDivaError().asNetworkError(
-                    HttpRequestMethod.POST,
-                    "/api/auth/signUp",
-                    HttpStatusCodes.InternalServerError
-                )
+                e.toDivaError().asNetworkError(HttpRequestMethod.POST, "/api/auth/verify/email")
             }
         ) {
             onVerify()
-                .mapError { err -> throw DivaErrorException(err) }
-                .map {
-                    onVerified().fold(
-                        onFailure = { err -> throw DivaErrorException(err) },
-                        onSuccess = { ApiResponse(message = "User verified") }
-                    )
+                .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/verify/email") }
+                .flatMap {
+                    onVerified()
+                        .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/verify/email") }
+                        .map { ApiResponse(message = "User verified") }
                 }
         }
+    }
+
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    private fun createSession(sessionId: Uuid, userId: Uuid, dto: SessionDataDto): Session {
+        val accessToken: String = jwtHelper.createAccessToken(
+            userId = userId.toString(),
+            sessionId = sessionId.toString()
+        )
+        val refreshToken: String = jwtHelper.createRefreshToken(
+            userId = userId.toString(),
+            sessionId = sessionId.toString()
+        )
+
+        val now: Instant = Clock.System.now()
+        val newSession = Session(
+            id = sessionId,
+            user = User(id = userId),
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            device = dto.device,
+            status = SessionStatus.ACTIVE,
+            // TODO: GET IP
+            ipAddress = dto.ipAddress ?: "",
+            userAgent = dto.userAgent ?: "",
+            expiresAt = now.plus(Duration.parse(SESSION_DURATION_MS)),
+            createdAt = now,
+            updatedAt = now
+        )
+        return newSession
+    }
+    companion object {
+        private const val SESSION_DURATION_MS = "86400000ms"
     }
 }

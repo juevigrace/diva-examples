@@ -10,13 +10,14 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.RoutingCall
 
 suspend fun DivaResult<ApiResponse<*>, DivaError.NetworkError>.respond(call: RoutingCall) {
-    onFailure { err ->
-        call.respond(
-            HttpStatusCode.fromValue(err.statusCode.code),
-            ApiResponse<Nothing>(message = err.message)
-        )
-    }
-    onSuccess { value ->
-        call.respond(HttpStatusCode.fromValue(value.statusCode), value)
-    }
+    this
+        .onFailure { err ->
+            call.respond(
+                HttpStatusCode.fromValue(err.statusCode.code),
+                ApiResponse<Nothing>(message = err.message)
+            )
+        }
+        .onSuccess { value ->
+            call.respond(HttpStatusCode.fromValue(value.statusCode), value)
+        }
 }

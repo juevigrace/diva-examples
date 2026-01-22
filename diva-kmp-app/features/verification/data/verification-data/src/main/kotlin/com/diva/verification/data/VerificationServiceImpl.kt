@@ -3,14 +3,11 @@ package com.diva.verification.data
 import com.diva.models.server.UserVerification
 import com.diva.verification.database.VerificationStorage
 import io.github.juevigrace.diva.core.DivaResult
-import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.DivaErrorException
 import io.github.juevigrace.diva.core.errors.toDivaError
+import io.github.juevigrace.diva.core.flatMap
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.isPresent
-import io.github.juevigrace.diva.core.map
-import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.tryResult
 import kotlin.random.Random
 import kotlin.time.Clock
@@ -34,71 +31,41 @@ class VerificationServiceImpl(
                 createdAt = Clock.System.now(),
             )
 
-            storage.insert(item).onFailure { err -> throw DivaErrorException(err) }
-            storage.getById(userId)
-                .onFailure { err -> throw DivaErrorException(err) }
-                .map { option ->
-                    option.fold(
-                        onNone = {
-                            throw DivaErrorException(
-                                DivaError.DatabaseError(
-                                    DatabaseAction.SELECT,
-                                    "diva_email_verification_tokens",
-                                    "Failed to get verification"
-                                )
-                            )
-                        },
-                        onSome = { it }
-                    )
-                }
+            storage.insert(item)
+                .flatMap { DivaResult.success(item) }
         }
     }
 
     @OptIn(ExperimentalTime::class)
     override suspend fun verify(token: String): DivaResult<Unit, DivaError> {
-        return tryResult(
-            onError = { e -> e.toDivaError() }
-        ) {
-            storage.getByToken(token).fold(
-                onFailure = { err -> throw DivaErrorException(err) },
-                onSuccess = { option ->
-                    option.fold(
-                        onNone = {
-                            throw DivaErrorException(
-                                DivaError.DatabaseError(
-                                    DatabaseAction.SELECT,
-                                    "diva_email_verification_tokens",
-                                    "Failed to get verification"
+        return storage
+            .getByToken(token)
+            .flatMap { option ->
+                option.fold(
+                    onNone = {
+                        DivaResult.failure(DivaError.ValidationError("token", "Token doesn't exists"))
+                    },
+                    onSome = { verification ->
+                        when {
+                            verification.expiresAt < Clock.System.now() -> {
+                                DivaResult.failure(DivaError.ValidationError("token", "Token has expired"))
+                            }
+                            verification.usedAt.isPresent() -> {
+                                DivaResult.failure(
+                                    DivaError.ValidationError("token", "Token has already been used")
                                 )
-                            )
-                        },
-                        onSome = { verification ->
-                            when {
-                                verification.expiresAt < Clock.System.now() -> {
-                                    throw DivaErrorException(
-                                        DivaError.ValidationError(
-                                            "expiresAt",
-                                            "Verification has expired"
-                                        )
-                                    )
-                                }
-                                verification.usedAt.isPresent() -> {
-                                    throw DivaErrorException(
-                                        DivaError.ValidationError(
-                                            "usedAt",
-                                            "Verification has already been used"
-                                        )
-                                    )
-                                }
-                                else -> {
-                                    storage.deleteByToken(token)
-                                }
+                            }
+                            else -> {
+                                storage.update(verification)
                             }
                         }
-                    )
-                }
-            )
-        }
+                    }
+                )
+            }
+    }
+
+    override suspend fun deleteToken(token: String): DivaResult<Unit, DivaError> {
+        return storage.deleteByToken(token)
     }
 
     private fun generateToken(): String {

@@ -1,6 +1,7 @@
 package com.diva.database.session
 
 import com.diva.models.auth.Session
+import com.diva.models.session.SessionStatus
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -22,5 +23,10 @@ interface SessionStorage : Storage<Session> {
 
     suspend fun getCurrentSession(): DivaResult<Option<Session>, DivaError.DatabaseError> {
         return DivaResult.failure(DivaError.DatabaseError(DatabaseAction.SELECT, details = "Client action only"))
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun updateStatus(sessionId: Uuid, status: SessionStatus): DivaResult<Unit, DivaError.DatabaseError> {
+        return DivaResult.failure(DivaError.DatabaseError(DatabaseAction.SELECT, details = "Server action only"))
     }
 }

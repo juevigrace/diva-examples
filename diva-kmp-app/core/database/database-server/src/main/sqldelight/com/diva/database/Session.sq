@@ -10,6 +10,11 @@ UPDATE diva_session
 SET access_token = ?, refresh_token = ?, device = ?, status = ?, ip_address = ?, user_agent = ?, expires_at = ?, updated_at = NOW() 
 WHERE id = ?;
 
+updateStatus:
+UPDATE diva_session
+SET status = :status
+WHERE id = ?;
+
 deleteByUserId:
 DELETE FROM diva_session
 WHERE user_id = ?;
@@ -33,6 +38,8 @@ SELECT
     u.id AS userId,
     u.email,
     u.username,
+    u.user_verified,
+    u.role,
     u.created_at AS uCreatedAt,
     u.updated_at AS uUpdatedAt
 FROM diva_session s
@@ -56,6 +63,8 @@ SELECT
   u.id AS userId,
   u.email,
   u.username,
+  u.user_verified,
+  u.role,
   u.created_at AS uCreatedAt,
   u.updated_at AS uUpdatedAt
 FROM diva_session s
@@ -77,6 +86,8 @@ SELECT
   u.id AS userId,
   u.email,
   u.username,
+  u.user_verified,
+  u.role,
   u.created_at AS uCreatedAt,
   u.updated_at AS uUpdatedAt
 FROM diva_session s
