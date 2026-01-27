@@ -22,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
@@ -33,12 +34,12 @@ import org.koin.ktor.ext.inject
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-fun Routing.userApiHandler() {
+fun Routing.userApiHandler(apiRoute: Route) {
     val service: UserService by inject()
     val verificationService: VerificationService by inject()
     val kMail: KMail by inject()
 
-    route("/user") {
+    apiRoute.route("/user") {
         get("/") {
             val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
@@ -94,11 +95,17 @@ fun Routing.userApiHandler() {
             route("/update") {
                 route("/email") {
                     post("/request") {
-                        call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
+                        call.respond(
+                            HttpStatusCode.NotImplemented,
+                            ApiResponse<Nothing>(message = "Not implemented")
+                        )
                     }
 
                     post("/confirm") {
-                        call.respond(HttpStatusCode.NotImplemented, ApiResponse<Nothing>(message = "Not implemented"))
+                        call.respond(
+                            HttpStatusCode.NotImplemented,
+                            ApiResponse<Nothing>(message = "Not implemented")
+                        )
                     }
 
                     patch("/") {

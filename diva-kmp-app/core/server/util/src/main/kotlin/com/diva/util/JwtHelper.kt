@@ -95,7 +95,7 @@ class JwtHelper(
                                         return null
                                     }
                                     when (session.status) {
-                                        SessionStatus.ACTIVE -> {
+                                        SessionStatus.Active -> {
                                             onFound(session)
                                             JWTPrincipal(credential.payload)
                                         }

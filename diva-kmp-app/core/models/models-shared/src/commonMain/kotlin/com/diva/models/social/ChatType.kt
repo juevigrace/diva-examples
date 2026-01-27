@@ -1,16 +1,15 @@
 package com.diva.models.social
 
-enum class ChatType(
-    val value: String,
-) {
-    DIRECT("direct"),
-    GROUP("group"),
+enum class ChatType {
+    Direct,
+    Group,
+    Unspecified,
 }
 
 fun safeChatType(value: String): ChatType {
     return try {
-        ChatType.valueOf(value.uppercase())
+        ChatType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        ChatType.DIRECT
+        ChatType.Unspecified
     }
 }

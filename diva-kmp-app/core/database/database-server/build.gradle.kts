@@ -7,7 +7,11 @@ dependencies {
     api(projects.core.database.databaseShared)
     api(projects.core.modelsServer)
 
-    api(libs.diva.database)
+    implementation(libs.postgresql)
+
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.koin.test)
 }
 
 sqldelight {
@@ -16,7 +20,7 @@ sqldelight {
             packageName.set("com.diva.database")
             schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
             dialect(libs.sqldelight.postgres.dialect)
-            generateAsync.set(true)
+            generateAsync.set(false)
             deriveSchemaFromMigrations.set(true)
             verifyMigrations.set(true)
         }

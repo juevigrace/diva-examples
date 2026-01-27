@@ -1,15 +1,15 @@
 services:
-  diva_ktor_server:
-    image: diva_ktor_server:prod
-    container_name: diva_ktor_server
+  diva_server:
+    image: diva_server:prod
+    container_name: diva_server
     build:
       context: .
       dockerfile: Dockerfile
       target: runtime
-    command: ["java", "-jar", "./bin/diva-ktor-server.jar"]
+    command: ["java", "-jar", "./bin/diva-server.jar"]
     restart: unless-stopped
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT}:5432"
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}

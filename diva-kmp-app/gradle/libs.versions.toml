@@ -7,15 +7,18 @@ android-targetSdk = "36"
 android-minSdk = "24"
 compose-hot-reload = "1.0.0"
 compose-multiplatform = "1.10.0"
-diva = "0.0.6"
+diva = "0.0.7"
 koin = "4.1.1"
-kotlin = "2.2.21"
-kotlinx-serialization = "1.9.0"
+kotlin = "2.3.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.10.0"
 ktor = "3.3.3"
 sqldelight = "2.2.1"
 kdotenv = "6.5.1"
 kbcrypt = "1.0.9"
-resend = "4.11.0"
+resend = "4.12.0"
+sqlite = "3.45.3.0"
+postgresql = "42.7.9"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -32,6 +35,9 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 [libraries]
 ######### [TEST DEPENDENCIES] #########
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 
 ######### [DIVA DEPENDENCIES] #########
 diva-core = { group = "io.github.juevigrace", name = "diva-core", version.ref = "diva" }
@@ -94,3 +100,6 @@ kbcrypt = { group = "com.ToxicBakery.library.bcrypt", name = "bcrypt", version.r
 kdotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "kdotenv" }
 
 resend = { group = "com.resend", name = "resend-java", version.ref = "resend" }
+
+sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }

@@ -8,8 +8,9 @@ kotlin {
         commonMain.dependencies {
             api(projects.core.models)
             api(projects.core.database.databaseShared)
-
-            api(libs.diva.database)
+        }
+        jvmMain.dependencies {
+            implementation(libs.sqlite)
         }
     }
 }

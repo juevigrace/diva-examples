@@ -9,6 +9,8 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.features.app.settings.data.settingsData)
+
             implementation(libs.koin.core)
         }
     }

@@ -31,7 +31,7 @@ data class Session(
             userId = user.id.toString(),
             accessToken = accessToken,
             refreshToken = refreshToken,
-            status = status.value,
+            status = status.name,
             device = device,
             ip = ipAddress,
             agent = userAgent,

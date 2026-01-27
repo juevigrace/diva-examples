@@ -25,13 +25,9 @@ help:
 	@echo ""
 
 # Development Commands
-dev-build:
-	@echo "Building development image..."
-	docker-compose -f docker-compose.dev.yml build
-
 dev-up:
 	@echo "Starting development environment..."
-	docker-compose -f docker-compose.dev.yml up -d
+	docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
 
 dev-down:
 	@echo "Stopping development environment..."
@@ -46,13 +42,9 @@ dev-shell:
 	docker-compose -f docker-compose.dev.yml exec diva_ktor_server sh
 
 # Production Commands
-prod-build:
-	@echo "Building production image..."
-	docker-compose build
-
 prod-up:
 	@echo "Starting production environment..."
-	docker-compose up -d
+	docker compose -f docker-compose.yml --env-file .env up -d --build
 
 prod-down:
 	@echo "Stopping production environment..."

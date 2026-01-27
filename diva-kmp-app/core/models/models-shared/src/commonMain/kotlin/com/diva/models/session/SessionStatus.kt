@@ -1,17 +1,15 @@
 package com.diva.models.session
 
-enum class SessionStatus(
-    val value: String,
-) {
-    ACTIVE("active"),
-    EXPIRED("expired"),
-    CLOSED("closed"),
+enum class SessionStatus {
+    Active,
+    Expired,
+    Closed,
 }
 
 fun safeSessionStatus(value: String): SessionStatus {
     return try {
-        SessionStatus.valueOf(value.uppercase())
+        SessionStatus.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        SessionStatus.ACTIVE
+        SessionStatus.Expired
     }
 }

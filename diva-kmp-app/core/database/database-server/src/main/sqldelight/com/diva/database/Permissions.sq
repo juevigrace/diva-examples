@@ -1,8 +1,6 @@
--- Entity queries for diva_permissions
-
 insert:
-INSERT INTO diva_permissions (id, name, description)
-VALUES (?, ?, ?);
+INSERT INTO diva_permissions (id, name, description, role_level)
+VALUES (?, ?, ?, ?);
 
 update:
 UPDATE diva_permissions

@@ -1,17 +1,16 @@
 package com.diva.models.social
 
-enum class MessageType(
-    val value: String,
-) {
-    TEXT("text"),
-    MEDIA("media"),
-    SYSTEM("system"),
+enum class MessageType {
+    Text,
+    Media,
+    System,
+    Unspecified,
 }
 
 fun safeMessageType(value: String): MessageType {
     return try {
-        MessageType.valueOf(value.uppercase())
+        MessageType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        MessageType.TEXT
+        MessageType.Unspecified
     }
 }

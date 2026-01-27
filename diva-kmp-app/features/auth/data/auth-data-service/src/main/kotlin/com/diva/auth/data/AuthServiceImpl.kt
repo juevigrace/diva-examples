@@ -186,7 +186,7 @@ class AuthServiceImpl(
         ) {
             // TODO: this should just update instead?
             storage
-                .updateStatus(sessionId, SessionStatus.CLOSED)
+                .updateStatus(sessionId, SessionStatus.Closed)
                 .mapError { err -> err.asNetworkError(HttpRequestMethod.POST, "/api/auth/signUp") }
                 .map { ApiResponse(message = "Sign out successful") }
         }
@@ -229,7 +229,7 @@ class AuthServiceImpl(
             accessToken = accessToken,
             refreshToken = refreshToken,
             device = dto.device,
-            status = SessionStatus.ACTIVE,
+            status = SessionStatus.Active,
             // TODO: GET IP
             ipAddress = dto.ipAddress ?: "",
             userAgent = dto.userAgent ?: "",

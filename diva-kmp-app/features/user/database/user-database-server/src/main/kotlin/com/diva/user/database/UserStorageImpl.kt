@@ -76,8 +76,8 @@ class UserStorageImpl(
                     avatar = item.avatar,
                     bio = item.bio,
                     user_verified = false,
-                    role = Role.USER.name
-                )
+                    role = Role.User
+                ).value
             }
             if (rows.toInt() == -1 || rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -103,7 +103,7 @@ class UserStorageImpl(
                     avatar = item.avatar,
                     bio = item.bio,
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -128,7 +128,7 @@ class UserStorageImpl(
                 userQueries.updateEmail(
                     email = email,
                     id = id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -150,7 +150,7 @@ class UserStorageImpl(
                 userQueries.updateVerified(
                     user_verified = true,
                     id = id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -175,7 +175,7 @@ class UserStorageImpl(
                 userQueries.updatePassword(
                     password_hash = passwordHash,
                     id = id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -194,7 +194,7 @@ class UserStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                userQueries.delete(id.toJavaUuid())
+                userQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -219,7 +219,7 @@ class UserStorageImpl(
         avatar: String,
         bio: String,
         userVerified: Boolean,
-        role: String,
+        role: Role,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
@@ -233,7 +233,7 @@ class UserStorageImpl(
             avatar = avatar,
             bio = bio,
             userVerified = userVerified,
-            role = safeRole(role),
+            role = role,
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

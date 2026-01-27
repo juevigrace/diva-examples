@@ -9,6 +9,8 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.features.app.home.data.homeData)
+
             implementation(libs.koin.core)
         }
     }

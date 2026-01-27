@@ -51,7 +51,7 @@ class VerificationStorageImpl(
                     user_id = item.userId.toJavaUuid(),
                     token = item.token,
                     expires_at = expiresAt,
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -70,7 +70,7 @@ class VerificationStorageImpl(
     override suspend fun update(item: UserVerification): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                emailVerificationTokensQueries.update(item.userId.toJavaUuid())
+                emailVerificationTokensQueries.update(item.userId.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -89,7 +89,7 @@ class VerificationStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                emailVerificationTokensQueries.delete(id.toJavaUuid())
+                emailVerificationTokensQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -107,7 +107,7 @@ class VerificationStorageImpl(
     override suspend fun deleteByToken(token: String): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                emailVerificationTokensQueries.deleteByToken(token)
+                emailVerificationTokensQueries.deleteByToken(token).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(

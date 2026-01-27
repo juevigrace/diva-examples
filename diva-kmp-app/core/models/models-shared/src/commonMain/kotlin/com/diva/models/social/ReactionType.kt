@@ -1,18 +1,17 @@
 package com.diva.models.social
 
-enum class ReactionType(
-    val value: String,
-) {
-    LIKE("like"),
-    COMMENT("comment"),
-    BOOKMARK("bookmark"),
-    SHARE("share"),
+enum class ReactionType {
+    Like,
+    Comment,
+    Bookmark,
+    Share,
+    Unspecified,
 }
 
 fun safeReactionType(value: String): ReactionType {
     return try {
-        ReactionType.valueOf(value.uppercase())
+        ReactionType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        ReactionType.LIKE
+        ReactionType.Unspecified
     }
 }

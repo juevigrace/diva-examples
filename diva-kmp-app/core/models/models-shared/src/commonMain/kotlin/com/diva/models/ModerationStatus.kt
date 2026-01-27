@@ -1,18 +1,17 @@
 package com.diva.models
 
-enum class ModerationStatus(
-    val value: String,
-) {
-    PENDING("pending"),
-    APPROVED("approved"),
-    REJECTED("rejected"),
-    HIDDEN("hidden"),
+enum class ModerationStatus {
+    Pending,
+    Approved,
+    Rejected,
+    Hidden,
+    Unspecified,
 }
 
 fun safeModerationStatus(value: String): ModerationStatus {
     return try {
-        ModerationStatus.valueOf(value.uppercase())
+        ModerationStatus.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        ModerationStatus.PENDING
+        ModerationStatus.Unspecified
     }
 }

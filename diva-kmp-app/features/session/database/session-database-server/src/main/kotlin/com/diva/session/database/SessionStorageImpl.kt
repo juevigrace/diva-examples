@@ -79,11 +79,11 @@ class SessionStorageImpl(
                     access_token = item.accessToken,
                     refresh_token = item.refreshToken,
                     device = item.device,
-                    status = item.status.value,
+                    status = item.status,
                     ip_address = item.ipAddress,
                     user_agent = item.userAgent,
                     expires_at = expiresAt,
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -110,12 +110,12 @@ class SessionStorageImpl(
                     access_token = item.accessToken,
                     refresh_token = item.refreshToken,
                     device = item.device,
-                    status = item.status.value,
+                    status = item.status,
                     ip_address = item.ipAddress,
                     user_agent = item.userAgent,
                     expires_at = expiresAt,
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -138,9 +138,9 @@ class SessionStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 sessionQueries.updateStatus(
-                    status = status.value,
+                    status = status,
                     id = sessionId.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -159,7 +159,7 @@ class SessionStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                sessionQueries.delete(id.toJavaUuid())
+                sessionQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -178,7 +178,7 @@ class SessionStorageImpl(
     override suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                sessionQueries.deleteByUserId(userId.toJavaUuid())
+                sessionQueries.deleteByUserId(userId.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -199,7 +199,7 @@ class SessionStorageImpl(
         accessToken: String,
         refreshToken: String,
         device: String,
-        status: String,
+        status: SessionStatus,
         ipAddress: String,
         userAgent: String,
         expiresAt: OffsetDateTime,
@@ -209,7 +209,7 @@ class SessionStorageImpl(
         email: String?,
         username: String?,
         userVerified: Boolean?,
-        role: String?,
+        role: Role?,
         uCreatedAt: OffsetDateTime?,
         uUpdatedAt: OffsetDateTime?,
     ): Session {
@@ -226,14 +226,14 @@ class SessionStorageImpl(
                 username = username,
                 email = email,
                 userVerified = userVerified ?: false,
-                role = role?.let { r -> safeRole(r) } ?: Role.USER,
+                role = role ?: Role.User,
                 createdAt = uCreatedAt.toInstant().toKotlinInstant(),
                 updatedAt = uUpdatedAt.toInstant().toKotlinInstant()
             ),
             accessToken = accessToken,
             refreshToken = refreshToken,
             device = device,
-            status = safeSessionStatus(status),
+            status = status,
             ipAddress = ipAddress,
             userAgent = userAgent,
             expiresAt = expiresAt.toInstant().toKotlinInstant(),

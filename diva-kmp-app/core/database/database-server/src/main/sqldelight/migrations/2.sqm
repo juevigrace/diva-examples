@@ -1,37 +1,9 @@
-CREATE TYPE reaction_enum AS ENUM (
-    'like', 'comment', 'bookmark', 'share'
-);
-
-CREATE TYPE moderation_status_enum AS ENUM (
-    'pending', 'approved', 'rejected', 'hidden'
-);
-
-CREATE TYPE share_type_enum AS ENUM (
-    'direct',
-    'external',
-    'embed',
-    'download'
-);
-
-CREATE TYPE notification_type_enum AS ENUM (
-    'like', 'comment', 'reply', 'share', 'follow', 'mention'
-);
-
-CREATE TYPE chat_type_enum AS ENUM (
-    'direct',
-    'group'
-);
-
-CREATE TYPE participant_role_enum AS ENUM (
-    'admin',
-    'member'
-);
-
-CREATE TYPE message_type_enum AS ENUM (
-    'text',
-    'media',
-    'system'
-);
+import com.diva.models.VisibilityType;
+import com.diva.models.social.ChatType;
+import com.diva.models.social.MessageType;
+import com.diva.models.social.ParticipantRole;
+import com.diva.models.social.ReactionType;
+import com.diva.models.social.share.ShareType;
 
 CREATE TABLE IF NOT EXISTS diva_follow(
     user_id UUID NOT NULL,
@@ -50,7 +22,7 @@ CREATE TABLE IF NOT EXISTS diva_post(
     content TEXT NOT NULL DEFAULT '',
     media_id UUID DEFAULT NULL,
     collection_id UUID DEFAULT NULL,
-    visibility visibility_enum NOT NULL DEFAULT 'public',
+    visibility VARCHAR(50) AS VisibilityType NOT NULL,
     edited_at TIMESTAMPTZ DEFAULT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -64,7 +36,7 @@ CREATE TABLE IF NOT EXISTS diva_interaction(
     id UUID NOT NULL PRIMARY KEY,
     user_id UUID NOT NULL,
     post_id UUID NOT NULL,
-    reaction_type reaction_enum NOT NULL DEFAULT 'like',
+    reaction_type VARCHAR(50) AS ReactionType NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
     FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
@@ -72,7 +44,7 @@ CREATE TABLE IF NOT EXISTS diva_interaction(
 
 CREATE TABLE IF NOT EXISTS diva_share(
     interaction_id UUID NOT NULL PRIMARY KEY,
-    share_type share_type_enum NOT NULL DEFAULT 'direct',
+    share_type VARCHAR(50) AS ShareType NOT NULL,
     caption TEXT NOT NULL DEFAULT '',
     FOREIGN KEY(interaction_id) REFERENCES diva_interaction(id) ON DELETE CASCADE
 );
@@ -89,7 +61,7 @@ CREATE TABLE IF NOT EXISTS diva_comment(
 CREATE TABLE IF NOT EXISTS diva_chat(
     id UUID NOT NULL PRIMARY KEY,
     created_by UUID NOT NULL,
-    chat_type chat_type_enum NOT NULL DEFAULT 'direct',
+    chat_type VARCHAR(50) AS ChatType NOT NULL,
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
     avatar UUID DEFAULT NULL,
@@ -104,7 +76,7 @@ CREATE TABLE IF NOT EXISTS diva_chat(
 CREATE TABLE IF NOT EXISTS diva_chat_participant(
     chat_id UUID NOT NULL,
     user_id UUID NOT NULL,
-    role participant_role_enum NOT NULL DEFAULT 'member',
+    role VARCHAR(50) AS ParticipantRole NOT NULL,
     joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_read_at TIMESTAMPTZ DEFAULT NULL,
     muted_until TIMESTAMPTZ DEFAULT NULL,
@@ -121,7 +93,7 @@ CREATE TABLE IF NOT EXISTS diva_message(
     chat_id UUID NOT NULL,
     sender_id UUID NOT NULL,
     content TEXT NOT NULL DEFAULT '',
-    message_type message_type_enum NOT NULL DEFAULT 'text',
+    message_type VARCHAR(50) AS MessageType NOT NULL,
     reply_to_id UUID DEFAULT NULL,
     edited_at TIMESTAMPTZ DEFAULT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

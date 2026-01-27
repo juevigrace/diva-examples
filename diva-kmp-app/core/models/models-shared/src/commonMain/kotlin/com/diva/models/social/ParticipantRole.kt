@@ -1,16 +1,15 @@
 package com.diva.models.social
 
-enum class ParticipantRole(
-    val value: String,
-) {
-    ADMIN("admin"),
-    MEMBER("member"),
+enum class ParticipantRole {
+    Admin,
+    Member,
+    Unspecified,
 }
 
 fun safeParticipantRole(value: String): ParticipantRole {
     return try {
-        ParticipantRole.valueOf(value.uppercase())
+        ParticipantRole.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        ParticipantRole.MEMBER
+        ParticipantRole.Unspecified
     }
 }

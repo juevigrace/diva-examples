@@ -1,15 +1,19 @@
 services:
-  diva_ktor_server:
-    image: diva_ktor_server:dev
-    container_name: diva_ktor_server
+  diva_server_dev:
+    image: diva_server:dev
+    container_name: diva_server_dev
+    env_file:
+      - ./.env.dev
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["java", "-jar", "./bin/diva-ktor-server.jar"]
+    command: ["java", "-jar", "./bin/diva-server.jar"]
     restart: unless-stopped
     ports:
       - "${PORT}:${PORT}"
     environment:
+      KTOR_ENV: development
+      KTOR_DEV: true
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}
       DB_HOST: ${DB_HOST}
@@ -28,7 +32,7 @@ services:
       ROOT_PASSWORD: ${ROOT_PASSWORD}
       ROOT_EMAIL: ${ROOT_EMAIL}
     depends_on:
-      diva_db:
+      diva_db_dev:
         condition: service_healthy
     volumes:
       # Base files
@@ -40,11 +44,12 @@ services:
       - ./gradle:/app/gradle
        
       # Core server modules
-      - ./core/server/util:/app/core/server/util
+      - ./core/server:/app/core/server
       - ./core/models-server:/app/core/models-server
       - ./core/models:/app/core/models
-      - ./core/database/postgres:/app/core/database/postgres
-       
+      - ./core/database/database-server:/app/core/database/database-server
+      - ./core/database/database-shared:/app/core/database/database-shared
+
       # Auth modules (corrected paths)
       - ./features/auth/api/auth-api-handler:/app/features/auth/api/auth-api-handler
       - ./features/auth/data/auth-data-service:/app/features/auth/data/auth-data-service
@@ -94,8 +99,8 @@ services:
       - ./features/permissions/database/permissions-database-server:/app/features/permissions/database/permissions-database-server
       - ./features/permissions/di/permissions-di-server:/app/features/permissions/di/permissions-di-server
     networks:
-       - net
-  diva_db:
+       - diva_dev_net
+  diva_db_dev:
     container_name: diva_db_dev
     image: postgres:15-alpine
     restart: unless-stopped
@@ -105,9 +110,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_dev_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
       interval: 10s
@@ -115,10 +120,10 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - net
+      - diva_dev_net
 volumes:
-  db_data:
+  db_dev_data:
     driver: local
 networks:
-  net:
+  diva_dev_net:
     driver: bridge

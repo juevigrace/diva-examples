@@ -1,18 +1,16 @@
 package com.diva.models.media
 
-enum class MediaType(
-    val value: String,
-) {
-    AUDIO("audio"),
-    IMAGE("image"),
-    VIDEO("video"),
-    UNSPECIFIED("unspecified"),
+enum class MediaType {
+    Audio,
+    Image,
+    Video,
+    Unspecified,
 }
 
 fun safeMediaType(value: String): MediaType {
     return try {
-        MediaType.valueOf(value.uppercase())
+        MediaType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        MediaType.UNSPECIFIED
+        MediaType.Unspecified
     }
 }

@@ -1,20 +1,19 @@
 package com.diva.models
 
-enum class NotificationType(
-    val value: String,
-) {
-    LIKE("like"),
-    COMMENT("comment"),
-    REPLY("reply"),
-    SHARE("share"),
-    FOLLOW("follow"),
-    MENTION("mention"),
+enum class NotificationType {
+    Like,
+    Comment,
+    Reply,
+    Share,
+    Follow,
+    Mention,
+    Unspecified,
 }
 
 fun safeNotificationType(value: String): NotificationType {
     return try {
-        NotificationType.valueOf(value.uppercase())
+        NotificationType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        NotificationType.LIKE
+        NotificationType.Unspecified
     }
 }

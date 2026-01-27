@@ -25,9 +25,9 @@ dependencies {
     implementation(projects.features.auth.di.authDiServer)
 
     implementation(projects.features.session.database.sessionDatabaseServer)
-    implementation(projects.features.user.database.userDatabaseServer)
 
     implementation(projects.features.user.api.userApiHandler)
+    implementation(projects.features.user.database.userDatabaseServer)
     implementation(projects.features.user.di.userDiServer)
 
     implementation(projects.features.verification.di.verificationDi)
@@ -80,7 +80,7 @@ dependencies {
 ktor {
     docker {
         jreVersion.set(JavaVersion.VERSION_21)
-        localImageName.set("diva-ktor-server")
+        localImageName.set("diva-server")
         imageTag.set(libs.versions.app.version.name)
         portMappings.set(
             listOf(
@@ -93,6 +93,6 @@ ktor {
         )
     }
     fatJar {
-        archiveFileName.set("diva-ktor-server.jar")
+        archiveFileName.set("diva-server.jar")
     }
 }

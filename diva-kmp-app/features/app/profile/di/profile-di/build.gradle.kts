@@ -9,6 +9,8 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.features.app.profile.data.profileData)
+
             implementation(libs.koin.core)
         }
     }

@@ -3,7 +3,6 @@ package com.diva.server.config
 import com.diva.server.database.Seed
 import io.ktor.server.application.Application
 import org.koin.ktor.ext.inject
-import kotlin.getValue
 
 fun Application.configureDatabase() {
     val seed: Seed by inject()

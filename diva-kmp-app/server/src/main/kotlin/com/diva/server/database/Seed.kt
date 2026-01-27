@@ -34,7 +34,7 @@ class Seed(
                 email = email,
                 username = username,
                 passwordHash = Option.of(passwordHash),
-                role = Role.ADMIN,
+                role = Role.Admin,
                 permissions = listOf()
             )
         )
