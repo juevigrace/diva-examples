@@ -1,6 +1,6 @@
 package com.diva.models.chat
 
-import com.diva.models.api.social.chat.response.MessageResponse
+import com.diva.models.api.chat.response.MessageResponse
 import com.diva.models.media.Media
 import com.diva.models.social.MessageType
 import com.diva.models.social.safeMessageType

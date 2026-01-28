@@ -1,5 +1,5 @@
 # Stage 1: build
-FROM gradle:9.3.0-jdk21 AS build
+FROM gradle:9.3.0-jdk21-alpine AS build
 WORKDIR /app
 ENV GRADLE_USER_HOME=/home/gradle/.gradle
 COPY gradle gradle

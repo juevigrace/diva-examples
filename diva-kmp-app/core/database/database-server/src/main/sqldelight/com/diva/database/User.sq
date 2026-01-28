@@ -7,7 +7,12 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
-SET email = ?, username = ?, alias = ?, avatar = ?, bio = ?, updated_at = NOW()
+SET alias = ?, avatar = ?, bio = ?, updated_at = NOW()
+WHERE id = ? AND deleted_at IS NULL;
+
+updateUsername:
+UPDATE diva_user
+SET username = ?
 WHERE id = ? AND deleted_at IS NULL;
 
 updateVerified:

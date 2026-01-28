@@ -1,4 +1,4 @@
-package com.diva.models.api.social.chat.response
+package com.diva.models.api.chat.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

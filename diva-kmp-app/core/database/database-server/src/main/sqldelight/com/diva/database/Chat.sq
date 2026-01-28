@@ -4,7 +4,7 @@ VALUES (?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_chat 
-SET name = ?, description = ?, avatar = ?, last_message_at = ?, updated_at = NOW() 
+SET name = ?, description = ?, avatar = ?, updated_at = NOW()
 WHERE id = ? AND deleted_at IS NULL;
 
 delete:
@@ -20,7 +20,6 @@ SELECT
   name,
   description,
   avatar,
-  last_message_at AS lastMessageAt,
   created_at AS createdAt,
   updated_at AS updatedAt
 FROM diva_chat 
@@ -34,7 +33,6 @@ SELECT
   name,
   description,
   avatar,
-  last_message_at AS lastMessageAt,
   created_at AS createdAt,
   updated_at AS updatedAt
 FROM diva_chat 
@@ -49,7 +47,6 @@ SELECT
   name,
   description,
   avatar,
-  last_message_at AS lastMessageAt,
   created_at AS createdAt,
   updated_at AS updatedAt
 FROM diva_chat 

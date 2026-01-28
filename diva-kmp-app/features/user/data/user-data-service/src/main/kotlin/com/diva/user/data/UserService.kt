@@ -22,7 +22,7 @@ interface UserService {
 
     suspend fun updateUser(
         dto: UpdateUserDto,
-        session: Session
+        id: String,
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError>
 
     suspend fun updateEmail(
@@ -30,8 +30,7 @@ interface UserService {
         session: Session,
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError>
 
-    @OptIn(ExperimentalUuidApi::class)
-    suspend fun deleteUser(id: Uuid): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError>
+    suspend fun deleteUser(id: String): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError>
 
     suspend fun getUserByUsername(username: String): DivaResult<User, DivaError>
 

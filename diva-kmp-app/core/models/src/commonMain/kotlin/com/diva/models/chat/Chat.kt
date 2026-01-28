@@ -1,6 +1,6 @@
 package com.diva.models.chat
 
-import com.diva.models.api.social.chat.response.ChatResponse
+import com.diva.models.api.chat.response.ChatResponse
 import com.diva.models.social.ChatType
 import com.diva.models.social.safeChatType
 import com.diva.models.user.User

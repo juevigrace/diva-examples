@@ -1,29 +1,33 @@
 package com.diva.chat.api.handler
 
-import io.ktor.server.routing.Routing
+import com.diva.chat.data.ChatMessageService
+import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 
-internal fun Routing.chatMessageHandler() {
+internal fun Route.chatMessageHandler() {
+    val service: ChatMessageService by inject()
+
     route("/message") {
         // todo: ws
-        get("/") {
+        get {
         }
 
-        post("/") {
+        post {
         }
-        put("/") {
+        put {
         }
-        delete("/") {
+        delete {
         }
 
         route("media") {
-            post("/") {
+            post {
             }
-            delete("/") {
+            delete {
             }
         }
     }

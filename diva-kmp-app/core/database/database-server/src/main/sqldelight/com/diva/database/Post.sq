@@ -4,7 +4,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_post 
-SET title = ?, content = ?, visibility = ?, edited_at = NOW(), updated_at = NOW() 
+SET visibility = ?, edited_at = NOW(), updated_at = NOW()
 WHERE id = ? AND deleted_at IS NULL;
 
 delete:

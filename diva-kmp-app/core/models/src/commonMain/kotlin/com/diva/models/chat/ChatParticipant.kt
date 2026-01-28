@@ -1,6 +1,6 @@
 package com.diva.models.chat
 
-import com.diva.models.api.social.chat.response.ChatParticipantResponse
+import com.diva.models.api.chat.response.ChatParticipantResponse
 import com.diva.models.social.ParticipantRole
 import com.diva.models.social.safeParticipantRole
 import com.diva.models.user.User

@@ -22,7 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
+import io.ktor.server.routing.Route
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -30,7 +30,7 @@ import org.koin.ktor.ext.inject
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-fun Routing.authApiHandler() {
+fun Route.authApiHandler() {
     val service: AuthService by inject()
     val userService: UserService by inject()
     val verificationService: VerificationService by inject()
@@ -124,7 +124,7 @@ fun Routing.authApiHandler() {
                 }
 
                 authenticate(AUTH_JWT_KEY) {
-                    patch("/") {
+                    patch {
                         val session: Session = call.attributes.getOrNull(SESSION_KEY)
                             ?: return@patch call.respond(
                                 status = HttpStatusCode.Unauthorized,

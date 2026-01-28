@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS diva_chat(
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
     avatar UUID DEFAULT NULL,
-    last_message_at TIMESTAMPTZ DEFAULT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ DEFAULT NULL,
@@ -84,8 +83,7 @@ CREATE TABLE IF NOT EXISTS diva_chat_participant(
     PRIMARY KEY (chat_id, user_id),
     FOREIGN KEY(chat_id) REFERENCES diva_chat(id) ON DELETE CASCADE,
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE RESTRICT,
-    CONSTRAINT no_self_add CHECK (user_id != added_by)
+    FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS diva_message(

@@ -2,8 +2,8 @@ package com.diva.collection.di
 
 import com.diva.collection.data.CollectionService
 import com.diva.collection.data.CollectionServiceImpl
-import com.diva.collection.data.PlaylistService
-import com.diva.collection.data.PlaylistServiceImpl
+import com.diva.collection.data.playlist.PlaylistService
+import com.diva.collection.data.playlist.PlaylistServiceImpl
 import com.diva.collection.database.CollectionStorageImpl
 import com.diva.collection.database.playlist.PlaylistStorageImpl
 import com.diva.database.collection.CollectionStorage

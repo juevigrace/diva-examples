@@ -1,10 +1,10 @@
-package com.diva.models.api.social.chat.dtos
+package com.diva.models.api.chat.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateMessageMediaDto(
+data class MessageMediaResponse(
     @SerialName("media_id")
     val mediaId: String,
 )

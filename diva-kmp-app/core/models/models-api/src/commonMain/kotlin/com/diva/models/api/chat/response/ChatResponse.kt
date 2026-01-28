@@ -1,22 +1,22 @@
-package com.diva.models.api.social.chat.response
+package com.diva.models.api.chat.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MessageResponse(
+data class ChatResponse(
     @SerialName("id")
     val id: String,
-    @SerialName("sender_id")
-    val senderId: String,
-    @SerialName("content")
-    val content: String,
+    @SerialName("created_by")
+    val createdBy: String,
     @SerialName("type")
     val type: String,
-    @SerialName("reply_to_id")
-    val replyTo: String? = null,
-    @SerialName("edited_at")
-    val editedAt: Long? = null,
+    @SerialName("name")
+    val name: String,
+    @SerialName("description")
+    val description: String,
+    @SerialName("avatar")
+    val avatar: String? = null,
     @SerialName("created_at")
     val createdAt: Long,
     @SerialName("updated_at")

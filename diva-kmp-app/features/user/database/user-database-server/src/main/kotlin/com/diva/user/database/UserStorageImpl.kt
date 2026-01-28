@@ -3,7 +3,6 @@ package com.diva.user.database
 import com.diva.database.DivaDB
 import com.diva.database.user.UserStorage
 import com.diva.models.roles.Role
-import com.diva.models.roles.safeRole
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -97,8 +96,6 @@ class UserStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 userQueries.update(
-                    email = item.email,
-                    username = item.username,
                     alias = item.alias,
                     avatar = item.avatar,
                     bio = item.bio,

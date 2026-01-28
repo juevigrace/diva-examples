@@ -1,4 +1,4 @@
-package com.diva.models.api.social.chat.dtos
+package com.diva.models.api.chat.dtos
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

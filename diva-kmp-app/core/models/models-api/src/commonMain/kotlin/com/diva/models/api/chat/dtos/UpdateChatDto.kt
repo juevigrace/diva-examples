@@ -1,12 +1,12 @@
-package com.diva.models.api.social.chat.dtos
+package com.diva.models.api.chat.dtos
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateChatDto(
-    @SerialName("type")
-    val type: String,
+data class UpdateChatDto(
+    @SerialName("id")
+    val id: String,
     @SerialName("name")
     val name: String? = null,
     @SerialName("description")

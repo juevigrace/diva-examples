@@ -78,21 +78,18 @@ class UserServiceImpl(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun updateUser(
         dto: UpdateUserDto,
-        session: Session
+        id: String,
     ): DivaResult<ApiResponse<Nothing>, DivaError.NetworkError> {
+        val parsedId: Uuid = Uuid.parse(id)
         val user = User(
-            id = session.user.id,
+            id = parsedId,
             username = dto.username,
             alias = dto.alias,
             avatar = dto.avatar,
             bio = dto.bio,
-            email = session.user.email,
-            userVerified = session.user.userVerified,
-            createdAt = session.user.createdAt,
-            updatedAt = session.user.updatedAt,
         )
         return storage
             .update(user)

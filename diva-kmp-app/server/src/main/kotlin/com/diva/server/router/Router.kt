@@ -54,15 +54,15 @@ fun Routing.applicationRoutes() {
                 onSuccess = { call.respond(HttpStatusCode.OK, ApiResponse(data = it, message = "OK")) }
             )
         }
-    }
-    route("/api") {
-        authApiHandler()
-        chatApiHandler()
-        collectionApiHandler()
-        mediaApiHandler()
-        permissionsApiHandler()
-        socialApiHandler()
-        tagApiHandler()
-        userApiHandler(this)
+        route("/api") {
+            authApiHandler()
+            chatApiHandler()
+            collectionApiHandler()
+            mediaApiHandler()
+            permissionsApiHandler()
+            socialApiHandler()
+            tagApiHandler()
+            userApiHandler()
+        }
     }
 }
