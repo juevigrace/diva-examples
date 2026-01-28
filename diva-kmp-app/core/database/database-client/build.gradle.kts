@@ -6,8 +6,8 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.core.models)
             api(projects.core.database.databaseShared)
+            implementation(projects.core.models)
         }
         jvmMain.dependencies {
             implementation(libs.sqlite)

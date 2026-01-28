@@ -15,53 +15,31 @@ COPY core/database/database-server core/database/database-server
 COPY core/database/database-shared core/database/database-shared
 
 # Auth modules
-COPY features/auth/api/auth-api-handler features/auth/api/auth-api-handler
-COPY features/auth/data/auth-data-service features/auth/data/auth-data-service
-COPY features/auth/di/auth-di-server features/auth/di/auth-di-server
+COPY features/auth/auth-server features/auth/auth-server
 
 # Chat modules
-COPY features/chat/api/chat-api-handler features/chat/api/chat-api-handler
-COPY features/chat/data/chat-data-service features/chat/data/chat-data-service
-COPY features/chat/database/chat-database-server features/chat/database/chat-database-server
-COPY features/chat/di/chat-di-server features/chat/di/chat-di-server
+COPY features/chat/chat-server features/chat/chat-server
 
 # Collection modules
-COPY features/collection/api/collection-api-handler features/collection/api/collection-api-handler
-COPY features/collection/data/collection-data-service features/collection/data/collection-data-service
-COPY features/collection/database/collection-database-server features/collection/database/collection-database-server
-COPY features/collection/di/collection-di-server features/collection/di/collection-di-server
+COPY features/collection/collection-server features/collection/collection-server
 
 # Media modules
-COPY features/media/api/media-api-handler features/media/api/media-api-handler
-COPY features/media/data/media-data-service features/media/data/media-data-service
-COPY features/media/database/media-database-server features/media/database/media-database-server
-COPY features/media/di/media-di-server features/media/di/media-di-server
+COPY features/media/media-server features/media/media-server
 
 # Permissions modules
-COPY features/permissions/api/permissions-api-handler features/permissions/api/permissions-api-handler
-COPY features/permissions/data/permissions-data-service features/permissions/data/permissions-data-service
-COPY features/permissions/database/permissions-database-server features/permissions/database/permissions-database-server
-COPY features/permissions/di/permissions-di-server features/permissions/di/permissions-di-server
+COPY features/permissions/permissions-server features/permissions/permissions-server
 
 # Session modules
-COPY features/session/database/session-database-server features/session/database/session-database-server
+COPY features/session/session-server features/session/session-server
 
 # Social modules
-COPY features/social/api/social-api-handler features/social/api/social-api-handler
-COPY features/social/data/social-data-service features/social/data/social-data-service
-COPY features/social/database/social-database-server features/social/database/social-database-server
-COPY features/social/di/social-di-server features/social/di/social-di-server
+COPY features/social/social-server features/social/social-server
 
 # User modules
-COPY features/user/api/user-api-handler features/user/api/user-api-handler
-COPY features/user/data/user-data-service features/user/data/user-data-service
-COPY features/user/database/user-database-server features/user/database/user-database-server
-COPY features/user/di/user-di-server features/user/di/user-di-server
+COPY features/user/user-server features/user/user-server
 
 # Verification modules
-COPY features/verification/data/verification-data features/verification/data/verification-data
-COPY features/verification/database/verification-database features/verification/database/verification-database
-COPY features/verification/di/verification-di features/verification/di/verification-di
+COPY features/verification features/verification
 
 RUN gradle :server:buildFatJar -PexcludeCompose=true --no-daemon
 

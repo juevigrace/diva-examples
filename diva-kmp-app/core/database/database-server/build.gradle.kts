@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     api(projects.core.database.databaseShared)
-    api(projects.core.modelsServer)
+    implementation(projects.core.modelsServer)
 
     implementation(libs.postgresql)
 

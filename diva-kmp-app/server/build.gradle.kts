@@ -21,31 +21,15 @@ dependencies {
     implementation(projects.core.database.databaseServer)
     implementation(projects.core.modelsServer)
 
-    implementation(projects.features.auth.api.authApiHandler)
-    implementation(projects.features.auth.di.authDiServer)
-
-    implementation(projects.features.session.database.sessionDatabaseServer)
-
-    implementation(projects.features.user.api.userApiHandler)
-    implementation(projects.features.user.database.userDatabaseServer)
-    implementation(projects.features.user.di.userDiServer)
-
-    implementation(projects.features.verification.di.verificationDi)
-
-    implementation(projects.features.chat.api.chatApiHandler)
-    implementation(projects.features.chat.di.chatDiServer)
-
-    implementation(projects.features.collection.api.collectionApiHandler)
-    implementation(projects.features.collection.di.collectionDiServer)
-
-    implementation(projects.features.media.api.mediaApiHandler)
-    implementation(projects.features.media.di.mediaDiServer)
-
-    implementation(projects.features.permissions.api.permissionsApiHandler)
-    implementation(projects.features.permissions.di.permissionsDiServer)
-
-    implementation(projects.features.social.api.socialApiHandler)
-    implementation(projects.features.social.di.socialDiServer)
+    implementation(projects.features.auth.authServer)
+    implementation(projects.features.verification)
+    implementation(projects.features.chat.chatServer)
+    implementation(projects.features.collection.collectionServer)
+    implementation(projects.features.media.mediaServer)
+    implementation(projects.features.permissions.permissionsServer)
+    implementation(projects.features.session.sessionServer)
+    implementation(projects.features.social.socialServer)
+    implementation(projects.features.user.userServer)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
@@ -66,11 +50,6 @@ dependencies {
     implementation(libs.ktor.server.caching.headers)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.config.yaml)
-
-    implementation(libs.kdotenv)
-
-    testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
 
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
