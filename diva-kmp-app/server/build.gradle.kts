@@ -42,7 +42,6 @@ dependencies {
     implementation(libs.ktor.server.request.validation)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.auth.jwt)
-    implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.forwarded.header)
     implementation(libs.ktor.server.default.headers)
     implementation(libs.ktor.server.cors)

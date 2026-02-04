@@ -31,7 +31,7 @@ class DivaDBTest {
         private val provider: DriverProvider = JvmDriverProviderFactory(
             JvmConf(
                 DriverConf.PostgresqlDriverConf(
-                    host = "localhost",
+                    host = "postgres_container",
                     port = 5433,
                     username = "postgres",
                     password = "postgres",

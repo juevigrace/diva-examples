@@ -10,44 +10,44 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class CommentStorageImpl : CommentStorage {
-    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+    override suspend fun count(): DivaResult<Long, DivaError> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getAll(
         limit: Int,
         offset: Int
-    ): DivaResult<List<Comment>, DivaError.DatabaseError> {
+    ): DivaResult<List<Comment>, DivaError> {
         TODO("Not yet implemented")
     }
 
     override fun getAllFlow(
         limit: Int,
         offset: Int
-    ): Flow<DivaResult<List<Comment>, DivaError.DatabaseError>> {
+    ): Flow<DivaResult<List<Comment>, DivaError>> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getById(id: Uuid): DivaResult<Option<Comment>, DivaError.DatabaseError> {
+    override suspend fun getById(id: Uuid): DivaResult<Option<Comment>, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Comment>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Comment>, DivaError>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun insert(item: Comment): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun insert(item: Comment): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun update(item: Comment): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun update(item: Comment): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 }

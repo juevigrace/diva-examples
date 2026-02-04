@@ -3,11 +3,11 @@ package com.diva.app
 import androidx.compose.ui.window.ComposeUIViewController
 import com.diva.app.config.AppConfig
 import com.diva.app.di.appModule
-import io.github.juevigrace.diva.di.DivaDi
+import org.koin.core.context.startKoin
 import platform.UIKit.UIViewController
 
 fun MainViewController(): UIViewController = ComposeUIViewController {
-    DivaDi.start {
+    startKoin {
         modules(appModule(AppConfig()))
     }
 

@@ -10,44 +10,44 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class MediaStorageImpl : MediaStorage {
-    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+    override suspend fun count(): DivaResult<Long, DivaError> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getAll(
         limit: Int,
         offset: Int
-    ): DivaResult<List<Media>, DivaError.DatabaseError> {
+    ): DivaResult<List<Media>, DivaError> {
         TODO("Not yet implemented")
     }
 
     override fun getAllFlow(
         limit: Int,
         offset: Int
-    ): Flow<DivaResult<List<Media>, DivaError.DatabaseError>> {
+    ): Flow<DivaResult<List<Media>, DivaError>> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getById(id: Uuid): DivaResult<Option<Media>, DivaError.DatabaseError> {
+    override suspend fun getById(id: Uuid): DivaResult<Option<Media>, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Media>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Media>, DivaError>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun insert(item: Media): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun insert(item: Media): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun update(item: Media): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun update(item: Media): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 }

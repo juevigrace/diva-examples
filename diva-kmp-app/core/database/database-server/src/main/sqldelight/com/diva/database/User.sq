@@ -102,4 +102,4 @@ SELECT
   updated_at AS updatedAt,
   deleted_at AS deletedAt
 FROM diva_user
-WHERE username = ? ;
+WHERE username = ? OR email = ? ;

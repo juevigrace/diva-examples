@@ -6,7 +6,6 @@ import io.ktor.server.application.install
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.routing
 import io.ktor.server.sse.SSE
 import io.ktor.server.websocket.WebSockets
@@ -29,7 +28,6 @@ fun Application.configureRouting() {
     routing {
         applicationRoutes()
         // Static plugin. Try to access `/static/index.html`
-        staticResources("/static", "static")
-        swaggerUI(path = "openapi")
+        staticResources("/", "static")
     }
 }

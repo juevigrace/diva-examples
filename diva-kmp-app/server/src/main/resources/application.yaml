@@ -1,13 +1,15 @@
 ktor:
-    development: $?KTOR_DEV:false
+    development: ${?KTOR_DEV}
+    environment: ${?KTOR_ENV}
     application:
         modules:
             - com.diva.server.ApplicationKt.module
     deployment:
-        environment: $?KTOR_ENV:prod
         port: ${PORT:8080}
         domain: ${DOMAIN:localhost}
-        watch: [ classes, resources ]
+        watch:
+          - classes
+          - resources
 database:
     host: ${DB_HOST:localhost}
     port: ${DB_PORT:5432}

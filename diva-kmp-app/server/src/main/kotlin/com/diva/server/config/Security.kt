@@ -42,7 +42,7 @@ fun Application.configureSecurity() {
                 )
             }
             challenge { _, _ ->
-                call.respond(HttpStatusCode.Unauthorized, ApiResponse<Nothing>(message = "Invalid token"))
+                call.respond(HttpStatusCode.Unauthorized, ApiResponse(data = null, message = "Invalid token"))
             }
         }
     }

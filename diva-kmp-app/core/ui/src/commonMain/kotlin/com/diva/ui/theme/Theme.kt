@@ -242,5 +242,8 @@ data class ColorFamily(
 )
 
 val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
+    Color.Unspecified,
+    Color.Unspecified,
+    Color.Unspecified,
+    Color.Unspecified
 )

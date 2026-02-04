@@ -1,22 +1,206 @@
 package com.diva.auth.api.client
 
-import com.diva.models.api.auth.dtos.PasswordUpdateDto
+import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.models.api.auth.dtos.SignUpDto
 import com.diva.models.api.auth.response.SessionResponse
-import com.diva.models.api.user.dtos.EmailTokenDto
-import com.diva.models.api.user.dtos.UserEmailDto
 import io.github.juevigrace.diva.core.DivaResult
+import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.ErrorCause
+import io.github.juevigrace.diva.core.errors.toDivaError
+import io.github.juevigrace.diva.core.flatMap
+import io.github.juevigrace.diva.core.network.HttpRequestMethod
+import io.github.juevigrace.diva.core.tryResult
+import io.github.juevigrace.diva.network.client.DivaClient
+import io.github.juevigrace.diva.network.client.post
+import io.github.juevigrace.diva.network.client.toHttpStatusCodes
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 
 interface AuthNetworkClient {
-    suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError.NetworkError>
-    suspend fun signUp(dto: SignUpDto): DivaResult<SessionResponse, DivaError.NetworkError>
-    suspend fun signOut(token: String): DivaResult<Unit, DivaError.NetworkError>
-    suspend fun ping(token: String): DivaResult<Unit, DivaError.NetworkError>
-    suspend fun refresh(dto: SessionDataDto, token: String): DivaResult<SessionResponse, DivaError.NetworkError>
-    suspend fun forgotPasswordRequest(dto: UserEmailDto): DivaResult<Unit, DivaError.NetworkError>
-    suspend fun forgotPasswordConfirm(dto: EmailTokenDto): DivaResult<Unit, DivaError.NetworkError>
-    suspend fun forgotPasswordReset(dto: PasswordUpdateDto, token: String): DivaResult<Unit, DivaError.NetworkError>
+    suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError>
+    suspend fun signUp(dto: SignUpDto): DivaResult<SessionResponse, DivaError>
+    suspend fun signOut(token: String): DivaResult<Unit, DivaError>
+    suspend fun ping(token: String): DivaResult<Unit, DivaError>
+    suspend fun refresh(dto: SessionDataDto, token: String): DivaResult<SessionResponse, DivaError>
+}
+
+class AuthNetworkClientImpl(
+    private val client: DivaClient
+) : AuthNetworkClient {
+    override suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            client.post(
+                path = "/api/auth/signIn",
+                body = dto
+            ).flatMap { response ->
+                val body: ApiResponse<SessionResponse> = response.body()
+                when (response.status) {
+                    HttpStatusCode.OK -> {
+                        body.data?.let { data -> DivaResult.success(data) }
+                            ?: DivaResult.failure(
+                                DivaError(
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "data",
+                                        details = Option.Some(body.message)
+                                    )
+                                )
+                            )
+                    }
+                    else -> {
+                        DivaResult.failure(
+                            DivaError(
+                                cause = ErrorCause.Network.Error(
+                                    method = HttpRequestMethod.POST,
+                                    url = "/api/auth/signIn",
+                                    status = response.status.toHttpStatusCodes(),
+                                    details = Option.Some(body.message)
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun signUp(dto: SignUpDto): DivaResult<SessionResponse, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            client.post(
+                path = "/api/auth/signUp",
+                body = dto
+            ).flatMap { response ->
+                val body: ApiResponse<SessionResponse> = response.body()
+                when (response.status) {
+                    HttpStatusCode.Created -> {
+                        body.data?.let { data -> DivaResult.success(data) }
+                            ?: DivaResult.failure(
+                                DivaError(
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "data",
+                                        details = Option.Some(body.message)
+                                    )
+                                )
+                            )
+                    }
+                    else -> {
+                        DivaResult.failure(
+                            DivaError(
+                                cause = ErrorCause.Network.Error(
+                                    method = HttpRequestMethod.PATCH,
+                                    url = "/api/auth/forgot/password",
+                                    status = response.status.toHttpStatusCodes(),
+                                    details = Option.Some(body.message)
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun signOut(token: String): DivaResult<Unit, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            client.post(
+                path = "/api/auth/signOut",
+                headers = mapOf("Authorization" to "Bearer $token"),
+            ).flatMap { response ->
+                val body: ApiResponse<Nothing> = response.body()
+                when (response.status) {
+                    HttpStatusCode.OK -> DivaResult.success(Unit)
+                    else -> {
+                        DivaResult.failure(
+                            DivaError(
+                                cause = ErrorCause.Network.Error(
+                                    method = HttpRequestMethod.PATCH,
+                                    url = "/api/auth/forgot/password",
+                                    status = response.status.toHttpStatusCodes(),
+                                    details = Option.Some(body.message)
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun ping(token: String): DivaResult<Unit, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            client.post(
+                path = "/api/auth/ping",
+                headers = mapOf("Authorization" to "Bearer $token"),
+            ).flatMap { response ->
+                val body: ApiResponse<Nothing> = response.body()
+                when (response.status) {
+                    HttpStatusCode.OK -> DivaResult.success(Unit)
+                    else -> {
+                        DivaResult.failure(
+                            DivaError(
+                                cause = ErrorCause.Network.Error(
+                                    method = HttpRequestMethod.PATCH,
+                                    url = "/api/auth/forgot/password",
+                                    status = response.status.toHttpStatusCodes(),
+                                    details = Option.Some(body.message)
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun refresh(
+        dto: SessionDataDto,
+        token: String
+    ): DivaResult<SessionResponse, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            client.post(
+                path = "/api/auth/refresh",
+                headers = mapOf("Authorization" to "Bearer $token"),
+                body = dto,
+            ).flatMap { response ->
+                val body: ApiResponse<SessionResponse> = response.body()
+                when (response.status) {
+                    HttpStatusCode.OK -> {
+                        body.data?.let { data -> DivaResult.success(data) }
+                            ?: DivaResult.failure(
+                                DivaError(
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "data",
+                                        details = Option.Some(body.message)
+                                    )
+                                )
+                            )
+                    }
+                    else -> {
+                        DivaResult.failure(
+                            DivaError(
+                                cause = ErrorCause.Network.Error(
+                                    method = HttpRequestMethod.PATCH,
+                                    url = "/api/auth/forgot/password",
+                                    status = response.status.toHttpStatusCodes(),
+                                    details = Option.Some(body.message)
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

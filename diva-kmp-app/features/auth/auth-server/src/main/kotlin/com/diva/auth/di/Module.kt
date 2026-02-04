@@ -1,5 +1,7 @@
 package com.diva.auth.di
 
+import com.diva.auth.api.handler.AuthHandler
+import com.diva.auth.api.handler.AuthHandlerImpl
 import com.diva.auth.data.AuthService
 import com.diva.auth.data.AuthServiceImpl
 import com.diva.database.session.SessionStorage
@@ -14,5 +16,7 @@ fun authModule(): Module {
         singleOf(::SessionStorageImpl) { bind<SessionStorage>() }
 
         singleOf(::AuthServiceImpl) { bind<AuthService>() }
+
+        singleOf(::AuthHandlerImpl) { bind<AuthHandler>() }
     }
 }

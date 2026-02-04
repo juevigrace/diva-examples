@@ -1,6 +1,6 @@
 package com.diva.server.router
 
-import com.diva.auth.api.handler.authApiHandler
+import com.diva.auth.api.routes.authRoutes
 import com.diva.chat.api.handler.chatApiHandler
 import com.diva.collection.api.handler.collectionApiHandler
 import com.diva.database.DivaDB
@@ -9,7 +9,7 @@ import com.diva.media.api.handler.tagApiHandler
 import com.diva.models.api.ApiResponse
 import com.diva.permissions.api.handler.permissionsApiHandler
 import com.diva.social.api.handler.socialApiHandler
-import com.diva.user.api.handler.userApiHandler
+import com.diva.user.api.routes.userApiRoutes
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.database.DivaDatabase
 import io.ktor.http.HttpStatusCode
@@ -55,14 +55,14 @@ fun Routing.applicationRoutes() {
             )
         }
         route("/api") {
-            authApiHandler()
+            authRoutes()
             chatApiHandler()
             collectionApiHandler()
             mediaApiHandler()
             permissionsApiHandler()
             socialApiHandler()
             tagApiHandler()
-            userApiHandler()
+            userApiRoutes()
         }
     }
 }

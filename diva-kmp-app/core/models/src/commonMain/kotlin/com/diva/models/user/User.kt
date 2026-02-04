@@ -7,9 +7,12 @@ import com.diva.models.social.interaction.share.Share
 import com.diva.models.social.post.Post
 import com.diva.models.user.permissions.UserPermission
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.getOrElse
+import io.github.juevigrace.diva.core.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlin.toString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -34,6 +37,20 @@ data class User(
     val shares: List<Share> = emptyList(),
     val collections: List<Collection> = emptyList(),
 ) {
+    fun toResponse(): UserResponse {
+        return UserResponse(
+            id = id.toString(),
+            email = email,
+            username = username,
+            alias = alias,
+            avatar = avatar,
+            bio = bio,
+            userVerified = userVerified,
+            createdAt = createdAt.toEpochMilliseconds(),
+            updatedAt = updatedAt.toEpochMilliseconds(),
+            deletedAt = deletedAt.getOrElse { null }?.toEpochMilliseconds(),
+        )
+    }
     companion object {
         fun fromResponse(response: UserResponse): User {
             return User(

@@ -3,8 +3,8 @@ package com.diva.models
 import com.diva.models.auth.Session
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
-import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.onSuccess
@@ -33,10 +33,10 @@ interface Repository {
                     option.fold(
                         onNone = {
                             DivaResult.failure(
-                                DivaError.DatabaseError(
-                                    operation = DatabaseAction.SELECT,
-                                    table = "diva_session",
-                                    details = "No current session found",
+                                DivaError(
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "session",
+                                    )
                                 )
                             )
                         },

@@ -22,7 +22,11 @@ kotlin {
             implementation(projects.features.user.userClient)
 
             implementation(libs.diva.network.client)
-            api(libs.diva.di)
+            api(libs.koin.core)
+        }
+
+        androidMain.dependencies {
+            api(libs.koin.android)
         }
 
         jvmMain.dependencies {

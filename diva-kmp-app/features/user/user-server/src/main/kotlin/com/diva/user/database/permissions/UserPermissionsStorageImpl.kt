@@ -12,16 +12,16 @@ import kotlin.uuid.Uuid
 class UserPermissionsStorageImpl(
     private val db: DivaDatabase<DivaDB>,
 ) : UserPermissionsStorage {
-    override suspend fun insert(item: UserPermission): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun insert(item: UserPermission): DivaResult<Unit, DivaError> {
         TODO()
     }
 
-    override suspend fun update(item: UserPermission): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun update(item: UserPermission): DivaResult<Unit, DivaError> {
         TODO()
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         TODO()
     }
 }

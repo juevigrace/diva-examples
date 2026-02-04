@@ -10,44 +10,44 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class PermissionsStorageImpl : PermissionsStorage {
-    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+    override suspend fun count(): DivaResult<Long, DivaError> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getAll(
         limit: Int,
         offset: Int
-    ): DivaResult<List<Permission>, DivaError.DatabaseError> {
+    ): DivaResult<List<Permission>, DivaError> {
         TODO("Not yet implemented")
     }
 
     override fun getAllFlow(
         limit: Int,
         offset: Int
-    ): Flow<DivaResult<List<Permission>, DivaError.DatabaseError>> {
+    ): Flow<DivaResult<List<Permission>, DivaError>> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getById(id: Uuid): DivaResult<Option<Permission>, DivaError.DatabaseError> {
+    override suspend fun getById(id: Uuid): DivaResult<Option<Permission>, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Permission>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Permission>, DivaError>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun insert(item: Permission): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun insert(item: Permission): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun update(item: Permission): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun update(item: Permission): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         TODO("Not yet implemented")
     }
 }

@@ -9,6 +9,7 @@ import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
@@ -20,48 +21,48 @@ import kotlin.uuid.Uuid
 class SessionStorageImpl(
     private val db: DivaDatabase<DivaDB>
 ) : SessionStorage {
-    override suspend fun count(): DivaResult<Long, DivaError.DatabaseError> {
+    override suspend fun count(): DivaResult<Long, DivaError> {
         return db.use {
             val value: Long = sessionQueries.count().executeAsOne()
             DivaResult.success(value)
         }
     }
 
-    override suspend fun getCurrentSession(): DivaResult<Option<Session>, DivaError.DatabaseError> {
+    override suspend fun getCurrentSession(): DivaResult<Option<Session>, DivaError> {
         return db.getOne { sessionQueries.findCurrent(mapper = ::mapToEntity) }
     }
 
     override suspend fun getAll(
         limit: Int,
         offset: Int
-    ): DivaResult<List<Session>, DivaError.DatabaseError> {
+    ): DivaResult<List<Session>, DivaError> {
         return db.getList { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
     override fun getAllFlow(
         limit: Int,
         offset: Int
-    ): Flow<DivaResult<List<Session>, DivaError.DatabaseError>> {
+    ): Flow<DivaResult<List<Session>, DivaError>> {
         return db.getListAsFlow { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError.DatabaseError> {
+    override suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError> {
         return db.getOne { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError.DatabaseError>> {
+    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError>> {
         return db.getOneAsFlow { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError.DatabaseError> {
+    override suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError> {
         return db.getList { sessionQueries.findByUserId(userId.toString(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    override suspend fun insert(item: Session): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun insert(item: Session): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
                 sessionQueries.insert(
@@ -78,10 +79,12 @@ class SessionStorageImpl(
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
-                    DivaError.DatabaseError(
-                        DatabaseAction.INSERT,
-                        "diva_session",
-                        "Failed to insert"
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_session"),
+                            details = Option.Some("Failed to insert")
+                        )
                     )
                 )
             }
@@ -90,7 +93,7 @@ class SessionStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
-    override suspend fun update(item: Session): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun update(item: Session): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
                 sessionQueries.update(
@@ -106,10 +109,12 @@ class SessionStorageImpl(
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
-                    DivaError.DatabaseError(
-                        DatabaseAction.UPDATE,
-                        "diva_session",
-                        "Failed to update"
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_session"),
+                            details = Option.Some("Failed to update")
+                        )
                     )
                 )
             }
@@ -118,17 +123,19 @@ class SessionStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
                 sessionQueries.delete(id.toString())
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
-                    DivaError.DatabaseError(
-                        DatabaseAction.DELETE,
-                        "diva_session",
-                        "Failed to delete"
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.DELETE,
+                            table = Option.Some("diva_session"),
+                            details = Option.Some("Failed to delete")
+                        )
                     )
                 )
             }
@@ -137,17 +144,19 @@ class SessionStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError.DatabaseError> {
+    override suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
                 sessionQueries.deleteByUserId(userId.toString())
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
-                    DivaError.DatabaseError(
-                        DatabaseAction.DELETE,
-                        "diva_session",
-                        "Failed to delete"
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.DELETE,
+                            table = Option.Some("diva_session"),
+                            details = Option.Some("Failed to delete")
+                        )
                     )
                 )
             }

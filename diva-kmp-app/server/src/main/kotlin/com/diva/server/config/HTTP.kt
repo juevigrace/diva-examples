@@ -13,6 +13,7 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 
 fun Application.configureHTTP() {
+    val dev = environment.config.property("ktor.development").getString().toBoolean()
 //    install(ForwardedHeaders) // WARNING: for security, do not include this if not behind a reverse proxy
 //    install(XForwardedHeaders) // WARNING: for security, do not include this if not behind a reverse proxy
     install(DefaultHeaders)
@@ -22,7 +23,9 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+        if (dev) {
+            anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+        }
     }
     install(Compression)
     install(CachingHeaders) {

@@ -3,153 +3,204 @@ package com.diva.user.api.handler
 import com.diva.mail.KMail
 import com.diva.mail.buildCodeVerificationEmail
 import com.diva.models.api.ApiResponse
+import com.diva.models.api.PaginationResponse
+import com.diva.models.api.auth.dtos.PasswordUpdateDto
+import com.diva.models.api.auth.response.SessionResponse
 import com.diva.models.api.user.dtos.CreateUserDto
+import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.dtos.UpdateUserDto
 import com.diva.models.api.user.dtos.UserEmailDto
+import com.diva.models.api.user.response.UserResponse
 import com.diva.models.auth.Session
-import com.diva.models.server.AUTH_JWT_KEY
-import com.diva.models.server.SESSION_KEY
+import com.diva.models.user.User
 import com.diva.user.data.UserService
-import com.diva.util.Encryption
-import com.diva.util.respond
 import com.diva.verification.data.VerificationService
-import io.github.juevigrace.diva.core.errors.asNetworkError
-import io.github.juevigrace.diva.core.map
-import io.github.juevigrace.diva.core.mapError
+import io.github.juevigrace.diva.core.DivaResult
+import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.errors.DivaError
+import io.github.juevigrace.diva.core.errors.ErrorCause
+import io.github.juevigrace.diva.core.errors.toDivaError
+import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.network.HttpRequestMethod
 import io.github.juevigrace.diva.core.network.HttpStatusCodes
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.patch
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.route
-import org.koin.ktor.ext.inject
+import io.github.juevigrace.diva.core.onFailure
+import io.github.juevigrace.diva.core.onSuccess
+import io.github.juevigrace.diva.core.tryResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
-// TODO: rethink admin privileges and available actions
-@OptIn(ExperimentalUuidApi::class)
-fun Route.userApiHandler() {
-    val service: UserService by inject()
-    val verificationService: VerificationService by inject()
-    val kMail: KMail by inject()
+interface UserHandler {
 
-    route("/user") {
-        get {
-            val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
-            val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
-            service.getUsers(page, pageSize).respond(call)
+    suspend fun getUsers(
+        page: Int,
+        pageSize: Int
+    ): DivaResult<ApiResponse<PaginationResponse<UserResponse>>, DivaError>
+
+    suspend fun getUser(id: String): DivaResult<ApiResponse<UserResponse>, DivaError>
+
+    suspend fun createUser(dto: CreateUserDto, session: Session): DivaResult<ApiResponse<String>, DivaError>
+
+    suspend fun updateUser(
+        id: String,
+        dto: UpdateUserDto,
+        session: Session,
+    ): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun updateEmail(
+        dto: UserEmailDto,
+        session: Session,
+    ): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun deleteUser(id: String, session: Session): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun requestPasswordReset(dto: UserEmailDto): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun confirmPasswordReset(dto: EmailTokenDto): DivaResult<ApiResponse<SessionResponse>, DivaError>
+
+    suspend fun resetPassword(dto: PasswordUpdateDto, session: Session): DivaResult<ApiResponse<Unit>, DivaError>
+}
+
+class UserHandlerImpl(
+    private val service: UserService,
+    private val verificationService: VerificationService,
+    private val kMail: KMail,
+) : UserHandler {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
+    override suspend fun getUsers(
+        page: Int,
+        pageSize: Int
+    ): DivaResult<ApiResponse<PaginationResponse<UserResponse>>, DivaError> {
+        return service.getUsers(page, pageSize)
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun getUser(id: String): DivaResult<ApiResponse<UserResponse>, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            val parsedId: Uuid = Uuid.parse(id)
+            service.getUser(parsedId)
         }
+    }
 
-        route("/{id}") {
-            get {
-                val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
-                )
-                service.getUser(idStr).respond(call)
-            }
-            // TODO: block with admin role or explicit permission
-            authenticate(AUTH_JWT_KEY) {
-                delete {
-                    val idStr: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse<Nothing>(message = "Missing id")
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun createUser(
+        dto: CreateUserDto,
+        session: Session
+    ): DivaResult<ApiResponse<String>, DivaError> {
+        if (session.user.permissions.isEmpty()) {
+            // TODO: do an actual check of the permissions
+            return DivaResult.failure(
+                DivaError(
+                    cause = ErrorCause.Network.Error(
+                        method = HttpRequestMethod.POST,
+                        url = "/api/user",
+                        status = HttpStatusCodes.Forbidden,
+                        details = Option.Some("You can't create users")
                     )
-                    service.deleteUser(idStr).respond(call)
-                }
-            }
-            userPermissionsHandler()
-        }
-
-        authenticate(AUTH_JWT_KEY) {
-            // TODO: block with admin role or explicit permission
-            post {
-                val dto: CreateUserDto = call.receive()
-                service
-                    .createUser(dto.copy(password = Encryption.hashPassword(dto.password))) { id ->
-                        verificationService.createVerificationCode(id).map { v ->
-                            kMail.sendEmail(
-                                to = dto.email,
-                                subject = "Email Verification",
-                                html = buildCodeVerificationEmail(v)
-                            )
-                        }
-                    }
-                    .map { id -> ApiResponse(data = id.toString(), message = "User created") }
-                    .mapError { err ->
-                        err.asNetworkError(
-                            method = HttpRequestMethod.POST,
-                            url = "/api/user",
-                            statusCode = HttpStatusCodes.InternalServerError,
-                        )
-                    }
-                    .respond(call)
-            }
-
-            // TODO: block with admin role or explicit permission
-            put("/{id}") {
-                val idStr: String = call.pathParameters["id"] ?: return@put call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
                 )
-
-                val dto: UpdateUserDto = call.receive()
-                service.updateUser(dto, idStr).respond(call)
-            }
-
-            route("/me") {
-                put {
-                    val session: Session = call.attributes.getOrNull(SESSION_KEY)
-                        ?: return@put call.respond(
-                            status = HttpStatusCode.Unauthorized,
-                            message = ApiResponse<Nothing>(message = "You are not authenticated")
-                        )
-                    val dto: UpdateUserDto = call.receive()
-                    service.updateUser(dto, session.id.toString()).respond(call)
-                }
-
-                route("/update") {
-                    route("/email") {
-                        post("/request") {
-                            call.respond(
-                                HttpStatusCode.NotImplemented,
-                                ApiResponse<Nothing>(message = "Not implemented")
-                            )
-                        }
-
-                        post("/confirm") {
-                            call.respond(
-                                HttpStatusCode.NotImplemented,
-                                ApiResponse<Nothing>(message = "Not implemented")
-                            )
-                        }
-
-                        patch {
-                            val session: Session = call.attributes.getOrNull(SESSION_KEY)
-                                ?: return@patch call.respond(
-                                    status = HttpStatusCode.Unauthorized,
-                                    message = ApiResponse<Nothing>(message = "You are not authenticated")
-                                )
-                            val dto: UserEmailDto = call.receive()
-                            service.updateEmail(dto, session).respond(call)
-                        }
-                    }
-                }
-                delete {
-                    val session: Session = call.attributes.getOrNull(SESSION_KEY)
-                        ?: return@delete call.respond(
-                            status = HttpStatusCode.Unauthorized,
-                            message = ApiResponse<Nothing>(message = "You are not authenticated")
-                        )
-                    service.deleteUser(session.id.toString()).respond(call)
-                }
-            }
+            )
         }
+
+        val userId: Uuid = service.createUser(dto).fold(
+            onFailure = { err ->
+                return DivaResult.failure(err)
+            },
+            onSuccess = { id -> id }
+        )
+
+        scope.launch {
+            verificationService.createVerificationCode(userId)
+                .onFailure { err -> println(err.message) }
+                .onSuccess { v ->
+                    kMail.sendEmail(
+                        to = dto.email,
+                        subject = "Email Verification",
+                        html = buildCodeVerificationEmail(v)
+                    )
+                }
+        }
+
+        return DivaResult.success(ApiResponse(data = userId.toString(), message = "User created"))
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updateUser(
+        id: String,
+        dto: UpdateUserDto,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            val parsedId: Uuid = Uuid.parse(id)
+            if (session.id != parsedId) {
+                // TODO: permission check to forced update
+                return@tryResult DivaResult.failure(
+                    DivaError(
+                        cause = ErrorCause.Network.Error(
+                            method = HttpRequestMethod.PUT,
+                            url = "/api/user/$id",
+                            status = HttpStatusCodes.Forbidden,
+                            details = Option.Some("You can't update users")
+                        )
+                    )
+                )
+            }
+            service.updateUser(dto, parsedId)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updateEmail(
+        dto: UserEmailDto,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        return service.updateEmail(dto, session.user.id)
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteUser(
+        id: String,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        return tryResult(
+            onError = { e -> e.toDivaError() }
+        ) {
+            val parsedId: Uuid = Uuid.parse(id)
+            if (session.id != parsedId) {
+                // TODO: permission check to forced delete
+                return@tryResult DivaResult.failure(
+                    DivaError(
+                        cause = ErrorCause.Network.Error(
+                            method = HttpRequestMethod.DELETE,
+                            url = "/api/user/$id",
+                            status = HttpStatusCodes.Forbidden,
+                            details = Option.Some("You can't delete users")
+                        )
+                    )
+                )
+            }
+            service.deleteUser(parsedId)
+        }
+    }
+
+    override suspend fun requestPasswordReset(dto: UserEmailDto): DivaResult<ApiResponse<Unit>, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun confirmPasswordReset(dto: EmailTokenDto): DivaResult<ApiResponse<SessionResponse>, DivaError> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun resetPassword(
+        dto: PasswordUpdateDto,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        TODO("Not yet implemented")
     }
 }

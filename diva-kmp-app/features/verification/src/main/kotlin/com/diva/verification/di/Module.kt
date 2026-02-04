@@ -1,5 +1,7 @@
 package com.diva.verification.di
 
+import com.diva.verification.api.handler.VerificationHandler
+import com.diva.verification.api.handler.VerificationHandlerImpl
 import com.diva.verification.data.VerificationService
 import com.diva.verification.data.VerificationServiceImpl
 import com.diva.verification.database.VerificationStorage
@@ -13,5 +15,6 @@ fun verificationModule(): Module {
     return module {
         singleOf(::VerificationStorageImpl) { bind<VerificationStorage>() }
         singleOf(::VerificationServiceImpl) { bind<VerificationService>() }
+        singleOf(::VerificationHandlerImpl) { bind<VerificationHandler>() }
     }
 }

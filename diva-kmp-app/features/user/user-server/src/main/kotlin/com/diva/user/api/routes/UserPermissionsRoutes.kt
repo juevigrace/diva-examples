@@ -1,4 +1,4 @@
-package com.diva.user.api.handler
+package com.diva.user.api.routes
 
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.user.permissions.dtos.UserPermissionDto

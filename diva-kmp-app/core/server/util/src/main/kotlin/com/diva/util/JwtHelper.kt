@@ -64,6 +64,7 @@ class JwtHelper(
                     .toJavaInstant(),
             ).sign(Algorithm.HMAC256(secret))
 
+    // TODO: REFACTOR
     suspend fun validate(
         credential: JWTCredential,
         sessionCallBack: suspend (sessionId: UUID) -> DivaResult<Option<Session>, DivaError>,
@@ -71,7 +72,7 @@ class JwtHelper(
     ): JWTPrincipal? {
         return tryResult(
             onError = { e ->
-                println(e.toDivaError("JwtHelper.validate"))
+                println(e.toDivaError())
             }
         ) {
             val sessionId: String? = credential.payload.getClaim(SESSION_ID_CLAIM_KEY).asString()
@@ -91,6 +92,7 @@ class JwtHelper(
                             option.fold(
                                 onNone = { null },
                                 onSome = { session ->
+                                    // TODO: TRIGGER VERIFICATION
                                     if (!session.user.userVerified) {
                                         return null
                                     }

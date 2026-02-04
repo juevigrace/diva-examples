@@ -15,7 +15,7 @@ class KMail(
 
     fun sendEmail(to: String, subject: String, html: String): DivaResult<Unit, DivaError> {
         return tryResult(
-            onError = { e -> e.toDivaError("sendMail") }
+            onError = { e -> e.toDivaError() }
         ) {
             val request = CreateEmailOptions.builder()
                 .from(config.fromEmail)
@@ -24,12 +24,8 @@ class KMail(
                 .html(html)
                 .build()
 
-            val response = resend.emails().send(request)
-            response.id?.let {
-                DivaResult.success(Unit)
-            } ?: return@tryResult DivaResult.failure(
-                DivaError.exception(Exception("No email ID returned"), "sendMail")
-            )
+            resend.emails().send(request)
+            DivaResult.success(Unit)
         }
     }
 

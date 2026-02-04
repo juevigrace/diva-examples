@@ -7,8 +7,11 @@ import com.diva.models.roles.Role
 import com.diva.models.user.User
 import com.diva.util.Encryption
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.isPresent
+import io.github.juevigrace.diva.core.isSuccess
 import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.onSome
+import io.github.juevigrace.diva.core.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,6 +49,11 @@ class Seed(
         scope.launch {
             launch {
                 rootUser.onSome { user ->
+                    userStorage.getByUsername(user.username).onSuccess { u ->
+                        if (u.isPresent()) {
+                            return@launch
+                        }
+                    }
                     userStorage.insert(user).onFailure { err ->
                         println("Error inserting root user: $err")
                     }
