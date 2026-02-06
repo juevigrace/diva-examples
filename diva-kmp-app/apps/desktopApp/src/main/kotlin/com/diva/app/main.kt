@@ -5,6 +5,7 @@ import androidx.compose.ui.window.application
 import com.diva.app.config.AppConfig
 import com.diva.app.config.Flavors
 import com.diva.app.di.appModule
+import com.diva.app.presentation.ui.screen.App
 import org.koin.core.context.GlobalContext.startKoin
 
 fun main(args: Array<String>) = application {
