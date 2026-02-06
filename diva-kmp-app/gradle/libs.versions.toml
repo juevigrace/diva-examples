@@ -7,14 +7,13 @@ android-targetSdk = "36"
 android-minSdk = "24"
 compose-hot-reload = "1.0.0"
 compose-multiplatform = "1.10.0"
-diva = "0.0.8"
+diva = "0.0.9"
 koin = "4.1.1"
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
 ktor = "3.4.0"
 sqldelight = "2.2.1"
-kdotenv = "6.5.1"
 kbcrypt = "1.0.9"
 resend = "4.12.0"
 sqlite = "3.45.3.0"
@@ -71,6 +70,11 @@ sqldelight-postgres-dialect = { group = "app.cash.sqldelight", name = "postgresq
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
+######### [COMPOSE DEPENDENCIES] #########
+
+compose-components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose-multiplatform" }
+compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose-multiplatform" }
+
 ######### [KTOR SERVER DEPENDENCIES] #########
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -84,7 +88,6 @@ ktor-server-sse = { module = "io.ktor:ktor-server-sse", version.ref = "ktor" }
 ktor-server-request-validation = { module = "io.ktor:ktor-server-request-validation", version.ref = "ktor" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
-ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor" }
 ktor-server-forwarded-header = { module = "io.ktor:ktor-server-forwarded-header", version.ref = "ktor" }
 ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers", version.ref = "ktor" }
 ktor-server-html = { module = "io.ktor:ktor-server-html-builder", version.ref = "ktor" }
@@ -93,10 +96,8 @@ ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.
 ktor-server-caching-headers = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
-ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 
 kbcrypt = { group = "com.ToxicBakery.library.bcrypt", name = "bcrypt", version.ref = "kbcrypt" }
-kdotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "kdotenv" }
 
 resend = { group = "com.resend", name = "resend-java", version.ref = "resend" }
 

@@ -1,6 +1,5 @@
 package com.diva.app
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.diva.ui.theme.AppTypography
 import com.diva.ui.theme.darkScheme
@@ -26,6 +25,6 @@ fun App() {
             )
         }
     ) {
-        Text(text = "Hello")
+
     }
 }

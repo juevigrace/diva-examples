@@ -11,6 +11,10 @@ data class UserResponse(
     val email: String,
     @SerialName("username")
     val username: String,
+    @SerialName("birthDate")
+    val birthDate: Long,
+    @SerialName("phoneNumber")
+    val phoneNumber: String,
     @SerialName("alias")
     val alias: String,
     @SerialName("avatar")

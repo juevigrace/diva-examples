@@ -11,6 +11,10 @@ data class CreateUserDto(
     val username: String = email,
     @SerialName("password")
     val password: String,
+    @SerialName("birthDate")
+    val birthDate: Long,
+    @SerialName("phoneNumber")
+    val phoneNumber: String,
     @SerialName("alias")
     val alias: String,
     @SerialName("avatar")

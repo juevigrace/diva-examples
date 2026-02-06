@@ -7,9 +7,8 @@ import io.ktor.server.request.path
 import org.slf4j.event.Level
 
 fun Application.configureAdministration() {
-    val dev = environment.config.property("ktor.development").getString().toBoolean()
     install(CallLogging) {
-        level = if (dev) Level.DEBUG else Level.INFO
+        level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
 }

@@ -7,9 +7,14 @@ data class SignUpForm(
     val email: String = "",
     val username: String = email,
     val password: String = "",
+    val confirmPassword: String = "",
+    val phone: String = "",
+    val birthDate: Long = 0L,
     val alias: String = "",
     val avatar: String = "",
     val bio: String = "",
+    val termsAndConditions: Boolean = false,
+    val privacyPolicy: Boolean = false,
     val sessionData: SessionData = SessionData(),
 ) {
     fun toSignUpDto(): SignUpDto {
@@ -18,6 +23,8 @@ data class SignUpForm(
                 email = email,
                 username = username,
                 password = password,
+                birthDate = birthDate,
+                phoneNumber = phone,
                 alias = alias,
                 avatar = avatar,
                 bio = bio,

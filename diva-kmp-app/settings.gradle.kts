@@ -44,13 +44,16 @@ if (shouldIncludeClientProjects()) {
         ":apps:sharedUI",
     )
 
-    include(":core:database:database-client")
-
-    include(":core:ui")
+    include(
+        ":core:database:database-client",
+        ":core:resources",
+        ":core:ui"
+    )
 
     include(
         ":features:app:home",
         ":features:app:library",
+        ":features:app:onboarding",
         ":features:app:profile",
         ":features:app:settings",
     )

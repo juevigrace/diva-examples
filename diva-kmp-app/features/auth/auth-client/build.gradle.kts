@@ -13,9 +13,11 @@ kotlin {
             implementation(projects.core.database.databaseClient)
 
             implementation(projects.core.models)
+            implementation(projects.core.resources)
             implementation(projects.core.ui)
 
             implementation(projects.features.session.sessionClient)
+            implementation(projects.features.user.userClient)
 
             implementation(libs.diva.network.client)
 

@@ -8,11 +8,9 @@ import com.diva.models.social.post.Post
 import com.diva.models.user.permissions.UserPermission
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.getOrElse
-import io.github.juevigrace.diva.core.map
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-import kotlin.toString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -22,6 +20,8 @@ data class User(
     val email: String = "",
     val username: String = "",
     val passwordHash: Option<String> = Option.None,
+    val birthDate: Instant = Clock.System.now(),
+    val phoneNumber: String = "",
     val alias: String = username,
     val avatar: String = "",
     val bio: String = "",
@@ -42,6 +42,8 @@ data class User(
             id = id.toString(),
             email = email,
             username = username,
+            birthDate = birthDate.toEpochMilliseconds(),
+            phoneNumber = phoneNumber,
             alias = alias,
             avatar = avatar,
             bio = bio,
@@ -57,6 +59,8 @@ data class User(
                 id = Uuid.parse(response.id),
                 email = response.email,
                 username = response.username,
+                birthDate = Instant.fromEpochMilliseconds(response.birthDate),
+                phoneNumber = response.phoneNumber,
                 alias = response.alias,
                 avatar = response.avatar,
                 bio = response.bio,

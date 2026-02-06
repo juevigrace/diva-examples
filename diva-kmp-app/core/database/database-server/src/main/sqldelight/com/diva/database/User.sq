@@ -2,12 +2,17 @@ count:
 SELECT COUNT(*) FROM diva_user;
 
 insert:
-INSERT INTO diva_user (id, email, username, password_hash, alias, avatar, bio, user_verified, role)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO diva_user (id, email, username, password_hash, birth_date, phone_number, alias, avatar, bio, user_verified, role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
 SET alias = ?, avatar = ?, bio = ?, updated_at = NOW()
+WHERE id = ? AND deleted_at IS NULL;
+
+updatePhoneNumber:
+UPDATE diva_user
+SET phone_number = ?
 WHERE id = ? AND deleted_at IS NULL;
 
 updateUsername:
