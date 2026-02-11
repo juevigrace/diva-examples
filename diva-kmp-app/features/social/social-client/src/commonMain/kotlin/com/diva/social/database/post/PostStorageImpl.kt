@@ -2,7 +2,9 @@ package com.diva.social.database.post
 
 import com.diva.database.DivaDB
 import com.diva.database.social.post.PostStorage
+import com.diva.models.VisibilityType
 import com.diva.models.social.post.Post
+import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -55,14 +57,9 @@ class PostStorageImpl(
             val rows: Long = transactionWithResult {
                 postQueries.insert(
                     id = item.id.toString(),
-                    title = item.title,
-                    content = item.content,
-                    author_id = item.authorId.toString(),
-                    status = item.status,
+                    author_id = item.author.id.toString(),
+                    text = item.text,
                     visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
-                    published_at = item.publishedAt?.toEpochMilliseconds(),
                 )
             }
             if (rows.toInt() == 0) {
@@ -72,37 +69,6 @@ class PostStorageImpl(
                             action = DatabaseAction.INSERT,
                             table = Option.Some("diva_post"),
                             details = Option.Some("Failed to insert")
-                        )
-                    )
-                )
-            }
-            DivaResult.success(Unit)
-        }
-    }
-
-    @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
-    override suspend fun update(item: Post): DivaResult<Unit, DivaError> {
-        return db.use {
-            val rows: Long = transactionWithResult {
-                postQueries.update(
-                    title = item.title,
-                    content = item.content,
-                    author_id = item.authorId.toString(),
-                    status = item.status,
-                    visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
-                    published_at = item.publishedAt?.toEpochMilliseconds(),
-                    id = item.id.toString()
-                )
-            }
-            if (rows.toInt() == 0) {
-                return@use DivaResult.failure(
-                    DivaError(
-                        ErrorCause.Database.NoRowsAffected(
-                            action = DatabaseAction.UPDATE,
-                            table = Option.Some("diva_post"),
-                            details = Option.Some("Failed to update")
                         )
                     )
                 )
@@ -135,25 +101,21 @@ class PostStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: String,
-        title: String,
-        content: String,
         authorId: String,
-        status: String,
-        visibility: String,
+        text: String,
+        visibility: VisibilityType,
         createdAt: Long,
         updatedAt: Long,
-        publishedAt: Long?
+        deletedAt: Long?
     ): Post {
         return Post(
             id = Uuid.parse(id),
-            title = title,
-            content = content,
-            authorId = Uuid.parse(authorId),
-            status = status,
+            author = User(id = Uuid.parse(authorId)),
+            text = text,
             visibility = visibility,
             createdAt = Instant.fromEpochMilliseconds(createdAt),
             updatedAt = Instant.fromEpochMilliseconds(updatedAt),
-            publishedAt = publishedAt?.let { Instant.fromEpochMilliseconds(it) }
+            deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),
         )
     }
 }

@@ -73,24 +73,7 @@ SELECT
   u.updated_at AS updatedAt,
   u.deleted_at AS deletedAt
 FROM diva_user u
-WHERE u.id = ?;
-
-findOneByEmail:
-SELECT
-  id,
-  email,
-  username,
-  password_hash AS passwordHash,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  role,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE email = ? ;
+WHERE u.id = ? AND u.deleted_at IS NULL;
 
 findOneByUsername:
 SELECT
@@ -107,4 +90,4 @@ SELECT
   updated_at AS updatedAt,
   deleted_at AS deletedAt
 FROM diva_user
-WHERE username = ? OR email = ? ;
+WHERE username = ? OR email = ? AND deleted_at IS NULL;

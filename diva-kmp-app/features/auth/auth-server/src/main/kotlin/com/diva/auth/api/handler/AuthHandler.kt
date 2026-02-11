@@ -113,7 +113,7 @@ class AuthHandlerImpl(
     override suspend fun signOut(
         session: Session
     ): DivaResult<ApiResponse<Unit>, DivaError> {
-        return service.signOut(session.id)
+        return service.signOut(session)
     }
 
     override suspend fun refresh(

@@ -1,10 +1,9 @@
 package com.diva.collection.api.routes
 
-import com.diva.models.api.ApiResponse
-import com.diva.models.api.collection.playlist.dtos.CreatePlaylistDto
-import com.diva.models.api.collection.playlist.dtos.UpdatePlaylistDto
-import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.collection.api.handler.PlaylistHandler
+import com.diva.models.api.ApiResponse
+import com.diva.models.api.collection.dtos.PlaylistDto
+import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -18,9 +17,10 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
+// TODO: ADD SESSION AND PERMISSION CHECK TO ROUTES
 fun Route.playlistApiRoutes() {
     val handler: PlaylistHandler by inject()
-    route("/collection/playlist") {
+    route("/playlist") {
         get {
             val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
@@ -35,14 +35,6 @@ fun Route.playlistApiRoutes() {
                 handler.getPlaylist(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdatePlaylistDto = call.receive()
-                    handler.updatePlaylist(id, dto).respond(call)
-                }
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -54,9 +46,15 @@ fun Route.playlistApiRoutes() {
         }
         authenticate(AUTH_JWT_KEY) {
             post {
-                val dto: CreatePlaylistDto = call.receive()
+                val dto: PlaylistDto = call.receive()
                 handler.createPlaylist(dto).respond(call)
             }
+            put {
+                val dto: PlaylistDto = call.receive()
+                handler.updatePlaylist(dto).respond(call)
+            }
         }
+        playlistContributorApiRoutes()
+        playlistSuggestionsApiRoutes()
     }
 }

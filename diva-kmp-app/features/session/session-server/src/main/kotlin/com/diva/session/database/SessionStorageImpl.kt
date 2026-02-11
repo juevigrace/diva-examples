@@ -12,7 +12,6 @@ import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
-import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
@@ -28,40 +27,9 @@ import kotlin.uuid.toKotlinUuid
 class SessionStorageImpl(
     private val db: DivaDatabase<DivaDB>
 ) : SessionStorage {
-    override suspend fun count(): DivaResult<Long, DivaError> {
-        return db.use {
-            val value: Long = sessionQueries.count().executeAsOne()
-            DivaResult.success(value)
-        }
-    }
-
-    override suspend fun getAll(
-        limit: Int,
-        offset: Int
-    ): DivaResult<List<Session>, DivaError> {
-        return db.getList { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
-    }
-
-    override fun getAllFlow(
-        limit: Int,
-        offset: Int
-    ): Flow<DivaResult<List<Session>, DivaError>> {
-        return db.getListAsFlow { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
-    }
-
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError> {
         return db.getOne { sessionQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError>> {
-        return db.getOneAsFlow { sessionQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError> {
-        return db.getList { sessionQueries.findByUserId(userId.toJavaUuid(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
@@ -88,10 +56,9 @@ class SessionStorageImpl(
                 return@use DivaResult.failure(
                     DivaError(
                         ErrorCause.Database.NoRowsAffected(
-
-                            DatabaseAction.INSERT,
-                            Option.Some("diva_session"),
-                            Option.Some("Failed to insert")
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_session"),
+                            details = Option.Some("Failed to insert")
                         )
                     )
                 )
@@ -117,33 +84,6 @@ class SessionStorageImpl(
                     user_agent = item.userAgent,
                     expires_at = expiresAt,
                     id = item.id.toJavaUuid()
-                ).value
-            }
-            if (rows.toInt() == 0) {
-                return@use DivaResult.failure(
-                    DivaError(
-                        ErrorCause.Database.NoRowsAffected(
-                            action = DatabaseAction.UPDATE,
-                            table = Option.Some("diva_session"),
-                            details = Option.Some("Failed to update")
-                        )
-                    )
-                )
-            }
-            DivaResult.success(Unit)
-        }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    override suspend fun updateStatus(
-        sessionId: Uuid,
-        status: SessionStatus
-    ): DivaResult<Unit, DivaError> {
-        return db.use {
-            val rows: Long = transactionWithResult {
-                sessionQueries.updateStatus(
-                    status = status,
-                    id = sessionId.toJavaUuid()
                 ).value
             }
             if (rows.toInt() == 0) {

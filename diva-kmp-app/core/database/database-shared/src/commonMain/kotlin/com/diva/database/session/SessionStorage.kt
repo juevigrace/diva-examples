@@ -1,33 +1,33 @@
 package com.diva.database.session
 
 import com.diva.models.auth.Session
-import com.diva.models.session.SessionStatus
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.ErrorCause
-import io.github.juevigrace.diva.database.Storage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-interface SessionStorage : Storage<Session> {
+interface SessionStorage {
     @OptIn(ExperimentalUuidApi::class)
-    suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError> {
-        return DivaResult.failure(
-            DivaError(
-                cause = ErrorCause.Error.NotImplemented(
-                    Option.Some("database: server action only")
-                )
-            )
-        )
-    }
+    suspend fun getById(id: Uuid): DivaResult<Option<Session>, DivaError>
+    suspend fun insert(item: Session): DivaResult<Unit, DivaError>
+
+    suspend fun update(item: Session): DivaResult<Unit, DivaError>
 
     @OptIn(ExperimentalUuidApi::class)
-    suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError> {
+    suspend fun delete(id: Uuid): DivaResult<Unit, DivaError>
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun deleteSessionsByUser(userId: Uuid): DivaResult<Unit, DivaError>
+
+    suspend fun count(): DivaResult<Long, DivaError> {
         return DivaResult.failure(
             DivaError(
                 cause = ErrorCause.Error.NotImplemented(
-                    Option.Some("database: server action only")
+                    Option.Some("database: client action only")
                 )
             )
         )
@@ -43,14 +43,32 @@ interface SessionStorage : Storage<Session> {
         )
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    suspend fun updateStatus(sessionId: Uuid, status: SessionStatus): DivaResult<Unit, DivaError> {
-        return DivaResult.failure(
-            DivaError(
-                cause = ErrorCause.Error.NotImplemented(
-                    Option.Some("database: server action only")
+    fun getAllFlow(limit: Int = 100, offset: Int = 0): Flow<DivaResult<List<Session>, DivaError>> {
+        return flow {
+            emit(
+                DivaResult.failure(
+                    DivaError(
+                        cause = ErrorCause.Error.NotImplemented(
+                            Option.Some("database: client action only")
+                        )
+                    )
                 )
             )
-        )
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Session>, DivaError>>{
+        return flow {
+            emit(
+                DivaResult.failure(
+                    DivaError(
+                        cause = ErrorCause.Error.NotImplemented(
+                            Option.Some("database: client action only")
+                        )
+                    )
+                )
+            )
+        }
     }
 }

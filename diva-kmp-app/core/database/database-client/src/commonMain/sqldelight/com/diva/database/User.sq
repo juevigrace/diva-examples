@@ -2,8 +2,8 @@ count:
 SELECT COUNT(*) FROM diva_user;
 
 insert:
-INSERT INTO diva_user (id, email, username, alias, avatar, bio, user_verified)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO diva_user (id, email, username, birth_date, phone_number, alias, avatar, bio, role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_user 
@@ -15,49 +15,37 @@ UPDATE diva_user
 SET deleted_at = (strftime('%s', 'now')) 
 WHERE id = ? AND deleted_at IS NULL;
 
-findOneById:
-SELECT 
-  id,
-  email,
-  username,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE id = ? AND deleted_at IS NULL;
-
 findAll:
-SELECT 
-  id,
-  email,
-  username,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC
+SELECT
+  u.id,
+  u.email,
+  u.username,
+  u.phone_number AS phoneNumber,
+  u.birth_date AS birthDate,
+  u.alias,
+  u.avatar,
+  u.bio,
+  u.role,
+  u.created_at AS createdAt,
+  u.updated_at AS updatedAt,
+  u.deleted_at AS deletedAt
+FROM diva_user u
+WHERE u.deleted_at IS NULL
 LIMIT ? OFFSET ?;
 
-findOneByUsername:
-SELECT 
-  id,
-  email,
-  username,
-  alias,
-  avatar,
-  bio,
-  user_verified AS userVerified,
-  created_at AS createdAt,
-  updated_at AS updatedAt,
-  deleted_at AS deletedAt
-FROM diva_user
-WHERE username = ? AND deleted_at IS NULL;
+findOneById:
+SELECT
+  u.id,
+  u.email,
+  u.username,
+  u.phone_number AS phoneNumber,
+  u.birth_date AS birthDate,
+  u.alias,
+  u.avatar,
+  u.bio,
+  u.role,
+  u.created_at AS createdAt,
+  u.updated_at AS updatedAt,
+  u.deleted_at AS deletedAt
+FROM diva_user u
+WHERE u.id = ? AND u.deleted_at IS NULL;

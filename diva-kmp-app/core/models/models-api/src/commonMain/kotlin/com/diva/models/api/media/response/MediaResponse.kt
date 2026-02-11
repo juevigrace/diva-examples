@@ -37,4 +37,12 @@ data class MediaResponse(
     val updatedAt: Long,
     @SerialName("deleted_at")
     val deletedAt: Long? = null,
+    @SerialName("tags")
+    val tags: List<MediaTagResponse> = emptyList()
+)
+
+@Serializable
+data class MediaTagResponse(
+    @SerialName("tag_id")
+    val tagId: String
 )

@@ -19,6 +19,7 @@ import io.github.juevigrace.diva.network.client.get
 import io.github.juevigrace.diva.network.client.post
 import io.github.juevigrace.diva.network.client.put
 import io.github.juevigrace.diva.network.client.toHttpStatusCodes
+import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
 interface PermissionsClient {
@@ -29,13 +30,12 @@ interface PermissionsClient {
 
     suspend fun getById(id: String): DivaResult<PermissionResponse, DivaError>
 
-    suspend fun create(dto: CreatePermissionDto, token: String): DivaResult<PermissionResponse, DivaError>
+    suspend fun create(dto: CreatePermissionDto, token: String): DivaResult<Unit, DivaError>
 
     suspend fun update(
-        id: String,
         dto: UpdatePermissionDto,
         token: String
-    ): DivaResult<PermissionResponse, DivaError>
+    ): DivaResult<Unit, DivaError>
 
     suspend fun delete(id: String, token: String): DivaResult<Unit, DivaError>
 }
@@ -57,7 +57,10 @@ class PermissionsClientImpl(
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
-                                    cause = ErrorCause.Validation.MissingValue("data", Option.Some(body.message)),
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "data",
+                                        details = Option.Some(body.message)
+                                    ),
                                 )
                             )
                     }
@@ -89,7 +92,10 @@ class PermissionsClientImpl(
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
-                                    cause = ErrorCause.Validation.MissingValue("data", Option.Some(body.message)),
+                                    cause = ErrorCause.Validation.MissingValue(
+                                        field = "data",
+                                        details = Option.Some(body.message)
+                                    ),
                                 )
                             )
                     }
@@ -113,7 +119,7 @@ class PermissionsClientImpl(
     override suspend fun create(
         dto: CreatePermissionDto,
         token: String
-    ): DivaResult<PermissionResponse, DivaError> {
+    ): DivaResult<Unit, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -122,16 +128,9 @@ class PermissionsClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<PermissionResponse> = response.body()
+                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.Created -> {
-                        body.data?.let { data -> DivaResult.success(data) }
-                            ?: DivaResult.failure(
-                                DivaError(
-                                    cause = ErrorCause.Validation.MissingValue("data", Option.Some(body.message)),
-                                )
-                            )
-                    }
+                    HttpStatusCode.Created -> DivaResult.success(Unit)
                     else -> {
                         DivaResult.failure(
                             DivaError(
@@ -150,34 +149,26 @@ class PermissionsClientImpl(
     }
 
     override suspend fun update(
-        id: String,
         dto: UpdatePermissionDto,
         token: String
-    ): DivaResult<PermissionResponse, DivaError> {
+    ): DivaResult<Unit, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
             client.put(
-                path = "/api/permissions/$id",
+                path = "/api/permissions",
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<PermissionResponse> = response.body()
+                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
-                    HttpStatusCode.Accepted -> {
-                        body.data?.let { data -> DivaResult.success(data) }
-                            ?: DivaResult.failure(
-                                DivaError(
-                                    cause = ErrorCause.Validation.MissingValue("data", Option.Some(body.message)),
-                                )
-                            )
-                    }
+                    HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
                                     method = HttpRequestMethod.PUT,
-                                    url = "/api/permissions/$id",
+                                    url = "/api/permissions",
                                     status = response.status.toHttpStatusCodes(),
                                     details = Option.Some(body.message)
                                 )

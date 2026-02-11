@@ -14,14 +14,12 @@ import io.ktor.server.config.ApplicationConfig
 import migrations.Diva_chat
 import migrations.Diva_chat_participant
 import migrations.Diva_collection
-import migrations.Diva_interaction
 import migrations.Diva_media
 import migrations.Diva_message
 import migrations.Diva_permissions
 import migrations.Diva_playlist_suggestions
 import migrations.Diva_post
 import migrations.Diva_session
-import migrations.Diva_share
 import migrations.Diva_user
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -40,6 +38,7 @@ fun databaseModule(config: ApplicationConfig): Module {
                 )
             )
             val provider: DriverProvider = JvmDriverProviderFactory(config).create()
+            // TODO: find a way to not throw
             val driver = provider.createDriver(Schema.Sync(DivaDB.Schema))
             driver.getOrThrow()
         }
@@ -60,9 +59,6 @@ fun databaseModule(config: ApplicationConfig): Module {
                         collection_typeAdapter = EnumColumnAdapter(),
                         visibilityAdapter = EnumColumnAdapter(),
                     ),
-                    diva_interactionAdapter = Diva_interaction.Adapter(
-                        reaction_typeAdapter = EnumColumnAdapter(),
-                    ),
                     diva_mediaAdapter = Diva_media.Adapter(
                         media_typeAdapter = EnumColumnAdapter(),
                         visibilityAdapter = EnumColumnAdapter(),
@@ -81,9 +77,6 @@ fun databaseModule(config: ApplicationConfig): Module {
                     ),
                     diva_sessionAdapter = Diva_session.Adapter(
                         statusAdapter = EnumColumnAdapter(),
-                    ),
-                    diva_shareAdapter = Diva_share.Adapter(
-                        share_typeAdapter = EnumColumnAdapter(),
                     ),
                     diva_userAdapter = Diva_user.Adapter(
                         roleAdapter = EnumColumnAdapter(),

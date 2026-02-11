@@ -1,10 +1,10 @@
 package com.diva.chat.api.routes
 
+import com.diva.chat.api.handler.ChatHandler
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.chat.dtos.CreateChatDto
 import com.diva.models.api.chat.dtos.UpdateChatDto
 import com.diva.models.server.AUTH_JWT_KEY
-import com.diva.chat.api.handler.ChatHandler
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -18,6 +18,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
+// TODO: ADD SESSION AND PERMISSION CHECK TO ROUTES
 fun Route.chatApiRoutes() {
     val handler: ChatHandler by inject()
     route("/chat") {
@@ -35,14 +36,6 @@ fun Route.chatApiRoutes() {
                     )
                     handler.getChat(id).respond(call)
                 }
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdateChatDto = call.receive()
-                    handler.updateChat(id, dto).respond(call)
-                }
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -55,6 +48,12 @@ fun Route.chatApiRoutes() {
                 val dto: CreateChatDto = call.receive()
                 handler.createChat(dto).respond(call)
             }
+            put {
+                val dto: UpdateChatDto = call.receive()
+                handler.updateChat(dto).respond(call)
+            }
+            chatParticipantApiRoutes()
+            chatMessageApiRoutes()
         }
     }
 }

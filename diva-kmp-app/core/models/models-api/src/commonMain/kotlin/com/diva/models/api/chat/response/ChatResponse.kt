@@ -23,4 +23,24 @@ data class ChatResponse(
     val updatedAt: Long,
     @SerialName("deleted_at")
     val deletedAt: Long? = null,
+    @SerialName("participants")
+    val participants: List<ChatParticipantResponse> = emptyList(),
+    @SerialName("messages")
+    val messages: List<MessageResponse> = emptyList(),
+)
+
+@Serializable
+data class ChatParticipantResponse(
+    @SerialName("user_id")
+    val userId: String,
+    @SerialName("role")
+    val role: String,
+    @SerialName("joined_at")
+    val joinedAt: Long,
+    @SerialName("last_read_at")
+    val lastReadAt: Long? = null,
+    @SerialName("muted_until")
+    val mutedUntil: Long? = null,
+    @SerialName("added_by")
+    val addedBy: String,
 )

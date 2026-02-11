@@ -11,6 +11,7 @@ import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.toDivaError
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.getOrNull
+import io.github.juevigrace.diva.core.isPresent
 import io.github.juevigrace.diva.core.tryResult
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -93,15 +94,22 @@ class JwtHelper(
                                 onNone = { null },
                                 onSome = { session ->
                                     // TODO: TRIGGER VERIFICATION
-                                    if (!session.user.userVerified) {
-                                        return null
-                                    }
-                                    when (session.status) {
-                                        SessionStatus.Active -> {
-                                            onFound(session)
-                                            JWTPrincipal(credential.payload)
+                                    return when {
+                                        !session.user.userVerified -> {
+                                            null
                                         }
-                                        else -> null
+                                        session.user.deletedAt.isPresent() -> {
+                                            null
+                                        }
+                                        else -> {
+                                            when (session.status) {
+                                                SessionStatus.ACTIVE -> {
+                                                    onFound(session)
+                                                    JWTPrincipal(credential.payload)
+                                                }
+                                                else -> null
+                                            }
+                                        }
                                     }
                                 }
                             )

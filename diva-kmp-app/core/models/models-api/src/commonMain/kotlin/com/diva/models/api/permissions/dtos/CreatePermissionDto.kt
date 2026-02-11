@@ -9,8 +9,6 @@ data class CreatePermissionDto(
     val name: String,
     @SerialName("description")
     val description: String,
-    @SerialName("resource")
-    val resource: String,
-    @SerialName("action")
-    val action: String,
+    @SerialName("level")
+    val roleLevel: String
 )

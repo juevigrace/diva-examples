@@ -71,6 +71,7 @@ class Seed(
             id = Uuid.random(),
             name = Permissions.Write.CreateUser.name,
             description = "Create new users",
+            roleLevel = Role.Admin,
             createdAt = Clock.System.now(),
             updatedAt = Clock.System.now()
         )

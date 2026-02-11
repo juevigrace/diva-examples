@@ -1,13 +1,12 @@
 package com.diva.chat.api.routes
 
-import com.diva.models.api.ApiResponse
-import com.diva.models.api.chat.participant.dtos.CreateChatParticipantDto
-import com.diva.models.api.chat.participant.dtos.UpdateChatParticipantDto
-import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.chat.api.handler.ChatParticipantHandler
+import com.diva.models.api.ApiResponse
+import com.diva.models.api.chat.dtos.AddParticipantDto
+import com.diva.models.api.chat.dtos.DeleteParticipantDto
+import com.diva.models.api.chat.dtos.UpdateParticipantDto
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -18,43 +17,30 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-fun Route.chatParticipantApiRoutes() {
+internal fun Route.chatParticipantApiRoutes() {
     val handler: ChatParticipantHandler by inject()
-    route("/chat/participant") {
-        authenticate(AUTH_JWT_KEY) {
-            get {
-                val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
-                val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
-                handler.getChatParticipants(page, pageSize).respond(call)
-            }
-            route("/{id}") {
-                get {
-                    val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    handler.getChatParticipant(id).respond(call)
-                }
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdateChatParticipantDto = call.receive()
-                    handler.updateChatParticipant(id, dto).respond(call)
-                }
-                delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    handler.deleteChatParticipant(id).respond(call)
-                }
-            }
-            post {
-                val dto: CreateChatParticipantDto = call.receive()
-                handler.createChatParticipant(dto).respond(call)
-            }
+    route("/participant") {
+        get("/{chatId}") {
+            val chatId: String = call.pathParameters["chatId"]
+                ?: return@get call.respond(
+                    status = HttpStatusCode.BadRequest,
+                    message = ApiResponse(data = null, message = "Missing chatId")
+                )
+            val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
+            handler.getChatParticipants(chatId, page, pageSize).respond(call)
+        }
+        post {
+            val dto: AddParticipantDto = call.receive()
+            handler.createChatParticipant(dto).respond(call)
+        }
+        put {
+            val dto: UpdateParticipantDto = call.receive()
+            handler.updateChatParticipant(dto).respond(call)
+        }
+        delete {
+            val dto: DeleteParticipantDto = call.receive()
+            handler.deleteChatParticipant(dto).respond(call)
         }
     }
 }

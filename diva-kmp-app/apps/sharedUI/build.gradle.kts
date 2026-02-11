@@ -5,6 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.models)
             implementation(projects.core.database.databaseClient)
             implementation(projects.core.ui)
 

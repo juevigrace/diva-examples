@@ -2,7 +2,9 @@ package com.diva.media.database
 
 import com.diva.database.DivaDB
 import com.diva.database.media.MediaStorage
+import com.diva.models.VisibilityType
 import com.diva.models.media.Media
+import com.diva.models.media.MediaType
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -12,10 +14,8 @@ import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -62,19 +62,18 @@ class MediaStorageImpl(
             val rows: Long = transactionWithResult {
                 mediaQueries.insert(
                     id = item.id.toJavaUuid(),
-                    title = item.title,
-                    description = item.description,
-                    file_path = item.filePath,
-                    file_size = item.fileSize,
-                    mime_type = item.mimeType,
-                    duration = item.duration,
-                    thumbnail_path = item.thumbnailPath,
+                    submitted_by = item.submittedBy.id.toJavaUuid(),
+                    url = item.url,
+                    alt_text = item.altText,
                     media_type = item.mediaType,
+                    file_size = item.fileSize,
+                    width = item.width,
+                    height = item.height,
+                    duration = item.duration,
                     visibility = item.visibility,
-                    tags = item.tags,
-                    metadata = item.metadata,
-                    owner_id = item.ownerId.toJavaUuid(),
-                )
+                    sensitive_content = item.sensitiveContent,
+                    adult_content = item.adultContent,
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -96,20 +95,18 @@ class MediaStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 mediaQueries.update(
-                    title = item.title,
-                    description = item.description,
-                    file_path = item.filePath,
-                    file_size = item.fileSize,
-                    mime_type = item.mimeType,
-                    duration = item.duration,
-                    thumbnail_path = item.thumbnailPath,
+                    url = item.url,
+                    alt_text = item.altText,
                     media_type = item.mediaType,
+                    file_size = item.fileSize,
+                    width = item.width,
+                    height = item.height,
+                    duration = item.duration,
                     visibility = item.visibility,
-                    tags = item.tags,
-                    metadata = item.metadata,
-                    owner_id = item.ownerId.toJavaUuid(),
+                    sensitive_content = item.sensitiveContent,
+                    adult_content = item.adultContent,
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -130,7 +127,7 @@ class MediaStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                mediaQueries.delete(id.toJavaUuid())
+                mediaQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -150,54 +147,39 @@ class MediaStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: UUID,
-        title: String,
-        description: String,
-        filePath: String,
+        submittedBy: UUID,
+        url: String,
+        altText: String,
+        mediaType: MediaType,
         fileSize: Long,
-        mimeType: String,
-        duration: Long?,
-        thumbnailPath: String?,
-        mediaType: String,
-        visibility: String,
-        tags: List<String>?,
-        metadata: String?,
-        ownerId: UUID,
+        width: Int,
+        height: Int,
+        duration: Int,
+        visibility: VisibilityType,
+        sensitiveContent: Boolean,
+        adultContent: Boolean,
+        publishedAt: OffsetDateTime,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
-        oEmail: String?,
-        oUsername: String?,
-        oCreatedAt: OffsetDateTime?,
-        oUpdatedAt: OffsetDateTime?,
     ): Media {
-        require(oEmail != null) { "Owner email cannot be null" }
-        require(oUsername != null) { "Owner username cannot be null" }
-        require(oCreatedAt != null) { "Owner created at cannot be null" }
-        require(oUpdatedAt != null) { "Owner updated at cannot be null" }
-
         return Media(
             id = id.toKotlinUuid(),
-            title = title,
-            description = description,
-            filePath = filePath,
-            fileSize = fileSize,
-            mimeType = mimeType,
-            duration = duration,
-            thumbnailPath = thumbnailPath,
+            submittedBy = User(id = submittedBy.toKotlinUuid()),
+            url = url,
+            altText = altText,
             mediaType = mediaType,
+            fileSize = fileSize,
+            width = width,
+            height = height,
+            duration = duration,
             visibility = visibility,
-            tags = tags ?: emptyList(),
-            metadata = metadata,
-            ownerId = User(
-                id = ownerId.toKotlinUuid(),
-                email = oEmail,
-                username = oUsername,
-                createdAt = oCreatedAt.toInstant().toKotlinInstant(),
-                updatedAt = oUpdatedAt.toInstant().toKotlinInstant()
-            ),
+            sensitiveContent = sensitiveContent,
+            adultContent = adultContent,
+            publishedAt = publishedAt.toInstant().toKotlinInstant(),
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
-            deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),
+            deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant())
         )
     }
 }

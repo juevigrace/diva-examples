@@ -1,13 +1,21 @@
+import com.diva.models.ModerationStatus;
+import com.diva.models.VisibilityType;
+import com.diva.models.collection.CollectionType;
+import com.diva.models.media.MediaType;
+import com.diva.models.roles.Role;
+import com.diva.models.session.SessionStatus;
 import kotlin.Boolean;
 
 CREATE TABLE IF NOT EXISTS diva_user(
     id TEXT NOT NULL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     username TEXT NOT NULL UNIQUE,
+    birth_date INTEGER NOT NULL,
+    phone_number TEXT NOT NULL,
     alias TEXT NOT NULL,
     avatar TEXT NOT NULL DEFAULT '',
     bio TEXT NOT NULL DEFAULT '',
-    user_verified INTEGER AS Boolean NOT NULL DEFAULT 0,
+    role TEXT AS Role NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     deleted_at INTEGER DEFAULT NULL
@@ -20,7 +28,7 @@ CREATE TABLE IF NOT EXISTS diva_session(
     refresh_token TEXT NOT NULL,
     device TEXT NOT NULL DEFAULT '',
     is_current INTEGER AS Boolean NOT NULL DEFAULT 0,
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'closed')),
+    status TEXT AS SessionStatus NOT NULL,
     ip_address TEXT NOT NULL DEFAULT '',
     user_agent TEXT NOT NULL DEFAULT '',
     expires_at INTEGER NOT NULL,
@@ -29,19 +37,42 @@ CREATE TABLE IF NOT EXISTS diva_session(
     FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS diva_permissions(
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL DEFAULT '',
+    role_level TEXT AS Role NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    deleted_at INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS diva_user_permissions(
+    permission_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    granted_by TEXT DEFAULT NULL,
+    granted INTEGER AS Boolean NOT NULL DEFAULT 0,
+    granted_at INTEGER DEFAULT NULL,
+    expires_at INTEGER DEFAULT NULL,
+    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    PRIMARY KEY (permission_id, user_id),
+    FOREIGN KEY (granted_by) REFERENCES diva_user(id),
+    FOREIGN KEY (user_id) REFERENCES diva_user(id)
+);
+
 CREATE TABLE IF NOT EXISTS diva_media(
     id TEXT NOT NULL PRIMARY KEY,
     submitted_by TEXT NOT NULL,
     url TEXT NOT NULL,
     alt_text TEXT NOT NULL DEFAULT '',
-    media_type TEXT NOT NULL DEFAULT 'image' CHECK (media_type IN ('image', 'video', 'audio')),
+    media_type TEXT AS MediaType NOT NULL,
     file_size INTEGER NOT NULL,
     width INTEGER NOT NULL DEFAULT 0,
     height INTEGER NOT NULL DEFAULT 0,
     duration INTEGER NOT NULL DEFAULT 0,
-    visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private', 'friends')),
-    sensitive_content INTEGER NOT NULL DEFAULT 0,
-    adult_content INTEGER NOT NULL DEFAULT 0,
+    visibility TEXT AS VisibilityType NOT NULL,
+    sensitive_content INTEGER AS Boolean NOT NULL DEFAULT 0,
+    adult_content INTEGER AS Boolean NOT NULL DEFAULT 0,
     published_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
@@ -71,8 +102,8 @@ CREATE TABLE IF NOT EXISTS diva_collection(
     cover_media_id TEXT NOT NULL,
     name TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    collection_type TEXT NOT NULL CHECK (collection_type IN ('album', 'playlist', 'mix', 'favorites', 'featured', 'trending')),
-    visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private', 'friends')),
+    collection_type TEXT AS CollectionType NOT NULL,
+    visibility TEXT AS VisibilityType NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     deleted_at INTEGER DEFAULT NULL,
@@ -82,8 +113,8 @@ CREATE TABLE IF NOT EXISTS diva_collection(
 
 CREATE TABLE IF NOT EXISTS diva_playlist_metadata(
     collection_id TEXT NOT NULL PRIMARY KEY,
-    is_collaborative INTEGER NOT NULL DEFAULT 0,
-    allow_suggestions INTEGER NOT NULL DEFAULT 1,
+    is_collaborative INTEGER AS Boolean NOT NULL DEFAULT 0,
+    allow_suggestions INTEGER AS Boolean NOT NULL DEFAULT 1,
     FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE
 );
 
@@ -99,7 +130,7 @@ CREATE TABLE IF NOT EXISTS diva_playlist_suggestions(
     collection_id TEXT NOT NULL,
     suggester_id TEXT NOT NULL,
     media_id TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('approved', 'pending', 'rejected', 'removed')),
+    status TEXT AS ModerationStatus NOT NULL,
     suggested_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     FOREIGN KEY(media_id) REFERENCES diva_media(id),
     FOREIGN KEY(suggester_id) REFERENCES diva_user(id),

@@ -2,7 +2,11 @@ package com.diva.collection.database
 
 import com.diva.database.DivaDB
 import com.diva.database.collection.CollectionStorage
+import com.diva.models.VisibilityType
 import com.diva.models.collection.Collection
+import com.diva.models.collection.CollectionType
+import com.diva.models.media.Media
+import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -55,12 +59,12 @@ class CollectionStorageImpl(
             val rows: Long = transactionWithResult {
                 collectionQueries.insert(
                     id = item.id.toString(),
+                    owner = item.owner.id.toString(),
+                    cover_media_id = item.coverMedia.id.toString(),
                     name = item.name,
                     description = item.description,
-                    owner_id = item.ownerId.toString(),
+                    collection_type = item.collectionType,
                     visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
                 )
             }
             if (rows.toInt() == 0) {
@@ -83,12 +87,10 @@ class CollectionStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 collectionQueries.update(
+                    cover_media_id = item.coverMedia.id.toString(),
                     name = item.name,
                     description = item.description,
-                    owner_id = item.ownerId.toString(),
                     visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
                     id = item.id.toString()
                 )
             }
@@ -131,21 +133,27 @@ class CollectionStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: String,
+        owner: String,
+        coverMediaId: String,
         name: String,
         description: String,
-        ownerId: String,
-        visibility: String,
+        collectionType: CollectionType,
+        visibility: VisibilityType,
         createdAt: Long,
-        updatedAt: Long
+        updatedAt: Long,
+        deletedAt: Long?,
     ): Collection {
         return Collection(
             id = Uuid.parse(id),
+            owner = User(id = Uuid.parse(owner)),
+            coverMedia = Media(id = Uuid.parse(coverMediaId)),
             name = name,
             description = description,
-            ownerId = Uuid.parse(ownerId),
+            collectionType = collectionType,
             visibility = visibility,
             createdAt = Instant.fromEpochMilliseconds(createdAt),
-            updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+            updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+            deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),
         )
     }
 }

@@ -2,7 +2,7 @@ package com.diva.media.database.tag
 
 import com.diva.database.DivaDB
 import com.diva.database.media.tag.TagStorage
-import com.diva.models.media.Tag
+import com.diva.models.media.tag.Tag
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -55,10 +55,7 @@ class TagStorageImpl(
             val rows: Long = transactionWithResult {
                 tagQueries.insert(
                     id = item.id.toString(),
-                    name = item.name,
-                    description = item.description,
-                    color = item.color,
-                    category = item.category,
+                    tag_name = item.name,
                 )
             }
             if (rows.toInt() == 0) {
@@ -81,10 +78,7 @@ class TagStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 tagQueries.update(
-                    name = item.name,
-                    description = item.description,
-                    color = item.color,
-                    category = item.category,
+                    tag_name = item.name,
                     id = item.id.toString()
                 )
             }
@@ -127,20 +121,14 @@ class TagStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: String,
-        name: String,
-        description: String,
-        color: String,
-        category: String,
+        tagName: String,
         createdAt: Long,
         updatedAt: Long,
         deletedAt: Long?,
     ): Tag {
         return Tag(
             id = Uuid.parse(id),
-            name = name,
-            description = description,
-            color = color,
-            category = category,
+            name = tagName,
             createdAt = Instant.fromEpochMilliseconds(createdAt),
             updatedAt = Instant.fromEpochMilliseconds(updatedAt),
             deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),

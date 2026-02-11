@@ -5,14 +5,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreatePostDto(
-    @SerialName("post_type")
-    val postType: String,
-    @SerialName("title")
-    val title: String,
-    @SerialName("content")
-    val content: String,
+    @SerialName("text")
+    val text: String,
     @SerialName("visibility")
     val visibility: String,
+    @SerialName("attachment")
+    val attachment: List<CreatePostAttachment> = emptyList(),
+)
+
+@Serializable
+data class CreatePostAttachment(
     @SerialName("media_id")
     val mediaId: String? = null,
     @SerialName("collection_id")

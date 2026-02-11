@@ -11,10 +11,8 @@ import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -61,11 +59,8 @@ class TagStorageImpl(
             val rows: Long = transactionWithResult {
                 tagQueries.insert(
                     id = item.id.toJavaUuid(),
-                    name = item.name,
-                    description = item.description,
-                    color = item.color,
-                    category = item.category,
-                )
+                    tag_name = item.name,
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -87,12 +82,9 @@ class TagStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 tagQueries.update(
-                    name = item.name,
-                    description = item.description,
-                    color = item.color,
-                    category = item.category,
+                    tag_name = item.name,
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -113,7 +105,7 @@ class TagStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                tagQueries.delete(id.toJavaUuid())
+                tagQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -133,20 +125,14 @@ class TagStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: UUID,
-        name: String,
-        description: String,
-        color: String,
-        category: String,
+        tagName: String,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
     ): Tag {
         return Tag(
             id = id.toKotlinUuid(),
-            name = name,
-            description = description,
-            color = color,
-            category = category,
+            name = tagName,
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

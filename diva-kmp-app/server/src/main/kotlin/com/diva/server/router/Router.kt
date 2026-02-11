@@ -1,15 +1,16 @@
 package com.diva.server.router
 
 import com.diva.auth.api.routes.authRoutes
-import com.diva.chat.api.handler.chatApiHandler
-import com.diva.collection.api.handler.collectionApiHandler
+import com.diva.chat.api.routes.chatApiRoutes
+import com.diva.collection.api.routes.collectionApiRoutes
 import com.diva.database.DivaDB
-import com.diva.media.api.handler.mediaApiHandler
-import com.diva.media.api.handler.tagApiHandler
+import com.diva.media.api.routes.mediaApiRoutes
+import com.diva.media.api.routes.tagApiRoutes
 import com.diva.models.api.ApiResponse
-import com.diva.permissions.api.handler.permissionsApiHandler
-import com.diva.social.api.handler.socialApiHandler
+import com.diva.permissions.api.routes.permissionsApiRoutes
+import com.diva.social.api.routes.postApiRoutes
 import com.diva.user.api.routes.userApiRoutes
+import com.diva.verification.api.routes.verificationRoutes
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.database.DivaDatabase
 import io.ktor.http.HttpStatusCode
@@ -56,13 +57,14 @@ fun Routing.applicationRoutes() {
         }
         route("/api") {
             authRoutes()
-            chatApiHandler()
-            collectionApiHandler()
-            mediaApiHandler()
-            permissionsApiHandler()
-            socialApiHandler()
-            tagApiHandler()
+            chatApiRoutes()
+            collectionApiRoutes()
+            mediaApiRoutes()
+            permissionsApiRoutes()
+            postApiRoutes()
+            tagApiRoutes()
             userApiRoutes()
+            verificationRoutes()
         }
     }
 }

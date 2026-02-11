@@ -1,6 +1,3 @@
-count:
-SELECT COUNT(s.id) FROM diva_session s;
-
 insert:
 INSERT INTO diva_session (id, user_id, access_token, refresh_token, device, status, ip_address, user_agent, expires_at)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -10,11 +7,6 @@ UPDATE diva_session
 SET access_token = ?, refresh_token = ?, device = ?, status = ?, ip_address = ?, user_agent = ?, expires_at = ?, updated_at = NOW() 
 WHERE id = ?;
 
-updateStatus:
-UPDATE diva_session
-SET status = :status
-WHERE id = ?;
-
 deleteByUserId:
 DELETE FROM diva_session
 WHERE user_id = ?;
@@ -22,31 +14,6 @@ WHERE user_id = ?;
 delete:
 DELETE FROM diva_session
 WHERE id = ?;
-
-findAll:
-SELECT
-    s.id,
-    s.access_token AS accessToken,
-    s.refresh_token AS refreshToken,
-    s.device,
-    s.status,
-    s.ip_address AS ipAddress,
-    s.user_agent AS userAgent,
-    s.expires_at AS expiresAt,
-    s.created_at AS createdAt,
-    s.updated_at AS updatedAt,
-    u.id AS userId,
-    u.email,
-    u.username,
-    u.user_verified,
-    u.role,
-    u.created_at AS uCreatedAt,
-    u.updated_at AS uUpdatedAt
-FROM diva_session s
-LEFT JOIN diva_user u ON s.user_id = u.id
-WHERE u.deleted_at IS NULL
-ORDER BY s.created_at DESC
-LIMIT ? OFFSET ?;
 
 findOneById:
 SELECT
@@ -70,26 +37,3 @@ SELECT
 FROM diva_session s
 LEFT JOIN diva_user u ON s.user_id = u.id
 WHERE s.id = ? AND u.deleted_at IS NULL;
-
-findByUserId:
-SELECT
-  s.id,
-  s.access_token AS accessToken,
-  s.refresh_token AS refreshToken,
-  s.device,
-  s.status,
-  s.ip_address AS ipAddress,
-  s.user_agent AS userAgent,
-  s.expires_at AS expiresAt,
-  s.created_at AS createdAt,
-  s.updated_at AS updatedAt,
-  u.id AS userId,
-  u.email,
-  u.username,
-  u.user_verified,
-  u.role,
-  u.created_at AS uCreatedAt,
-  u.updated_at AS uUpdatedAt
-FROM diva_session s
-LEFT JOIN diva_user u ON s.user_id = u.id
-WHERE s.user_id = ? AND u.deleted_at IS NULL;

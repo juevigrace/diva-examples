@@ -32,17 +32,9 @@ fun Route.permissionsApiRoutes() {
                     HttpStatusCode.BadRequest,
                     ApiResponse(data = null, message = "Missing id")
                 )
-                handler.getPermission(id).respond(call)
+                handler.getPermissionById(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdatePermissionDto = call.receive()
-                    handler.updatePermission(id, dto).respond(call)
-                }
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -56,6 +48,10 @@ fun Route.permissionsApiRoutes() {
             post {
                 val dto: CreatePermissionDto = call.receive()
                 handler.createPermission(dto).respond(call)
+            }
+            put {
+                val dto: UpdatePermissionDto = call.receive()
+                handler.updatePermission(dto).respond(call)
             }
         }
     }

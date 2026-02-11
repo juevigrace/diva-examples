@@ -16,3 +16,11 @@ data class UserPermissionDto(
     @SerialName("granted_by")
     val grantedBy: String? = null,
 )
+
+@Serializable
+data class DeleteUserPermissionDto(
+    @SerialName("user_id")
+    val userId: String,
+    @SerialName("permission_id")
+    val permissionId: String,
+)

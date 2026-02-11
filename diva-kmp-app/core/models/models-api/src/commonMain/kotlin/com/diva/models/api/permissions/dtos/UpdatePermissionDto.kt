@@ -9,8 +9,4 @@ data class UpdatePermissionDto(
     val name: String,
     @SerialName("description")
     val description: String,
-    @SerialName("resource")
-    val resource: String,
-    @SerialName("action")
-    val action: String,
 )

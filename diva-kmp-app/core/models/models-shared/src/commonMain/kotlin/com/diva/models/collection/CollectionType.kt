@@ -1,19 +1,19 @@
 package com.diva.models.collection
 
 enum class CollectionType {
-    Album,
-    Playlist,
-    Mix,
-    Favorites,
-    Featured,
-    Trending,
-    Unspecified,
+    ALBUM,
+    PLAYLIST,
+    MIX,
+    FAVORITES,
+    FEATURED,
+    TRENDING,
+    UNSPECIFIED,
 }
 
 fun safeCollectionType(value: String): CollectionType {
     return try {
         CollectionType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        CollectionType.Unspecified
+        CollectionType.UNSPECIFIED
     }
 }

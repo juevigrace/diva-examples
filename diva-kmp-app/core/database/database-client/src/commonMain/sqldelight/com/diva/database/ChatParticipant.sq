@@ -4,7 +4,7 @@ VALUES (?, ?, ?, ?);
 
 update:
 UPDATE diva_chat_participant 
-SET role = ?, last_read_at = ?, muted_until = ? 
+SET role = ?, last_read_at = ?
 WHERE chat_id = ? AND user_id = ?;
 
 delete:

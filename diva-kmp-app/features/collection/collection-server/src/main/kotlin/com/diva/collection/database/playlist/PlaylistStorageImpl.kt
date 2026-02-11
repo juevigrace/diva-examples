@@ -2,7 +2,11 @@ package com.diva.collection.database.playlist
 
 import com.diva.database.DivaDB
 import com.diva.database.collection.playlist.PlaylistStorage
+import com.diva.models.VisibilityType
+import com.diva.models.collection.Collection
+import com.diva.models.collection.CollectionType
 import com.diva.models.collection.playlist.Playlist
+import com.diva.models.media.Media
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -12,10 +16,8 @@ import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -27,7 +29,7 @@ class PlaylistStorageImpl(
 ) : PlaylistStorage {
     override suspend fun count(): DivaResult<Long, DivaError> {
         return db.use {
-            val value: Long = playlistSuggestionsQueries.count().executeAsOne()
+            val value: Long = playlistQueries.count().executeAsOne()
             DivaResult.success(value)
         }
     }
@@ -36,45 +38,42 @@ class PlaylistStorageImpl(
         limit: Int,
         offset: Int
     ): DivaResult<List<Playlist>, DivaError> {
-        return db.getList { playlistSuggestionsQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
+        return db.getList { playlistQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
     override fun getAllFlow(
         limit: Int,
         offset: Int
     ): Flow<DivaResult<List<Playlist>, DivaError>> {
-        return db.getListAsFlow { playlistSuggestionsQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
+        return db.getListAsFlow { playlistQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getById(id: Uuid): DivaResult<Option<Playlist>, DivaError> {
-        return db.getOne { playlistSuggestionsQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
+        return db.getOne { playlistQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<Playlist>, DivaError>> {
-        return db.getOneAsFlow { playlistSuggestionsQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
+        return db.getOneAsFlow { playlistQueries.findOneById(id.toJavaUuid(), mapper = ::mapToEntity) }
     }
 
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     override suspend fun insert(item: Playlist): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                playlistSuggestionsQueries.insert(
-                    id = item.id.toJavaUuid(),
-                    name = item.name,
-                    description = item.description,
-                    collection_id = item.collectionId.toJavaUuid(),
-                    created_by = item.createdBy.toJavaUuid(),
-                    status = item.status,
-                )
+                playlistQueries.insert(
+                    collection_id = item.collection.id.toJavaUuid(),
+                    is_collaborative = item.isCollaborative,
+                    allow_suggestions = item.allowSuggestions
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
                     DivaError(
                         ErrorCause.Database.NoRowsAffected(
                             action = DatabaseAction.INSERT,
-                            table = Option.Some("diva_playlist_suggestions"),
+                            table = Option.Some("diva_playlist"),
                             details = Option.Some("Failed to insert")
                         )
                     )
@@ -88,21 +87,18 @@ class PlaylistStorageImpl(
     override suspend fun update(item: Playlist): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                playlistSuggestionsQueries.update(
-                    name = item.name,
-                    description = item.description,
-                    collection_id = item.collectionId.toJavaUuid(),
-                    created_by = item.createdBy.toJavaUuid(),
-                    status = item.status,
-                    id = item.id.toJavaUuid()
-                )
+                playlistQueries.update(
+                    is_collaborative = item.isCollaborative,
+                    allow_suggestions = item.allowSuggestions,
+                    collection_id = item.collection.id.toJavaUuid(),
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
                     DivaError(
                         ErrorCause.Database.NoRowsAffected(
                             action = DatabaseAction.UPDATE,
-                            table = Option.Some("diva_playlist_suggestions"),
+                            table = Option.Some("diva_playlist"),
                             details = Option.Some("Failed to update")
                         )
                     )
@@ -116,14 +112,14 @@ class PlaylistStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                playlistSuggestionsQueries.delete(id.toJavaUuid())
+                playlistQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
                     DivaError(
                         ErrorCause.Database.NoRowsAffected(
                             action = DatabaseAction.DELETE,
-                            table = Option.Some("diva_playlist_suggestions"),
+                            table = Option.Some("diva_playlist"),
                             details = Option.Some("Failed to delete")
                         )
                     )
@@ -135,41 +131,38 @@ class PlaylistStorageImpl(
 
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
-        id: UUID,
+        owner: UUID,
+        coverMediaId: UUID,
         name: String,
         description: String,
-        collectionId: UUID,
-        createdBy: UUID,
-        status: String,
+        collectionType: CollectionType,
+        visibility: VisibilityType,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
-        cEmail: String?,
-        cUsername: String?,
-        cCreatedAt: OffsetDateTime?,
-        cUpdatedAt: OffsetDateTime?,
+        id: UUID?,
+        isCollaborative: Boolean?,
+        allowSuggestions: Boolean?,
     ): Playlist {
-        require(cEmail != null) { "Creator email cannot be null" }
-        require(cUsername != null) { "Creator username cannot be null" }
-        require(cCreatedAt != null) { "Creator created at cannot be null" }
-        require(cUpdatedAt != null) { "Creator updated at cannot be null" }
+        require(id != null) { "Playlist id cannot be null" }
+        require(isCollaborative != null) { "Playlist isCollaborative cannot be null" }
+        require(allowSuggestions != null) { "Playlist allowSuggestions cannot be null" }
 
         return Playlist(
-            id = id.toKotlinUuid(),
-            name = name,
-            description = description,
-            collectionId = collectionId.toKotlinUuid(),
-            createdBy = User(
-                id = createdBy.toKotlinUuid(),
-                email = cEmail,
-                username = cUsername,
-                createdAt = cCreatedAt.toInstant().toKotlinInstant(),
-                updatedAt = cUpdatedAt.toInstant().toKotlinInstant()
+            collection = Collection(
+                id = id.toKotlinUuid(),
+                owner = User(id = owner.toKotlinUuid()),
+                coverMedia = Media(id = coverMediaId.toKotlinUuid()),
+                name = name,
+                description = description,
+                collectionType = collectionType,
+                visibility = visibility,
+                createdAt = createdAt.toInstant().toKotlinInstant(),
+                updatedAt = updatedAt.toInstant().toKotlinInstant(),
+                deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant())
             ),
-            status = status,
-            createdAt = createdAt.toInstant().toKotlinInstant(),
-            updatedAt = updatedAt.toInstant().toKotlinInstant(),
-            deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),
+            isCollaborative = isCollaborative,
+            allowSuggestions = allowSuggestions
         )
     }
 }

@@ -1,24 +1,21 @@
 package com.diva.models.social.post
 
 import com.diva.models.VisibilityType
-import com.diva.models.collection.Collection
-import com.diva.models.media.Media
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.Option
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
+@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 data class Post(
     val id: Uuid,
     val author: User,
-    val title: String,
-    val content: String,
-    val media: Option<Media>,
-    val collection: Option<Collection>,
+    val text: String,
     val visibility: VisibilityType,
-    val editedAt: Option<Long>,
-    val createdAt: Long,
-    val updatedAt: Long,
-    val deletedAt: Option<Long>,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val deletedAt: Option<Instant>,
+    val attachments: List<PostAttachment> = emptyList()
 )

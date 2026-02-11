@@ -15,9 +15,10 @@ import org.koin.dsl.module
 
 fun mediaModule(): Module {
     return module {
-        singleOf(::MediaStorageImpl) { bind<MediaStorage>() }
-        singleOf(::MediaServiceImpl) { bind<MediaService>() }
         singleOf(::TagStorageImpl) { bind<TagStorage>() }
         singleOf(::TagServiceImpl) { bind<TagService>() }
+
+        singleOf(::MediaStorageImpl) { bind<MediaStorage>() }
+        singleOf(::MediaServiceImpl) { bind<MediaService>() }
     }
 }

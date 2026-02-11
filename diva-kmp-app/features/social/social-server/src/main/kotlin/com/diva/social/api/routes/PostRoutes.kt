@@ -2,7 +2,6 @@ package com.diva.social.api.routes
 
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.social.post.dtos.CreatePostDto
-import com.diva.models.api.social.post.dtos.UpdatePostDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.social.api.handler.PostHandler
 import com.diva.util.respond
@@ -14,7 +13,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -32,17 +30,10 @@ fun Route.postApiRoutes() {
                     HttpStatusCode.BadRequest,
                     ApiResponse(data = null, message = "Missing id")
                 )
-                handler.getPost(id).respond(call)
+                handler.getPostById(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdatePostDto = call.receive()
-                    handler.updatePost(id, dto).respond(call)
-                }
+                // TODO: restrict deletion
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -56,6 +47,24 @@ fun Route.postApiRoutes() {
             post {
                 val dto: CreatePostDto = call.receive()
                 handler.createPost(dto).respond(call)
+            }
+        }
+        route("/attachment") {
+            get("/{postId}") {
+                val postId: String = call.pathParameters["postId"] ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    ApiResponse(data = null, message = "Missing postId")
+                )
+                handler.getPostAttachments(postId).respond(call)
+            }
+            authenticate(AUTH_JWT_KEY) {
+                delete("/{id}") {
+                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
+                        HttpStatusCode.BadRequest,
+                        ApiResponse(data = null, message = "Missing id")
+                    )
+                    handler.deletePostAttachment(id).respond(call)
+                }
             }
         }
     }

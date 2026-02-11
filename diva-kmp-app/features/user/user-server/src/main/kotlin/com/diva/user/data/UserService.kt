@@ -49,8 +49,6 @@ interface UserService {
 
     suspend fun getUserByUsername(username: String): DivaResult<User, DivaError>
 
-    suspend fun getUserByEmail(email: String): DivaResult<User, DivaError>
-
     @OptIn(ExperimentalUuidApi::class)
     suspend fun createUser(dto: CreateUserDto): DivaResult<Uuid, DivaError>
 
@@ -72,7 +70,7 @@ class UserServiceImpl(
                     .map { count ->
                         ApiResponse(
                             data = PaginationResponse(
-                                items = users.map{u -> u.toResponse()},
+                                items = users.map { u -> u.toResponse() },
                                 totalItems = count.toInt(),
                                 totalPages = ((count / pageSize) + 1).toInt(),
                                 currentPage = page,
@@ -138,26 +136,6 @@ class UserServiceImpl(
     override suspend fun getUserByUsername(username: String): DivaResult<User, DivaError> {
         return storage
             .getByUsername(username)
-            .flatMap { option ->
-                option.fold(
-                    onNone = {
-                        DivaResult.failure(
-                            DivaError(
-                                cause = ErrorCause.Validation.MissingValue(
-                                    "user",
-                                    Option.Some("user not found")
-                                )
-                            )
-                        )
-                    },
-                    onSome = { value -> DivaResult.success(value) }
-                )
-            }
-    }
-
-    override suspend fun getUserByEmail(email: String): DivaResult<User, DivaError> {
-        return storage
-            .getByEmail(email)
             .flatMap { option ->
                 option.fold(
                     onNone = {

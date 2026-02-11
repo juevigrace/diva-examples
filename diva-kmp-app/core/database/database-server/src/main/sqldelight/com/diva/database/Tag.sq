@@ -1,3 +1,8 @@
+count:
+SELECT COUNT(*)
+FROM diva_tag
+WHERE deleted_at IS NULL;
+
 insert:
 INSERT INTO diva_tag (id, tag_name)
 VALUES (?, ?);
@@ -13,9 +18,11 @@ SET deleted_at = NOW()
 WHERE id = ? AND deleted_at IS NULL;
 
 findAll:
-SELECT id, tag_name AS tagName, created_at AS createdAt, updated_at AS updatedAt, deleted_at AS deletedAt FROM diva_tag 
-ORDER BY created_at DESC;
+SELECT id, tag_name AS tagName, created_at AS createdAt, updated_at AS updatedAt, deleted_at AS deletedAt FROM diva_tag
+WHERE deletedAt IS NULL
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
 
-findByName:
+findOneById:
 SELECT id, tag_name AS tagName, created_at AS createdAt, updated_at AS updatedAt, deleted_at AS deletedAt FROM diva_tag 
-WHERE tag_name = ?;
+WHERE id = ? AND deletedAt IS NULL;

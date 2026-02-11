@@ -3,7 +3,7 @@ package com.diva.session.database
 import com.diva.database.DivaDB
 import com.diva.database.session.SessionStorage
 import com.diva.models.auth.Session
-import com.diva.models.session.safeSessionStatus
+import com.diva.models.session.SessionStatus
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -32,13 +32,6 @@ class SessionStorageImpl(
         return db.getOne { sessionQueries.findCurrent(mapper = ::mapToEntity) }
     }
 
-    override suspend fun getAll(
-        limit: Int,
-        offset: Int
-    ): DivaResult<List<Session>, DivaError> {
-        return db.getList { sessionQueries.findAll(limit.toLong(), offset.toLong(), mapper = ::mapToEntity) }
-    }
-
     override fun getAllFlow(
         limit: Int,
         offset: Int
@@ -56,11 +49,6 @@ class SessionStorageImpl(
         return db.getOneAsFlow { sessionQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
-    override suspend fun getSessionsByUser(userId: Uuid): DivaResult<List<Session>, DivaError> {
-        return db.getList { sessionQueries.findByUserId(userId.toString(), mapper = ::mapToEntity) }
-    }
-
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     override suspend fun insert(item: Session): DivaResult<Unit, DivaError> {
         return db.use {
@@ -71,7 +59,7 @@ class SessionStorageImpl(
                     access_token = item.accessToken,
                     refresh_token = item.refreshToken,
                     device = item.device,
-                    status = item.status.name,
+                    status = item.status,
                     ip_address = item.ipAddress,
                     user_agent = item.userAgent,
                     expires_at = item.expiresAt.toEpochMilliseconds(),
@@ -101,7 +89,7 @@ class SessionStorageImpl(
                     access_token = item.accessToken,
                     refresh_token = item.refreshToken,
                     device = item.device,
-                    status = item.status.name,
+                    status = item.status,
                     ip_address = item.ipAddress,
                     user_agent = item.userAgent,
                     expires_at = item.expiresAt.toEpochMilliseconds(),
@@ -170,7 +158,7 @@ class SessionStorageImpl(
         accessToken: String,
         refreshToken: String,
         device: String,
-        status: String,
+        status: SessionStatus,
         ipAddress: String,
         userAgent: String,
         expiresAt: Long,
@@ -180,7 +168,7 @@ class SessionStorageImpl(
         email: String?,
         username: String?,
         uCreatedAt: Long?,
-        uUpdatedAt: Long?
+        uUpdatedAt: Long?,
     ): Session {
         require(userId != null) { "User ID cannot be null" }
         require(email != null) { "Email cannot be null" }
@@ -200,7 +188,7 @@ class SessionStorageImpl(
             accessToken = accessToken,
             refreshToken = refreshToken,
             device = device,
-            status = safeSessionStatus(status),
+            status = status,
             ipAddress = ipAddress,
             userAgent = userAgent,
             expiresAt = Instant.fromEpochMilliseconds(expiresAt),

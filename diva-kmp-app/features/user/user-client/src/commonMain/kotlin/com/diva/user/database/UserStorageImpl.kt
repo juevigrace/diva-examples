@@ -2,14 +2,19 @@ package com.diva.user.database
 
 import com.diva.database.DivaDB
 import com.diva.database.user.UserStorage
+import com.diva.models.roles.Role
 import com.diva.models.user.User
+import com.diva.models.user.permissions.UserPermission
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.ErrorCause
+import io.github.juevigrace.diva.core.getOrElse
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
@@ -40,7 +45,7 @@ class UserStorageImpl(
         return db.getOneAsFlow { userQueries.findOneById(id.toString(), mapper = ::mapToEntity) }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     override suspend fun insert(item: User): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
@@ -48,10 +53,12 @@ class UserStorageImpl(
                     id = item.id.toString(),
                     email = item.email,
                     username = item.username,
+                    birth_date = item.birthDate.toEpochMilliseconds(),
+                    phone_number = item.phoneNumber,
                     alias = item.alias,
                     avatar = item.avatar,
                     bio = item.bio,
-                    user_verified = item.userVerified,
+                    role = item.role,
                 )
             }
             if (rows.toInt() == 0) {
@@ -119,26 +126,118 @@ class UserStorageImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    override suspend fun insertPermissions(
+        userId: Uuid,
+        perm: UserPermission
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPermissionsQueries.insert(
+                    user_id = userId.toString(),
+                    permission_id = perm.permission.id.toString(),
+                    granted_at = perm.grantedAt.toEpochMilliseconds(),
+                    granted_by = perm.grantedBy.id.toString(),
+                    expires_at = perm.expiresAt.getOrElse {
+                        Clock.System.now().plus(10.minutes)
+                    }.toEpochMilliseconds(),
+                    granted = perm.granted,
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_user_permissions"),
+                            details = Option.Some("Failed to insert")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    override suspend fun updatePermissions(
+        userId: Uuid,
+        perm: UserPermission
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPermissionsQueries.update(
+                    granted = perm.granted,
+                    expires_at = perm.expiresAt.getOrElse {
+                        Clock.System.now().plus(10.minutes)
+                    }.toEpochMilliseconds(),
+                    user_id = userId.toString(),
+                    permission_id = perm.permission.id.toString(),
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_user_permissions"),
+                            details = Option.Some("Failed to update")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deletePermissions(
+        userId: Uuid,
+        permId: Uuid
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPermissionsQueries.delete(permId.toString(), userId.toString())
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.DELETE,
+                            table = Option.Some("diva_user_permissions"),
+                            details = Option.Some("Failed to delete")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     private fun mapToEntity(
-        id: String,
-        email: String,
-        username: String,
-        alias: String,
-        avatar: String,
-        bio: String,
-        userVerified: Boolean,
-        createdAt: Long,
-        updatedAt: Long,
-        deletedAt: Long?,
+          id: String,
+      email: String,
+      username: String,
+      phoneNumber: String,
+      birthDate: Long,
+      alias: String,
+      avatar: String,
+      bio: String,
+      role: Role,
+      createdAt: Long,
+      updatedAt: Long,
+      deletedAt: Long?,
     ): User {
         return User(
             id = Uuid.parse(id),
             email = email,
             username = username,
+            phoneNumber = phoneNumber,
+            birthDate = Instant.fromEpochMilliseconds(birthDate),
             alias = alias,
             avatar = avatar,
             bio = bio,
-            userVerified = userVerified,
+            role = role,
             createdAt = Instant.fromEpochMilliseconds(createdAt),
             updatedAt = Instant.fromEpochMilliseconds(updatedAt),
             deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),

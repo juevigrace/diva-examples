@@ -2,7 +2,10 @@ package com.diva.collection.database
 
 import com.diva.database.DivaDB
 import com.diva.database.collection.CollectionStorage
+import com.diva.models.VisibilityType
 import com.diva.models.collection.Collection
+import com.diva.models.collection.CollectionType
+import com.diva.models.media.Media
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -12,10 +15,8 @@ import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -62,12 +63,13 @@ class CollectionStorageImpl(
             val rows: Long = transactionWithResult {
                 collectionQueries.insert(
                     id = item.id.toJavaUuid(),
+                    owner = item.owner.id.toJavaUuid(),
+                    cover_media_id = item.coverMedia.id.toJavaUuid(),
                     name = item.name,
                     description = item.description,
                     collection_type = item.collectionType,
                     visibility = item.visibility,
-                    owner_id = item.ownerId.toJavaUuid(),
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -89,13 +91,12 @@ class CollectionStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 collectionQueries.update(
+                    cover_media_id = item.coverMedia.id.toJavaUuid(),
                     name = item.name,
                     description = item.description,
-                    collection_type = item.collectionType,
                     visibility = item.visibility,
-                    owner_id = item.ownerId.toJavaUuid(),
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -116,7 +117,7 @@ class CollectionStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                collectionQueries.delete(id.toJavaUuid())
+                collectionQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -136,37 +137,24 @@ class CollectionStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: UUID,
+        owner: UUID,
+        coverMediaId: UUID,
         name: String,
         description: String,
-        collectionType: String,
-        visibility: String,
-        ownerId: UUID,
+        collectionType: CollectionType,
+        visibility: VisibilityType,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
-        oEmail: String?,
-        oUsername: String?,
-        oCreatedAt: OffsetDateTime?,
-        oUpdatedAt: OffsetDateTime?,
     ): Collection {
-        require(oEmail != null) { "Owner email cannot be null" }
-        require(oUsername != null) { "Owner username cannot be null" }
-        require(oCreatedAt != null) { "Owner created at cannot be null" }
-        require(oUpdatedAt != null) { "Owner updated at cannot be null" }
-
         return Collection(
             id = id.toKotlinUuid(),
+            owner = User(id = owner.toKotlinUuid()),
+            coverMedia = Media(id = coverMediaId.toKotlinUuid()),
             name = name,
             description = description,
             collectionType = collectionType,
             visibility = visibility,
-            ownerId = User(
-                id = ownerId.toKotlinUuid(),
-                email = oEmail,
-                username = oUsername,
-                createdAt = oCreatedAt.toInstant().toKotlinInstant(),
-                updatedAt = oUpdatedAt.toInstant().toKotlinInstant()
-            ),
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

@@ -3,6 +3,7 @@ package com.diva.permissions.database
 import com.diva.database.DivaDB
 import com.diva.database.permissions.PermissionsStorage
 import com.diva.models.permission.Permission
+import com.diva.models.roles.Role
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -57,10 +58,7 @@ class PermissionsStorageImpl(
                     id = item.id.toString(),
                     name = item.name,
                     description = item.description,
-                    resource = item.resource,
-                    action = item.action,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
+                    role_level = item.roleLevel
                 )
             }
             if (rows.toInt() == 0) {
@@ -85,10 +83,6 @@ class PermissionsStorageImpl(
                 permissionsQueries.update(
                     name = item.name,
                     description = item.description,
-                    resource = item.resource,
-                    action = item.action,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
                     id = item.id.toString()
                 )
             }
@@ -133,19 +127,19 @@ class PermissionsStorageImpl(
         id: String,
         name: String,
         description: String,
-        resource: String,
-        action: String,
+        roleLevel: Role,
         createdAt: Long,
-        updatedAt: Long
+        updatedAt: Long,
+        deletedAt: Long?,
     ): Permission {
         return Permission(
             id = Uuid.parse(id),
             name = name,
             description = description,
-            resource = resource,
-            action = action,
+            roleLevel = roleLevel,
             createdAt = Instant.fromEpochMilliseconds(createdAt),
-            updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+            updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+            deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),
         )
     }
 }

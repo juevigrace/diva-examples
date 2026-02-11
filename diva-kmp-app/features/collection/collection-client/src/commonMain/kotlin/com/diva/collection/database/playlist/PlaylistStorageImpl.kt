@@ -2,7 +2,12 @@ package com.diva.collection.database.playlist
 
 import com.diva.database.DivaDB
 import com.diva.database.collection.playlist.PlaylistStorage
+import com.diva.models.VisibilityType
+import com.diva.models.collection.Collection
+import com.diva.models.collection.CollectionType
 import com.diva.models.collection.playlist.Playlist
+import com.diva.models.media.Media
+import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -54,14 +59,9 @@ class PlaylistStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 playlistQueries.insert(
-                    id = item.id.toString(),
-                    name = item.name,
-                    description = item.description,
-                    collection_id = item.collectionId.toString(),
-                    owner_id = item.ownerId.toString(),
-                    visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
+                    collection_id = item.collection.id.toString(),
+                    is_collaborative = item.isCollaborative,
+                    allow_suggestions = item.allowSuggestions
                 )
             }
             if (rows.toInt() == 0) {
@@ -84,14 +84,9 @@ class PlaylistStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 playlistQueries.update(
-                    name = item.name,
-                    description = item.description,
-                    collection_id = item.collectionId.toString(),
-                    owner_id = item.ownerId.toString(),
-                    visibility = item.visibility,
-                    created_at = item.createdAt.toEpochMilliseconds(),
-                    updated_at = item.updatedAt.toEpochMilliseconds(),
-                    id = item.id.toString()
+                    is_collaborative = item.isCollaborative,
+                    allow_suggestions = item.allowSuggestions,
+                    collection_id = item.collection.id.toString(),
                 )
             }
             if (rows.toInt() == 0) {
@@ -132,24 +127,38 @@ class PlaylistStorageImpl(
 
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
-        id: String,
+        owner: String,
+        coverMediaId: String,
         name: String,
         description: String,
-        collectionId: String,
-        ownerId: String,
-        visibility: String,
+        collectionType: CollectionType,
+        visibility: VisibilityType,
         createdAt: Long,
-        updatedAt: Long
+        updatedAt: Long,
+        deletedAt: Long?,
+        id: String?,
+        isCollaborative: Boolean?,
+        allowSuggestions: Boolean?,
     ): Playlist {
+        require(id != null) { "Playlist id cannot be null" }
+        require(isCollaborative != null) { "Playlist isCollaborative cannot be null" }
+        require(allowSuggestions != null) { "Playlist allowSuggestions cannot be null" }
+
         return Playlist(
-            id = Uuid.parse(id),
-            name = name,
-            description = description,
-            collectionId = Uuid.parse(collectionId),
-            ownerId = Uuid.parse(ownerId),
-            visibility = visibility,
-            createdAt = Instant.fromEpochMilliseconds(createdAt),
-            updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+            collection = Collection(
+                id = Uuid.parse(id),
+                owner = User(id = Uuid.parse(owner)),
+                coverMedia = Media(id = Uuid.parse(coverMediaId)),
+                name = name,
+                description = description,
+                collectionType = collectionType,
+                visibility = visibility,
+                createdAt = Instant.fromEpochMilliseconds(createdAt),
+                updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+                deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) })
+            ),
+            isCollaborative = isCollaborative,
+            allowSuggestions = allowSuggestions
         )
     }
 }

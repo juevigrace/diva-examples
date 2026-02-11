@@ -2,7 +2,10 @@ package com.diva.media.database
 
 import com.diva.database.DivaDB
 import com.diva.database.media.MediaStorage
+import com.diva.models.VisibilityType
 import com.diva.models.media.Media
+import com.diva.models.media.MediaType
+import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -55,18 +58,17 @@ class MediaStorageImpl(
             val rows: Long = transactionWithResult {
                 mediaQueries.insert(
                     id = item.id.toString(),
-                    title = item.title,
-                    description = item.description,
-                    file_path = item.filePath,
-                    file_size = item.fileSize,
-                    mime_type = item.mimeType,
-                    duration = item.duration,
-                    thumbnail_path = item.thumbnailPath,
+                    submitted_by = item.submittedBy.id.toString(),
+                    url = item.url,
+                    alt_text = item.altText,
                     media_type = item.mediaType,
+                    file_size = item.fileSize,
+                    width = item.width.toLong(),
+                    height = item.height.toLong(),
+                    duration = item.duration.toLong(),
                     visibility = item.visibility,
-                    tags = item.tags,
-                    metadata = item.metadata,
-                    owner_id = item.ownerId.toString(),
+                    sensitive_content = item.sensitiveContent,
+                    adult_content = item.adultContent,
                 )
             }
             if (rows.toInt() == 0) {
@@ -89,18 +91,16 @@ class MediaStorageImpl(
         return db.use {
             val rows: Long = transactionWithResult {
                 mediaQueries.update(
-                    title = item.title,
-                    description = item.description,
-                    file_path = item.filePath,
-                    file_size = item.fileSize,
-                    mime_type = item.mimeType,
-                    duration = item.duration,
-                    thumbnail_path = item.thumbnailPath,
+                    url = item.url,
+                    alt_text = item.altText,
                     media_type = item.mediaType,
+                    file_size = item.fileSize,
+                    width = item.width.toLong(),
+                    height = item.height.toLong(),
+                    duration = item.duration.toLong(),
                     visibility = item.visibility,
-                    tags = item.tags,
-                    metadata = item.metadata,
-                    owner_id = item.ownerId.toString(),
+                    sensitive_content = item.sensitiveContent,
+                    adult_content = item.adultContent,
                     id = item.id.toString()
                 )
             }
@@ -143,39 +143,39 @@ class MediaStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: String,
-        title: String,
-        description: String,
-        filePath: String,
-        fileSize: Long,
-        mimeType: String,
-        duration: Long?,
-        thumbnailPath: String?,
-        mediaType: String,
-        visibility: String,
-        tags: List<String>?,
-        metadata: String?,
-        ownerId: String,
-        createdAt: Long,
-        updatedAt: Long,
-        deletedAt: Long?,
+    submittedBy: String,
+    url: String,
+    altText: String,
+    mediaType: MediaType,
+    fileSize: Long,
+    width: Long,
+    height: Long,
+    duration: Long,
+    visibility: VisibilityType,
+    sensitiveContent: Boolean,
+    adultContent: Boolean,
+    publishedAt: Long,
+    createdAt: Long,
+    updatedAt: Long,
+    deletedAt: Long?,
     ): Media {
         return Media(
             id = Uuid.parse(id),
-            title = title,
-            description = description,
-            filePath = filePath,
-            fileSize = fileSize,
-            mimeType = mimeType,
-            duration = duration,
-            thumbnailPath = thumbnailPath,
+            submittedBy = User(id = Uuid.parse(submittedBy)),
+            url = url,
+            altText = altText,
             mediaType = mediaType,
+            fileSize = fileSize,
+            width = width.toInt(),
+            height = height.toInt(),
+            duration = duration.toInt(),
             visibility = visibility,
-            tags = tags ?: emptyList(),
-            metadata = metadata,
-            ownerId = Uuid.parse(ownerId),
+            sensitiveContent = sensitiveContent,
+            adultContent = adultContent,
+            publishedAt = Instant.fromEpochMilliseconds(publishedAt),
             createdAt = Instant.fromEpochMilliseconds(createdAt),
             updatedAt = Instant.fromEpochMilliseconds(updatedAt),
-            deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) }),
+            deletedAt = Option.of(deletedAt?.let { Instant.fromEpochMilliseconds(it) })
         )
     }
 }

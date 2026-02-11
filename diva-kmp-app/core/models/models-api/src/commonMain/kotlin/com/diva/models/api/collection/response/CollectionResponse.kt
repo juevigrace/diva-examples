@@ -24,5 +24,20 @@ data class CollectionResponse(
     @SerialName("updated_at")
     val updatedAt: Long,
     @SerialName("deleted_at")
-    val deletedAt: Long? = null
+    val deletedAt: Long? = null,
+)
+
+
+@Serializable
+data class CollectionMediaResponse(
+    @SerialName("media_id")
+    val mediaId: String,
+    @SerialName("position")
+    val position: Int,
+    @SerialName("added_by_id")
+    val addedById: String,
+    @SerialName("score")
+    val score: Float,
+    @SerialName("added_at")
+    val addedAt: Long,
 )

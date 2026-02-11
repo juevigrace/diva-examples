@@ -77,7 +77,7 @@ android {
 
         all {
             val properties = gradleLocalProperties(project.rootDir, providers)
-            buildConfigField("String", "DOMAIN", properties.getProperty("DOMAIN"))
+            buildConfigField("String", "DOMAIN", "\"${properties.getProperty("DOMAIN")}\"")
             dimension = "environment"
             applicationIdSuffix = ".$name"
             versionNameSuffix = "-$name"

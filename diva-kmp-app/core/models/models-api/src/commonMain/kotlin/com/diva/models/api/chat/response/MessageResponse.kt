@@ -23,4 +23,12 @@ data class MessageResponse(
     val updatedAt: Long,
     @SerialName("deleted_at")
     val deletedAt: Long? = null,
+    @SerialName("media")
+    val media: List<MessageMediaResponse> = emptyList(),
+)
+
+@Serializable
+data class MessageMediaResponse(
+    @SerialName("media_id")
+    val mediaId: String,
 )

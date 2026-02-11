@@ -24,5 +24,17 @@ data class PostResponse(
     @SerialName("updated_at")
     val updatedAt: Long,
     @SerialName("deleted_at")
-    val deletedAt: Long? = null
+    val deletedAt: Long? = null,
+    @SerialName("attachments")
+    val attachments: List<PostAttachmentResponse> = emptyList()
+)
+
+@Serializable
+data class PostAttachmentResponse(
+    @SerialName("id")
+    val id: String,
+    @SerialName("media_id")
+    val mediaId: String? = null,
+    @SerialName("collection_id")
+    val collectionId: String? = null
 )

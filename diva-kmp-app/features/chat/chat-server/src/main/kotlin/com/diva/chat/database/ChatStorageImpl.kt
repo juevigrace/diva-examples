@@ -3,17 +3,23 @@ package com.diva.chat.database
 import com.diva.database.DivaDB
 import com.diva.database.chat.ChatStorage
 import com.diva.models.chat.Chat
+import com.diva.models.chat.ChatParticipant
+import com.diva.models.media.Media
+import com.diva.models.social.ChatType
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.ErrorCause
+import io.github.juevigrace.diva.core.fold
+import io.github.juevigrace.diva.core.getOrElse
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.util.UUID
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
@@ -62,11 +68,12 @@ class ChatStorageImpl(
             val rows: Long = transactionWithResult {
                 chatQueries.insert(
                     id = item.id.toJavaUuid(),
+                    created_by = item.createdBy.id.toJavaUuid(),
+                    chat_type = item.type,
                     name = item.name,
                     description = item.description,
-                    chat_type = item.chatType,
-                    created_by = item.createdBy.toJavaUuid(),
-                )
+                    avatar = item.avatar.getOrElse { null }?.id?.toJavaUuid()
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -86,14 +93,32 @@ class ChatStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     override suspend fun update(item: Chat): DivaResult<Unit, DivaError> {
         return db.use {
+            val currentChat = getById(item.id)
+                .fold(
+                    onFailure = { err ->
+                        return@use DivaResult.failure(err)
+                    },
+                    onSuccess = { opt ->
+                        opt.fold(
+                            onNone = {
+                                return@use DivaResult.failure(
+                                    DivaError(
+                                        ErrorCause.Validation.MissingValue("chat", Option.Some("chat doesn't exists"))
+                                    )
+                                )
+                            },
+                            onSome = { it }
+                        )
+                    }
+                )
+
             val rows: Long = transactionWithResult {
                 chatQueries.update(
                     name = item.name,
                     description = item.description,
-                    chat_type = item.chatType,
-                    created_by = item.createdBy.toJavaUuid(),
+                    avatar = item.avatar.getOrElse { currentChat.avatar.getOrElse { null } }?.id?.toJavaUuid(),
                     id = item.id.toJavaUuid()
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -114,7 +139,86 @@ class ChatStorageImpl(
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                chatQueries.delete(id.toJavaUuid())
+                chatQueries.delete(id.toJavaUuid()).value
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.DELETE,
+                            table = Option.Some("diva_chat"),
+                            details = Option.Some("Failed to delete")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun insertParticipant(chatId: Uuid, item: ChatParticipant): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                chatParticipantQueries.insert(
+                    chat_id = chatId.toJavaUuid(),
+                    user_id = item.user.id.toJavaUuid(),
+                    role = item.role,
+                    added_by = item.addedBy.id.toJavaUuid()
+                ).value
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_chat_participant"),
+                            details = Option.Some("Failed to insert")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updateParticipant(chatId: Uuid, item: ChatParticipant): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                chatParticipantQueries.update(
+                    role = item.role,
+                    last_read_at = OffsetDateTime.ofInstant(
+                        item.lastReadAt.getOrElse { Clock.System.now() }.toJavaInstant(),
+                        ZoneId.systemDefault()
+                    ),
+                    chat_id = chatId.toJavaUuid(),
+                    user_id = item.user.id.toJavaUuid()
+                ).value
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_chat_participant"),
+                            details = Option.Some("Failed to update")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun deleteParticipant(
+        chatId: Uuid,
+        userId: Uuid
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                chatParticipantQueries.delete(chatId.toJavaUuid(), userId.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -134,35 +238,24 @@ class ChatStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: UUID,
+        chatType: ChatType,
         name: String,
         description: String,
-        chatType: String,
+        avatar: UUID?,
         createdBy: UUID,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
-        cEmail: String?,
-        cUsername: String?,
-        cCreatedAt: OffsetDateTime?,
-        cUpdatedAt: OffsetDateTime?,
     ): Chat {
-        require(cEmail != null) { "Creator email cannot be null" }
-        require(cUsername != null) { "Creator username cannot be null" }
-        require(cCreatedAt != null) { "Creator created at cannot be null" }
-        require(cUpdatedAt != null) { "Creator updated at cannot be null" }
-
         return Chat(
             id = id.toKotlinUuid(),
             name = name,
             description = description,
-            chatType = chatType,
+            type = chatType,
             createdBy = User(
                 id = createdBy.toKotlinUuid(),
-                email = cEmail,
-                username = cUsername,
-                createdAt = cCreatedAt.toInstant().toKotlinInstant(),
-                updatedAt = cUpdatedAt.toInstant().toKotlinInstant()
             ),
+            avatar = avatar?.let { Option.Some(Media(id = it.toKotlinUuid())) } ?: Option.None,
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

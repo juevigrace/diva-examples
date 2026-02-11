@@ -1,10 +1,11 @@
 package com.diva.media.api.routes
 
+import com.diva.media.api.handler.MediaHandler
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.media.dtos.CreateMediaDto
+import com.diva.models.api.media.dtos.DeleteMediaTagDto
 import com.diva.models.api.media.dtos.UpdateMediaDto
 import com.diva.models.server.AUTH_JWT_KEY
-import com.diva.media.api.handler.MediaHandler
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -13,7 +14,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
-import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
@@ -36,22 +36,6 @@ fun Route.mediaApiRoutes() {
                 handler.getMedia(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdateMediaDto = call.receive()
-                    handler.updateMedia(id, dto).respond(call)
-                }
-                patch {
-                    val id: String = call.pathParameters["id"] ?: return@patch call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdateMediaDto = call.receive()
-                    handler.updateMedia(id, dto).respond(call)
-                }
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -65,6 +49,25 @@ fun Route.mediaApiRoutes() {
             post {
                 val dto: CreateMediaDto = call.receive()
                 handler.createMedia(dto).respond(call)
+            }
+            put {
+                val dto: UpdateMediaDto = call.receive()
+                handler.updateMedia(dto).respond(call)
+            }
+        }
+        route("/tag") {
+            get("/{mediaId}") {
+                val mediaId: String = call.pathParameters["mediaId"] ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    ApiResponse(data = null, message = "Missing mediaId")
+                )
+                handler.getMediaTagsByMediaId(mediaId).respond(call)
+            }
+            authenticate(AUTH_JWT_KEY) {
+                delete {
+                    val dto: DeleteMediaTagDto = call.receive()
+                    handler.deleteMediaTag(dto).respond(call)
+                }
             }
         }
     }

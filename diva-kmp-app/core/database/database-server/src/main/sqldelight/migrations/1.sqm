@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS diva_user(
     username VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     birth_date TIMESTAMPTZ NOT NULL,
-    phone_number VARCHAR(50),
+    phone_number VARCHAR(50) NOT NULL,
     alias VARCHAR(50) NOT NULL,
     avatar TEXT NOT NULL DEFAULT '',
     bio TEXT NOT NULL DEFAULT '',
@@ -176,53 +176,3 @@ CREATE TABLE IF NOT EXISTS diva_collection_media(
 
 CREATE INDEX IF NOT EXISTS idx_diva_user_permissions_user_id ON diva_user_permissions (user_id);
 CREATE INDEX IF NOT EXISTS idx_diva_user_permissions_permission_id ON diva_user_permissions (permission_id);
-
--- CREATE TYPE visibility_enum AS ENUM ('public', 'private', 'friends');
--- CREATE TYPE request_status_enum AS ENUM ('approved', 'pending', 'rejected', 'removed');
--- CREATE TYPE collection_enum AS ENUM (
---     'album',      -- User-created media albums
---     'playlist',   -- Curated media playlists
---     'mix',        -- Algorithmic collections
---     'favorites',  -- User favorites
---     'featured',   -- Staff picks
---     'trending'    -- Trending content
--- );
--- CREATE TYPE media_type_enum AS ENUM ('image', 'video', 'audio');
--- CREATE TYPE session_status_enum AS ENUM ('active', 'expired', 'closed');
---
--- CREATE TYPE role_enum AS ENUM ('admin', 'user', 'moderator');
---
--- CREATE TYPE reaction_enum AS ENUM (
---     'like', 'comment', 'bookmark', 'share'
--- );
---
--- CREATE TYPE moderation_status_enum AS ENUM (
---     'pending', 'approved', 'rejected', 'hidden'
--- );
---
--- CREATE TYPE share_type_enum AS ENUM (
---     'direct',
---     'external',
---     'embed',
---     'download'
--- );
---
--- CREATE TYPE notification_type_enum AS ENUM (
---     'like', 'comment', 'reply', 'share', 'follow', 'mention'
--- );
---
--- CREATE TYPE chat_type_enum AS ENUM (
---     'direct',
---     'group'
--- );
---
--- CREATE TYPE participant_role_enum AS ENUM (
---     'admin',
---     'member'
--- );
---
--- CREATE TYPE message_type_enum AS ENUM (
---     'text',
---     'media',
---     'system'
--- );

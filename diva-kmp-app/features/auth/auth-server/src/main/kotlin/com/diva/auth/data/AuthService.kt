@@ -46,8 +46,7 @@ interface AuthService {
         userId: Uuid,
     ): DivaResult<ApiResponse<SessionResponse>, DivaError>
 
-    @OptIn(ExperimentalUuidApi::class)
-    suspend fun signOut(sessionId: Uuid): DivaResult<ApiResponse<Unit>, DivaError>
+    suspend fun signOut(session: Session): DivaResult<ApiResponse<Unit>, DivaError>
 }
 
 class AuthServiceImpl(
@@ -166,12 +165,12 @@ class AuthServiceImpl(
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun signOut(sessionId: Uuid): DivaResult<ApiResponse<Unit>, DivaError> {
+    override suspend fun signOut(session: Session): DivaResult<ApiResponse<Unit>, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
             storage
-                .updateStatus(sessionId, SessionStatus.Closed)
+                .update(session.copy(status = SessionStatus.CLOSED))
                 .mapError { err -> err }
                 .map { ApiResponse(message = "Sign out successful") }
         }
@@ -195,7 +194,7 @@ class AuthServiceImpl(
             accessToken = accessToken,
             refreshToken = refreshToken,
             device = dto.device,
-            status = SessionStatus.Active,
+            status = SessionStatus.ACTIVE,
             // TODO: GET IP
             ipAddress = dto.ipAddress ?: "",
             userAgent = dto.userAgent ?: "",

@@ -1,10 +1,10 @@
 package com.diva.media.api.routes
 
-import com.diva.models.api.ApiResponse
-import com.diva.models.api.media.tag.dtos.CreateTagDto
-import com.diva.models.api.media.tag.dtos.UpdateTagDto
-import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.media.api.handler.TagHandler
+import com.diva.models.api.ApiResponse
+import com.diva.models.api.media.dtos.CreateTagDto
+import com.diva.models.api.media.dtos.UpdateTagDto
+import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -35,14 +35,6 @@ fun Route.tagApiRoutes() {
                 handler.getTag(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
-                put {
-                    val id: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
-                    val dto: UpdateTagDto = call.receive()
-                    handler.updateTag(id, dto).respond(call)
-                }
                 delete {
                     val id: String = call.pathParameters["id"] ?: return@delete call.respond(
                         HttpStatusCode.BadRequest,
@@ -56,6 +48,14 @@ fun Route.tagApiRoutes() {
             post {
                 val dto: CreateTagDto = call.receive()
                 handler.createTag(dto).respond(call)
+            }
+            put {
+                val id: String = call.pathParameters["id"] ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    ApiResponse(data = null, message = "Missing id")
+                )
+                val dto: UpdateTagDto = call.receive()
+                handler.updateTag(dto).respond(call)
             }
         }
     }

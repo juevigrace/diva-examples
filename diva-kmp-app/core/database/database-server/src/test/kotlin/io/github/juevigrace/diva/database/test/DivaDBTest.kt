@@ -15,14 +15,12 @@ import kotlinx.coroutines.test.runTest
 import migrations.Diva_chat
 import migrations.Diva_chat_participant
 import migrations.Diva_collection
-import migrations.Diva_interaction
 import migrations.Diva_media
 import migrations.Diva_message
 import migrations.Diva_permissions
 import migrations.Diva_playlist_suggestions
 import migrations.Diva_post
 import migrations.Diva_session
-import migrations.Diva_share
 import migrations.Diva_user
 import kotlin.test.Test
 
@@ -31,7 +29,7 @@ class DivaDBTest {
         private val provider: DriverProvider = JvmDriverProviderFactory(
             JvmConf(
                 DriverConf.PostgresqlDriverConf(
-                    host = "postgres_container",
+                    host = "localhost",
                     port = 5433,
                     username = "postgres",
                     password = "postgres",
@@ -61,9 +59,6 @@ class DivaDBTest {
                         collection_typeAdapter = EnumColumnAdapter(),
                         visibilityAdapter = EnumColumnAdapter(),
                     ),
-                    diva_interactionAdapter = Diva_interaction.Adapter(
-                        reaction_typeAdapter = EnumColumnAdapter(),
-                    ),
                     diva_mediaAdapter = Diva_media.Adapter(
                         media_typeAdapter = EnumColumnAdapter(),
                         visibilityAdapter = EnumColumnAdapter(),
@@ -82,9 +77,6 @@ class DivaDBTest {
                     ),
                     diva_sessionAdapter = Diva_session.Adapter(
                         statusAdapter = EnumColumnAdapter(),
-                    ),
-                    diva_shareAdapter = Diva_share.Adapter(
-                        share_typeAdapter = EnumColumnAdapter(),
                     ),
                     diva_userAdapter = Diva_user.Adapter(
                         roleAdapter = EnumColumnAdapter(),

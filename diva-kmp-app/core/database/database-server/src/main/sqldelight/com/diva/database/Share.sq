@@ -1,3 +1,0 @@
-insert:
-INSERT INTO diva_share (interaction_id, share_type, caption)
-VALUES (?, ?, ?);

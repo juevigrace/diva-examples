@@ -1,6 +1,7 @@
 package com.diva.models.chat
 
 import com.diva.models.api.chat.response.ChatResponse
+import com.diva.models.media.Media
 import com.diva.models.social.ChatType
 import com.diva.models.social.safeChatType
 import com.diva.models.user.User
@@ -17,7 +18,7 @@ data class Chat(
     val type: ChatType,
     val name: String,
     val description: String = "",
-    val avatar: Option<String> = Option.None,
+    val avatar: Option<Media> = Option.None,
     val createdAt: Instant,
     val updatedAt: Instant,
     val deletedAt: Option<Instant> = Option.None,
@@ -34,7 +35,7 @@ data class Chat(
                 type = safeChatType(response.type),
                 name = response.name,
                 description = response.description,
-                avatar = Option.of(response.avatar),
+                avatar = Option.of(response.avatar?.let { Media(id = Uuid.parse(it)) }),
                 createdAt = Instant.fromEpochMilliseconds(response.createdAt),
                 updatedAt = Instant.fromEpochMilliseconds(response.updatedAt),
                 deletedAt = Option.of(response.deletedAt?.let { Instant.fromEpochMilliseconds(it) }),

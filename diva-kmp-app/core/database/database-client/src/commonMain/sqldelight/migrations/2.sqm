@@ -1,120 +1,109 @@
-CREATE TABLE IF NOT EXISTS diva_follow(
-    user_id TEXT NOT NULL,
-    followed TEXT NOT NULL,
-    followed_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    PRIMARY KEY (user_id, followed),
-    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    FOREIGN KEY(followed) REFERENCES diva_user(id) ON DELETE CASCADE,
-    CHECK (user_id != followed)
-);
+import com.diva.models.ModerationStatus;
+import com.diva.models.VisibilityType;
+import com.diva.models.collection.CollectionType;
+import com.diva.models.media.MediaType;
+import kotlin.Boolean;
 
-CREATE TABLE IF NOT EXISTS diva_post(
+CREATE TABLE IF NOT EXISTS diva_media(
     id TEXT NOT NULL PRIMARY KEY,
-    author_id TEXT NOT NULL,
-    post_type TEXT NOT NULL DEFAULT 'media' CHECK (post_type IN ('media', 'collection', 'text')),
-    title TEXT NOT NULL DEFAULT '',
-    content TEXT NOT NULL DEFAULT '',
-    media_id TEXT DEFAULT NULL,
-    collection_id TEXT DEFAULT NULL,
-    visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private', 'friends')),
-    edited_at INTEGER DEFAULT NULL,
+    submitted_by TEXT NOT NULL,
+    url TEXT NOT NULL,
+    alt_text TEXT NOT NULL DEFAULT '',
+    media_type TEXT AS MediaType NOT NULL,
+    file_size INTEGER NOT NULL,
+    width INTEGER NOT NULL DEFAULT 0,
+    height INTEGER NOT NULL DEFAULT 0,
+    duration INTEGER NOT NULL DEFAULT 0,
+    visibility TEXT AS VisibilityType NOT NULL,
+    sensitive_content INTEGER AS Boolean NOT NULL DEFAULT 0,
+    adult_content INTEGER AS Boolean NOT NULL DEFAULT 0,
+    published_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     deleted_at INTEGER DEFAULT NULL,
-    FOREIGN KEY(author_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
-    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE RESTRICT,
-    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE RESTRICT,
-    CHECK (
-        (post_type = 'media' AND media_id IS NOT NULL AND collection_id IS NULL) OR
-        (post_type = 'collection' AND collection_id IS NOT NULL AND media_id IS NULL) OR
-        (post_type = 'text' AND media_id IS NULL AND collection_id IS NULL)
-    )
+    FOREIGN KEY(submitted_by) REFERENCES diva_user(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS diva_interaction(
+CREATE TABLE IF NOT EXISTS diva_tag(
     id TEXT NOT NULL PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    post_id TEXT NOT NULL,
-    reaction_type TEXT NOT NULL DEFAULT 'like' CHECK (reaction_type IN ('like', 'comment', 'bookmark', 'share')),
-    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    FOREIGN KEY(post_id) REFERENCES diva_post(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS diva_share(
-    interaction_id TEXT NOT NULL PRIMARY KEY,
-    share_type TEXT NOT NULL DEFAULT 'direct' CHECK (share_type IN ('direct', 'external', 'embed', 'download')),
-    caption TEXT NOT NULL DEFAULT '',
-    FOREIGN KEY(interaction_id) REFERENCES diva_interaction(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS diva_comment(
-    interaction_id TEXT NOT NULL PRIMARY KEY,
-    reply_to TEXT DEFAULT NULL,
-    content TEXT NOT NULL,
-    edited_at INTEGER DEFAULT NULL,
-    FOREIGN KEY(interaction_id) REFERENCES diva_interaction(id) ON DELETE RESTRICT,
-    FOREIGN KEY(reply_to) REFERENCES diva_comment(interaction_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE IF NOT EXISTS diva_chat(
-    id TEXT NOT NULL PRIMARY KEY,
-    created_by TEXT NOT NULL,
-    chat_type TEXT NOT NULL DEFAULT 'direct' CHECK (chat_type IN ('direct', 'group')),
-    name TEXT NOT NULL DEFAULT '',
-    description TEXT NOT NULL DEFAULT '',
-    avatar TEXT NOT NULL DEFAULT '',
-    last_message_at INTEGER DEFAULT NULL,
+    tag_name TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    deleted_at INTEGER DEFAULT NULL,
-    FOREIGN KEY(created_by) REFERENCES diva_user(id) ON DELETE RESTRICT,
-    CHECK (
-        (chat_type = 'group' AND name != '') OR 
-        (chat_type = 'direct')
-    )
+    deleted_at INTEGER DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS diva_chat_participant(
-    chat_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
-    joined_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    last_read_at INTEGER DEFAULT NULL,
-    muted_until INTEGER DEFAULT NULL,
-    added_by TEXT NOT NULL,
-    PRIMARY KEY (chat_id, user_id),
-    FOREIGN KEY(chat_id) REFERENCES diva_chat(id) ON DELETE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE,
-    FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE RESTRICT,
-    CHECK (user_id != added_by)
-);
-
-CREATE TABLE IF NOT EXISTS diva_message(
-    id TEXT NOT NULL PRIMARY KEY,
-    chat_id TEXT NOT NULL,
-    sender_id TEXT NOT NULL,
-    content TEXT NOT NULL DEFAULT '',
-    message_type TEXT NOT NULL DEFAULT 'text' CHECK (message_type IN ('text', 'media', 'system')),
-    reply_to_id TEXT DEFAULT NULL,
-    edited_at INTEGER DEFAULT NULL,
-    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    deleted_at INTEGER DEFAULT NULL,
-    FOREIGN KEY(chat_id) REFERENCES diva_chat(id) ON DELETE CASCADE,
-    FOREIGN KEY(sender_id) REFERENCES diva_user(id) ON DELETE RESTRICT,
-    FOREIGN KEY(reply_to_id) REFERENCES diva_message(id) ON DELETE RESTRICT,
-    CHECK (
-        (message_type = 'text' AND content != '') OR
-        (message_type IN ('media', 'system'))
-    )
-);
-
-CREATE TABLE IF NOT EXISTS diva_message_media(
-    message_id TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS diva_media_tag(
     media_id TEXT NOT NULL,
-    position INTEGER NOT NULL DEFAULT 0,
-    PRIMARY KEY (message_id, media_id),
-    FOREIGN KEY(message_id) REFERENCES diva_message(id) ON DELETE CASCADE,
-    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE CASCADE
+    tag_id TEXT NOT NULL,
+    PRIMARY KEY (media_id, tag_id),
+    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE CASCADE,
+    FOREIGN KEY(tag_id) REFERENCES diva_tag(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_collection(
+    id TEXT NOT NULL PRIMARY KEY,
+    owner TEXT NOT NULL,
+    cover_media_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    collection_type TEXT AS CollectionType NOT NULL,
+    visibility TEXT AS VisibilityType NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    deleted_at INTEGER DEFAULT NULL,
+    FOREIGN KEY(owner) REFERENCES diva_user(id) ON DELETE RESTRICT,
+    FOREIGN KEY(cover_media_id) REFERENCES diva_media(id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS diva_collection_media(
+    collection_id TEXT NOT NULL,
+    media_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    added_by TEXT NOT NULL,
+    score REAL NOT NULL DEFAULT 0.0,
+    added_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE,
+    FOREIGN KEY(media_id) REFERENCES diva_media(id) ON DELETE CASCADE,
+    FOREIGN KEY(added_by) REFERENCES diva_user(id) ON DELETE CASCADE,
+    PRIMARY KEY (collection_id, media_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_playlist_metadata(
+    collection_id TEXT NOT NULL PRIMARY KEY,
+    is_collaborative INTEGER AS Boolean NOT NULL DEFAULT 0,
+    allow_suggestions INTEGER AS Boolean NOT NULL DEFAULT 1,
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_playlist_contributor(
+    collection_id TEXT NOT NULL,
+    contributor_id TEXT NOT NULL,
+    FOREIGN KEY(contributor_id) REFERENCES diva_user(id),
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE,
+    PRIMARY KEY (collection_id, contributor_id)
+);
+
+CREATE TABLE IF NOT EXISTS diva_playlist_suggestions(
+    id TEXT NOT NULL PRIMARY KEY,
+    collection_id TEXT NOT NULL,
+    suggester_id TEXT NOT NULL,
+    media_id TEXT NOT NULL,
+    status TEXT AS ModerationStatus NOT NULL,
+    suggested_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY(media_id) REFERENCES diva_media(id),
+    FOREIGN KEY(suggester_id) REFERENCES diva_user(id),
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS diva_mix_metadata(
+    collection_id TEXT NOT NULL PRIMARY KEY,
+    algorithm_type TEXT NOT NULL DEFAULT 'trending',
+    time_window_hours INTEGER NOT NULL DEFAULT 24,
+    content_weight REAL NOT NULL DEFAULT 0.7,
+    freshness_weight REAL NOT NULL DEFAULT 0.3,
+    min_engagement_score INTEGER NOT NULL DEFAULT 10,
+    excluded_tags TEXT NOT NULL DEFAULT '',
+    auto_refresh INTEGER NOT NULL DEFAULT 1,
+    refresh_interval_seconds INTEGER NOT NULL DEFAULT 3600,
+    FOREIGN KEY(collection_id) REFERENCES diva_collection(id) ON DELETE CASCADE
 );

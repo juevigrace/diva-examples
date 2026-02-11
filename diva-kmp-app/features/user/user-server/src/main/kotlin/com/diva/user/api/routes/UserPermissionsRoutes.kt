@@ -1,9 +1,10 @@
 package com.diva.user.api.routes
 
 import com.diva.models.api.ApiResponse
+import com.diva.models.api.user.permissions.dtos.DeleteUserPermissionDto
 import com.diva.models.api.user.permissions.dtos.UserPermissionDto
 import com.diva.models.server.AUTH_JWT_KEY
-import com.diva.user.data.UserPermissionsService
+import com.diva.user.api.handler.UserPermissionsHandler
 import com.diva.util.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -18,48 +19,28 @@ import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
 internal fun Route.userPermissionsHandler() {
-    val service: UserPermissionsService by inject()
+    val handler: UserPermissionsHandler by inject()
 
     route("/permissions") {
-        get {
-            val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
+        get("/{userId}") {
+            val userId: String = call.pathParameters["userId"] ?: return@get call.respond(
                 HttpStatusCode.BadRequest,
                 ApiResponse<Nothing>(message = "Missing id")
             )
-            service.getPermissions(idStr).respond(call)
-        }
-        route("/{permissionId}") {
-            get {
-                val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
-                )
-                val permissionId: String = call.pathParameters["permissionId"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
-                )
-                service.getPermission(idStr, permissionId).respond(call)
-            }
-            delete {
-                val idStr: String = call.pathParameters["id"] ?: return@delete call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
-                )
-                val permissionId: String = call.pathParameters["permissionId"] ?: return@delete call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse<Nothing>(message = "Missing id")
-                )
-                service.deletePermission(idStr, permissionId).respond(call)
-            }
+            handler.getPermissions(userId).respond(call)
         }
         authenticate(AUTH_JWT_KEY) {
             post {
                 val dto: UserPermissionDto = call.receive()
-                service.createPermission(dto).respond(call)
+                handler.createPermission(dto).respond(call)
             }
             put {
                 val dto: UserPermissionDto = call.receive()
-                service.updatePermission(dto).respond(call)
+                handler.updatePermission(dto).respond(call)
+            }
+            delete {
+                val dto: DeleteUserPermissionDto = call.receive()
+                handler.deletePermission(dto).respond(call)
             }
         }
     }

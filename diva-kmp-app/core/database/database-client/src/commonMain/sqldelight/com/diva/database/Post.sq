@@ -1,30 +1,26 @@
-insert:
-INSERT INTO diva_post (id, author_id, post_type, title, content, media_id, collection_id, visibility)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+count:
+SELECT COUNT(*)
+FROM diva_post
+WHERE deleted_at IS NULL;
 
-update:
-UPDATE diva_post 
-SET title = ?, content = ?, visibility = ?, edited_at = (strftime('%s', 'now')), updated_at = (strftime('%s', 'now')) 
-WHERE id = ? AND deleted_at IS NULL;
+insert:
+INSERT INTO diva_post (id, author_id, text, visibility)
+VALUES (?, ?, ?, ?);
 
 delete:
 UPDATE diva_post 
 SET deleted_at = (strftime('%s', 'now')) 
 WHERE id = ? AND deleted_at IS NULL;
 
-findById:
+findOneById:
 SELECT 
   id,
   author_id AS authorId,
-  post_type AS postType,
-  title,
-  content,
-  media_id AS mediaId,
-  collection_id AS collectionId,
+  text,
   visibility,
-  edited_at AS editedAt,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_post
 WHERE id = ? AND deleted_at IS NULL;
 
@@ -32,49 +28,12 @@ findAll:
 SELECT 
   id,
   author_id AS authorId,
-  post_type AS postType,
-  title,
-  content,
-  media_id AS mediaId,
-  collection_id AS collectionId,
+  text,
   visibility,
-  edited_at AS editedAt,
   created_at AS createdAt,
-  updated_at AS updatedAt
+  updated_at AS updatedAt,
+  deleted_at AS deletedAt
 FROM diva_post
 WHERE deleted_at IS NULL
-ORDER BY created_at DESC;
-
-findByAuthor:
-SELECT 
-  id,
-  author_id AS authorId,
-  post_type AS postType,
-  title,
-  content,
-  media_id AS mediaId,
-  collection_id AS collectionId,
-  visibility,
-  edited_at AS editedAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_post
-WHERE author_id = ? AND deleted_at IS NULL
-ORDER BY created_at DESC;
-
-findByType:
-SELECT 
-  id,
-  author_id AS authorId,
-  post_type AS postType,
-  title,
-  content,
-  media_id AS mediaId,
-  collection_id AS collectionId,
-  visibility,
-  edited_at AS editedAt,
-  created_at AS createdAt,
-  updated_at AS updatedAt
-FROM diva_post
-WHERE post_type = ? AND deleted_at IS NULL
-ORDER BY created_at DESC;
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;

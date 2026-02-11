@@ -2,6 +2,7 @@ package com.diva.social.database.post
 
 import com.diva.database.DivaDB
 import com.diva.database.social.post.PostStorage
+import com.diva.models.VisibilityType
 import com.diva.models.social.post.Post
 import com.diva.models.user.User
 import io.github.juevigrace.diva.core.DivaResult
@@ -12,10 +13,8 @@ import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -62,11 +61,10 @@ class PostStorageImpl(
             val rows: Long = transactionWithResult {
                 postQueries.insert(
                     id = item.id.toJavaUuid(),
-                    title = item.title,
-                    content = item.content,
+                    author_id = item.author.id.toJavaUuid(),
+                    text = item.text,
                     visibility = item.visibility,
-                    author_id = item.authorId.toJavaUuid(),
-                )
+                ).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -83,38 +81,11 @@ class PostStorageImpl(
         }
     }
 
-    @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
-    override suspend fun update(item: Post): DivaResult<Unit, DivaError> {
-        return db.use {
-            val rows: Long = transactionWithResult {
-                postQueries.update(
-                    title = item.title,
-                    content = item.content,
-                    visibility = item.visibility,
-                    author_id = item.authorId.toJavaUuid(),
-                    id = item.id.toJavaUuid()
-                )
-            }
-            if (rows.toInt() == 0) {
-                return@use DivaResult.failure(
-                    DivaError(
-                        ErrorCause.Database.NoRowsAffected(
-                            action = DatabaseAction.UPDATE,
-                            table = Option.Some("diva_post"),
-                            details = Option.Some("Failed to update")
-                        )
-                    )
-                )
-            }
-            DivaResult.success(Unit)
-        }
-    }
-
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun delete(id: Uuid): DivaResult<Unit, DivaError> {
         return db.use {
             val rows: Long = transactionWithResult {
-                postQueries.delete(id.toJavaUuid())
+                postQueries.delete(id.toJavaUuid()).value
             }
             if (rows.toInt() == 0) {
                 return@use DivaResult.failure(
@@ -134,35 +105,18 @@ class PostStorageImpl(
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
     private fun mapToEntity(
         id: UUID,
-        title: String,
-        content: String,
-        visibility: String,
         authorId: UUID,
+        text: String,
+        visibility: VisibilityType,
         createdAt: OffsetDateTime,
         updatedAt: OffsetDateTime,
         deletedAt: OffsetDateTime?,
-        aEmail: String?,
-        aUsername: String?,
-        aCreatedAt: OffsetDateTime?,
-        aUpdatedAt: OffsetDateTime?,
     ): Post {
-        require(aEmail != null) { "Author email cannot be null" }
-        require(aUsername != null) { "Author username cannot be null" }
-        require(aCreatedAt != null) { "Author created at cannot be null" }
-        require(aUpdatedAt != null) { "Author updated at cannot be null" }
-
         return Post(
             id = id.toKotlinUuid(),
-            title = title,
-            content = content,
+            author = User(id = authorId.toKotlinUuid()),
+            text = text,
             visibility = visibility,
-            authorId = User(
-                id = authorId.toKotlinUuid(),
-                email = aEmail,
-                username = aUsername,
-                createdAt = aCreatedAt.toInstant().toKotlinInstant(),
-                updatedAt = aUpdatedAt.toInstant().toKotlinInstant()
-            ),
             createdAt = createdAt.toInstant().toKotlinInstant(),
             updatedAt = updatedAt.toInstant().toKotlinInstant(),
             deletedAt = Option.of(deletedAt?.toInstant()?.toKotlinInstant()),

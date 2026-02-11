@@ -1,16 +1,16 @@
 package com.diva.models
 
 enum class VisibilityType {
-    Public,
-    Private,
-    Friends,
-    Unspecified,
+    PUBLIC,
+    PRIVATE,
+    FRIENDS,
+    UNSPECIFIED,
 }
 
 fun safeVisibilityType(value: String): VisibilityType {
     return try {
         VisibilityType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        VisibilityType.Unspecified
+        VisibilityType.UNSPECIFIED
     }
 }

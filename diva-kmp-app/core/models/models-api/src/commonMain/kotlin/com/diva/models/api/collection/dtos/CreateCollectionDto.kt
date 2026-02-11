@@ -14,5 +14,17 @@ data class CreateCollectionDto(
     @SerialName("collection_type")
     val collectionType: String,
     @SerialName("visibility")
-    val visibility: String
+    val visibility: String,
+    @SerialName("collection_media")
+    val media: List<CreateCollectionMediaDto> = emptyList()
+)
+
+@Serializable
+data class CreateCollectionMediaDto(
+    @SerialName("media_id")
+    val mediaId: String,
+    @SerialName("position")
+    val position: Int,
+    @SerialName("added_by")
+    val addedBy: String? = null,
 )

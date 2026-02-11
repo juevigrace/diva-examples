@@ -8,9 +8,6 @@ import io.github.juevigrace.diva.core.database.DatabaseAction
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.database.DivaDatabase
-import io.github.juevigrace.diva.database.Storage
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
@@ -22,38 +19,22 @@ import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
-interface VerificationStorage : Storage<UserVerification> {
+interface VerificationStorage {
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun getById(id: Uuid): DivaResult<Option<UserVerification>, DivaError>
+
+    suspend fun insert(item: UserVerification): DivaResult<Unit, DivaError>
+
+    suspend fun update(item: UserVerification): DivaResult<Unit, DivaError>
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun delete(id: Uuid): DivaResult<Unit, DivaError>
+
     suspend fun getByToken(token: String): DivaResult<Option<UserVerification>, DivaError>
     suspend fun deleteByToken(token: String): DivaResult<Unit, DivaError>
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun verifyUser(userId: Uuid): DivaResult<Unit, DivaError>
-
-    override suspend fun count(): DivaResult<Long, DivaError> {
-        return DivaResult.Failure(
-            DivaError(cause = ErrorCause.Error.NotImplemented(Option.Some("database: action not supported")))
-        )
-    }
-
-    override suspend fun getAll(
-        limit: Int,
-        offset: Int
-    ): DivaResult<List<UserVerification>, DivaError> {
-        return DivaResult.Failure(
-            DivaError(cause = ErrorCause.Error.NotImplemented(Option.Some("database: action not supported")))
-        )
-    }
-
-    override fun getAllFlow(
-        limit: Int,
-        offset: Int
-    ): Flow<DivaResult<List<UserVerification>, DivaError>> {
-        return flowOf(
-            DivaResult.Failure(
-                DivaError(cause = ErrorCause.Error.NotImplemented(Option.Some("database: action not supported")))
-            )
-        )
-    }
 }
 
 class VerificationStorageImpl(
@@ -62,13 +43,6 @@ class VerificationStorageImpl(
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun getById(id: Uuid): DivaResult<Option<UserVerification>, DivaError> {
         return db.getOne { emailVerificationTokensQueries.findOneByUserId(id.toJavaUuid(), mapper = ::mapToEntity) }
-    }
-
-    @OptIn(ExperimentalUuidApi::class)
-    override fun getByIdFlow(id: Uuid): Flow<DivaResult<Option<UserVerification>, DivaError>> {
-        return db.getOneAsFlow {
-            emailVerificationTokensQueries.findOneByUserId(id.toJavaUuid(), mapper = ::mapToEntity)
-        }
     }
 
     override suspend fun getByToken(token: String): DivaResult<Option<UserVerification>, DivaError> {
