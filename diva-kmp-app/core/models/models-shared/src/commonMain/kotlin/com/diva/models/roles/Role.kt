@@ -1,15 +1,15 @@
 package com.diva.models.roles
 
 enum class Role {
-    Admin,
-    User,
-    Moderator,
+    ADMIN,
+    USER,
+    MODERATOR,
 }
 
 fun safeRole(value: String): Role {
     return try {
         Role.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        Role.User
+        Role.USER
     }
 }

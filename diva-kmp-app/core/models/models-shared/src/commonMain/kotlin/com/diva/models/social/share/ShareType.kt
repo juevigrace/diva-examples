@@ -1,17 +1,17 @@
 package com.diva.models.social.share
 
 enum class ShareType {
-    Direct,
-    External,
-    Embed,
-    Download,
-    Unspecified,
+    DIRECT,
+    EXTERNAL,
+    EMBED,
+    DOWNLOAD,
+    UNSPECIFIED,
 }
 
 fun safeShareType(value: String): ShareType {
     return try {
         ShareType.valueOf(value)
     } catch (_: IllegalArgumentException) {
-        ShareType.Unspecified
+        ShareType.UNSPECIFIED
     }
 }
