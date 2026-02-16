@@ -83,7 +83,7 @@ class UserStorageImpl(
                     avatar = item.avatar,
                     bio = item.bio,
                     user_verified = false,
-                    role = Role.User
+                    role = Role.USER
                 ).value
             }
             if (rows.toInt() == -1 || rows.toInt() == 0) {

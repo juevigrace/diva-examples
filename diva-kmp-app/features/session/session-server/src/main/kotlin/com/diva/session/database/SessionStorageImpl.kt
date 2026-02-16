@@ -176,7 +176,7 @@ class SessionStorageImpl(
                 username = username,
                 email = email,
                 userVerified = userVerified ?: false,
-                role = role ?: Role.User,
+                role = role ?: Role.USER,
                 createdAt = uCreatedAt.toInstant().toKotlinInstant(),
                 updatedAt = uUpdatedAt.toInstant().toKotlinInstant()
             ),

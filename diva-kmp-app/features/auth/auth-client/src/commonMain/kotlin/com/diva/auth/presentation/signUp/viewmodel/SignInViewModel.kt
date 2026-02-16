@@ -1,7 +1,7 @@
 package com.diva.auth.presentation.signUp.viewmodel
 
 import com.diva.auth.data.AuthRepository
-import com.diva.auth.domain.models.ForgotAction
+import com.diva.ui.navigation.arguments.ForgotAction
 import com.diva.auth.presentation.signUp.events.SignInEvents
 import com.diva.auth.presentation.signUp.state.SignInState
 import com.diva.models.auth.SignInForm

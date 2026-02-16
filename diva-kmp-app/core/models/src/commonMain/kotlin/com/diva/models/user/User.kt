@@ -26,7 +26,7 @@ data class User(
     val avatar: String = "",
     val bio: String = "",
     val userVerified: Boolean = false,
-    val role: Role = Role.User,
+    val role: Role = Role.USER,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now(),
     val deletedAt: Option<Instant> = Option.None,

@@ -1,6 +1,6 @@
 package com.diva.auth.presentation.signUp.events
 
-import com.diva.auth.domain.models.ForgotAction
+import com.diva.ui.navigation.arguments.ForgotAction
 import com.diva.ui.models.SocialProvider
 
 sealed interface SignInEvents {

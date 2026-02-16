@@ -11,6 +11,7 @@ kotlin {
 
             implementation(projects.features.app.home)
             implementation(projects.features.app.library)
+            implementation(projects.features.app.onboarding)
             implementation(projects.features.app.profile)
             implementation(projects.features.app.settings)
 

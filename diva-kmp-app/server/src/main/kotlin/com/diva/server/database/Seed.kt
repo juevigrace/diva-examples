@@ -37,7 +37,6 @@ class Seed(
                 email = email,
                 username = username,
                 passwordHash = Option.of(passwordHash),
-                role = Role.Admin,
                 permissions = listOf()
             )
         )
@@ -71,7 +70,7 @@ class Seed(
             id = Uuid.random(),
             name = Permissions.Write.CreateUser.name,
             description = "Create new users",
-            roleLevel = Role.Admin,
+            roleLevel = Role.ADMIN,
             createdAt = Clock.System.now(),
             updatedAt = Clock.System.now()
         )

@@ -16,6 +16,7 @@ kotlin {
 
         commonMain.dependencies {
             api(libs.diva.ui)
+            implementation(project(":core:resources"))
 
             api(libs.koin.core)
             api(libs.koin.compose)
