@@ -28,14 +28,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.diva.core.resources.Res
+import com.diva.core.resources.get_started
+import com.diva.core.resources.go_back
 import com.diva.core.resources.ic_arrow_left
 import com.diva.core.resources.ic_chevron_left
 import com.diva.core.resources.ic_chevron_right
+import com.diva.core.resources.next
+import com.diva.core.resources.previous
 import com.diva.core.resources.puerro
+import com.diva.core.resources.skip
 import com.diva.onboarding.presentation.events.OnboardingEvents
 import com.diva.onboarding.presentation.viewmodel.OnboardingViewModel
 import io.github.juevigrace.diva.ui.components.layout.Screen
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +59,7 @@ fun OnboardingScreen(
     Screen(
         topBar = {
             CenterAlignedTopAppBar(
-                navigationIcon = if (pagerState.currentPage == state.pages.lastIndex) {
+                navigationIcon = if (state.showBackButton) {
                     {
                         IconButton(
                             onClick = {
@@ -62,7 +68,7 @@ fun OnboardingScreen(
                         ) {
                             Icon(
                                 painter = painterResource(Res.drawable.ic_arrow_left),
-                                contentDescription = "Back"
+                                contentDescription = stringResource(Res.string.go_back)
                             )
                         }
                     }
@@ -70,7 +76,7 @@ fun OnboardingScreen(
                     {}
                 },
                 title = {
-                    Text(text = state.pages[state.page].title)
+                    Text(text = stringResource(state.currentPage.title))
                 }
             )
         }
@@ -94,7 +100,7 @@ fun OnboardingScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = state.currentPage.description,
+                        text = stringResource(state.currentPage.description),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 24.dp)
@@ -112,7 +118,10 @@ fun OnboardingScreen(
                         Button(
                             onClick = { viewModel.onEvent(OnboardingEvents.OnNavigateToSignIn) }
                         ) {
-                            Text("Get Started")
+                            Text(
+                                text = stringResource(Res.string.get_started),
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
                     }
                 }
@@ -135,7 +144,7 @@ fun OnboardingScreen(
                         ) {
                             Icon(
                                 painter = painterResource(Res.drawable.ic_chevron_left),
-                                contentDescription = "Previous"
+                                contentDescription = stringResource(Res.string.previous)
                             )
                         }
                         Text(
@@ -150,7 +159,7 @@ fun OnboardingScreen(
                         ) {
                             Icon(
                                 painter = painterResource(Res.drawable.ic_chevron_right),
-                                contentDescription = "Next"
+                                contentDescription = stringResource(Res.string.next)
                             )
                         }
                     }
@@ -159,7 +168,10 @@ fun OnboardingScreen(
                         onClick = { viewModel.onEvent(OnboardingEvents.OnSkip) },
                         modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
-                        Text("Skip")
+                        Text(
+                            text = stringResource(Res.string.skip),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }

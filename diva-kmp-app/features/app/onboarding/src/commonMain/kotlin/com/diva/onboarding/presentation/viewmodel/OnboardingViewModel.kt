@@ -30,49 +30,21 @@ class OnboardingViewModel(
 
     private fun nextPage() {
         _state.update { state ->
-            if (state.page == state.pages.lastIndex) {
-                return@update state
-            }
-            val newPage = state.page + 1
-            state.copy(
-                page = newPage,
-                currentPage = state.pages[newPage],
-                previousEnabled = newPage > 0,
-                nextEnabled = newPage < state.pages.lastIndex,
-                showBottomRow = newPage != state.pages.lastIndex,
-                showNavigateToAuth = newPage == state.pages.lastIndex
-            )
+            if (state.page == state.pages.lastIndex) return@update state
+            state.copy(page = state.page + 1)
         }
     }
 
     private fun previousPage() {
         _state.update { state ->
-            if (state.page == 0) {
-                return@update state
-            }
-            val newPage = state.page - 1
-            state.copy(
-                page = newPage,
-                currentPage = state.pages[newPage],
-                previousEnabled = newPage > 0,
-                nextEnabled = newPage < state.pages.lastIndex,
-                showBottomRow = newPage != state.pages.lastIndex,
-                showNavigateToAuth = newPage == state.pages.lastIndex
-            )
+            if (state.page == 0) return@update state
+            state.copy(page = state.page - 1)
         }
     }
 
     private fun skipToLastPage() {
         _state.update { state ->
-            val newPage = state.pages.lastIndex
-            state.copy(
-                page = newPage,
-                currentPage = state.pages[newPage],
-                previousEnabled = newPage > 0,
-                nextEnabled = newPage < state.pages.lastIndex,
-                showBottomRow = newPage != state.pages.lastIndex,
-                showNavigateToAuth = newPage == state.pages.lastIndex
-            )
+            state.copy(page = state.pages.lastIndex)
         }
     }
 }

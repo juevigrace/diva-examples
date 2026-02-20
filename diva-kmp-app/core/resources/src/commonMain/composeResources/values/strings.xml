@@ -1,4 +1,20 @@
 <resources>
     <string name="app">Diva App</string>
+    <!--DESCRIPTIONS-->
     <string name="logo">Logo</string>
+    <string name="go_back">Go back</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="skip">Skip</string>
+    <!--GENERIC TEXTS-->
+    <string name="get_started">Get Started</string>
+    <!--SPECIFIC APP TEXT-->
+    <string name="onboarding_social_title">Connect with Social &amp; Media</string>
+    <string name="onboarding_social_description">Share moments, follow friends, and discover trending content from around the world.</string>
+    <string name="onboarding_personalize_title">Personalize Your Profile</string>
+    <string name="onboarding_personalize_description">Customize your profile with photos, bio, and unique style to express yourself.</string>
+    <string name="onboarding_chat_title">Chat &amp; Interact</string>
+    <string name="onboarding_chat_description">Message friends, join groups, and stay connected anytime, anywhere.</string>
+    <string name="onboarding_get_started_title">Get Started</string>
+    <string name="onboarding_get_started_description">Ready to explore all features? Sign in to begin your journey!</string>
 </resources>
