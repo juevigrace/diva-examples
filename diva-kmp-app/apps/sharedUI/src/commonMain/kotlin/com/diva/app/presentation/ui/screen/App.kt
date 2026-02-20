@@ -13,7 +13,6 @@ import com.diva.ui.theme.AppTypography
 import com.diva.ui.theme.darkScheme
 import com.diva.ui.theme.lightScheme
 import io.github.juevigrace.diva.ui.components.navigation.Navigator
-import io.github.juevigrace.diva.ui.components.observable.ObserveFlow
 import io.github.juevigrace.diva.ui.components.toaster.LocalToaster
 import io.github.juevigrace.diva.ui.components.wrappers.DivaApp
 import io.github.juevigrace.diva.ui.navigation.Navigator
@@ -30,10 +29,6 @@ fun App() {
 
     val toaster: Toaster = koinInject()
     val navigator: Navigator<Destination> = koinInject()
-
-    ObserveFlow(navigator.backStack) {
-        println(it)
-    }
 
     DivaApp(
         providers = arrayOf(LocalToaster provides toaster),

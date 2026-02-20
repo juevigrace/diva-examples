@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Destination : NavKey {
-
     @Serializable
     sealed interface OnboardingGraph : Destination {
         @Serializable

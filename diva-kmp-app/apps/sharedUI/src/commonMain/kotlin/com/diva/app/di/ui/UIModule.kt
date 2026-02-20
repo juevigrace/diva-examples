@@ -12,9 +12,8 @@ fun uiModule(): Module {
         single<Toaster> {
             Toaster.invoke()
         }
-
         single<Navigator<Destination>> {
-            Navigator(SplashDestination)
+            Navigator.newInstance(SplashDestination)
         }
     }
 }

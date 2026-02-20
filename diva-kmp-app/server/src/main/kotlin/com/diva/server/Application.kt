@@ -15,6 +15,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    println(environment.config.toMap())
     configureFrameworks()
     configureAdministration()
     configureSerialization()

@@ -1,6 +1,6 @@
 ktor:
-    development: ${?KTOR_DEV}
-    environment: ${?KTOR_ENV}
+    development: ${?KTOR_DEV:true}
+    environment: ${?KTOR_ENV:dev}
     application:
         modules:
             - com.diva.server.ApplicationKt.module

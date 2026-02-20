@@ -15,6 +15,7 @@ kotlin {
 }
 
 compose.resources {
-    generateResClass = always
+    generateResClass = auto
     publicResClass = true
+    packageOfResClass = "com.diva.core.resources"
 }
