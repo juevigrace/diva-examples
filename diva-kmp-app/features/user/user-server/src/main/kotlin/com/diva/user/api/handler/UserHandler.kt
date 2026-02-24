@@ -10,9 +10,10 @@ import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.api.user.dtos.EmailTokenDto
 import com.diva.models.api.user.dtos.UpdateUserDto
 import com.diva.models.api.user.dtos.UserEmailDto
+import com.diva.models.api.user.preferences.dtos.UserPreferencesDto
 import com.diva.models.api.user.response.UserResponse
 import com.diva.models.auth.Session
-import com.diva.models.user.User
+import com.diva.user.data.UserPreferencesService
 import com.diva.user.data.UserService
 import com.diva.verification.data.VerificationService
 import io.github.juevigrace.diva.core.DivaResult
@@ -61,11 +62,22 @@ interface UserHandler {
     suspend fun confirmPasswordReset(dto: EmailTokenDto): DivaResult<ApiResponse<SessionResponse>, DivaError>
 
     suspend fun resetPassword(dto: PasswordUpdateDto, session: Session): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun createPreferences(
+        dto: UserPreferencesDto,
+        session: Session,
+    ): DivaResult<ApiResponse<Unit>, DivaError>
+
+    suspend fun updatePreferences(
+        dto: UserPreferencesDto,
+        session: Session,
+    ): DivaResult<ApiResponse<Unit>, DivaError>
 }
 
 class UserHandlerImpl(
     private val service: UserService,
     private val verificationService: VerificationService,
+    private val preferencesService: UserPreferencesService,
     private val kMail: KMail,
 ) : UserHandler {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -202,5 +214,21 @@ class UserHandlerImpl(
         session: Session
     ): DivaResult<ApiResponse<Unit>, DivaError> {
         TODO("Not yet implemented")
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun createPreferences(
+        dto: UserPreferencesDto,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        return preferencesService.createPreferences(session.user.id, dto)
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updatePreferences(
+        dto: UserPreferencesDto,
+        session: Session
+    ): DivaResult<ApiResponse<Unit>, DivaError> {
+        return preferencesService.updatePreferences(session.user.id, dto)
     }
 }

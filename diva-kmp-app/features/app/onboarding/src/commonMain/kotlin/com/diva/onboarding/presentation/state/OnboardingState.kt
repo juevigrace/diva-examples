@@ -11,7 +11,6 @@ import com.diva.core.resources.onboarding_social_description
 import com.diva.core.resources.onboarding_social_title
 import org.jetbrains.compose.resources.StringResource
 
-
 data class OnboardingState(
     val page: Int = 0,
     val pages: List<OnboardingPage> = defaultPages

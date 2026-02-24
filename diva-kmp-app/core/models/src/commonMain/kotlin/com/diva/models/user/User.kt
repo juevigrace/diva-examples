@@ -6,15 +6,15 @@ import com.diva.models.roles.Role
 import com.diva.models.social.interaction.share.Share
 import com.diva.models.social.post.Post
 import com.diva.models.user.permissions.UserPermission
+import com.diva.models.user.preferences.UserPreferences
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.getOrElse
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalUuidApi::class)
 data class User(
     val id: Uuid,
     val email: String = "",
@@ -27,6 +27,7 @@ data class User(
     val bio: String = "",
     val userVerified: Boolean = false,
     val role: Role = Role.USER,
+    val preferences: UserPreferences = UserPreferences(),
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now(),
     val deletedAt: Option<Instant> = Option.None,

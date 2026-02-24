@@ -13,6 +13,8 @@ kotlin {
 
             implementation(projects.core.models)
 
+            implementation(projects.features.user.userClient)
+
             implementation(libs.koin.core)
         }
     }

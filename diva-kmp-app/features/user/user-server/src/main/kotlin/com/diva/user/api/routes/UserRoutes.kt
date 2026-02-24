@@ -83,7 +83,6 @@ fun Route.userApiRoutes() {
                 }
             }
         }
-        // TODO: separate routes in a profile like route?
         authenticate(AUTH_JWT_KEY) {
             post {
                 val session: Session = call.attributes.getOrNull(SESSION_KEY)
@@ -93,7 +92,7 @@ fun Route.userApiRoutes() {
                 handler.createUser(dto, session).respond(call)
             }
             userProfileRoutes()
+            userPermissionsHandler()
         }
-        userPermissionsHandler()
     }
 }

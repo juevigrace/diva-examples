@@ -1,4 +1,5 @@
 import com.diva.models.ModerationStatus;
+import com.diva.models.Theme;
 import com.diva.models.VisibilityType;
 import com.diva.models.collection.CollectionType;
 import com.diva.models.media.MediaType;
@@ -20,6 +21,18 @@ CREATE TABLE IF NOT EXISTS diva_user(
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS diva_user_preferences(
+    id UUID NOT NULL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    theme VARCHAR(20) AS Theme NOT NULL DEFAULT 'SYSTEM',
+    onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    language VARCHAR(10) NOT NULL DEFAULT 'en',
+    last_sync_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES diva_user(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS diva_session(

@@ -17,6 +17,7 @@ import migrations.Diva_playlist_suggestions
 import migrations.Diva_post
 import migrations.Diva_session
 import migrations.Diva_user
+import migrations.Diva_user_preferences
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -67,6 +68,10 @@ fun databaseModule(): Module {
                     ),
                     diva_userAdapter = Diva_user.Adapter(
                         roleAdapter = EnumColumnAdapter(),
+                    ),
+                    diva_user_preferencesAdapter = Diva_user_preferences.Adapter(
+                        typeAdapter = EnumColumnAdapter(),
+                        themeAdapter = EnumColumnAdapter(),
                     ),
                 ),
             )

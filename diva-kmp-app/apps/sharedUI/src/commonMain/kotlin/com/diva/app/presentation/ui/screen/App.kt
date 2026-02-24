@@ -1,6 +1,7 @@
 package com.diva.app.presentation.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -29,6 +30,10 @@ fun App() {
 
     val toaster: Toaster = koinInject()
     val navigator: Navigator<Destination> = koinInject()
+
+    LaunchedEffect(Unit) {
+        viewModel.initialize()
+    }
 
     DivaApp(
         providers = arrayOf(LocalToaster provides toaster),

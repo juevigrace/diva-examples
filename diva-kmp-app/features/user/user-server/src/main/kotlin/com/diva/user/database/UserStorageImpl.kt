@@ -5,6 +5,7 @@ import com.diva.database.user.UserStorage
 import com.diva.models.roles.Role
 import com.diva.models.user.User
 import com.diva.models.user.permissions.UserPermission
+import com.diva.models.user.preferences.UserPreferences
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -289,6 +290,67 @@ class UserStorageImpl(
                             action = DatabaseAction.DELETE,
                             table = Option.Some("diva_user_permissions"),
                             details = Option.Some("Failed to delete")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun insertCloudPreferences(
+        userId: Uuid,
+        prefs: UserPreferences
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.insert(
+                    id = prefs.id.toJavaUuid(),
+                    user_id = userId.toJavaUuid(),
+                    theme = prefs.theme,
+                    onboarding_completed = prefs.onboardingCompleted,
+                    language = prefs.language,
+                    created_at = OffsetDateTime.ofInstant(prefs.createdAt.toJavaInstant(), ZoneId.systemDefault()),
+                    updated_at = OffsetDateTime.ofInstant(prefs.updatedAt.toJavaInstant(), ZoneId.systemDefault()),
+                ).value
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to insert")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updatePreferences(
+        prefs: UserPreferences
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.update(
+                    id = prefs.id.toJavaUuid(),
+                    theme = prefs.theme,
+                    onboarding_completed = prefs.onboardingCompleted,
+                    language = prefs.language,
+                    updated_at = OffsetDateTime.ofInstant(prefs.updatedAt.toJavaInstant(), ZoneId.systemDefault()),
+                ).value
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to update")
                         )
                     )
                 )

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -38,6 +39,7 @@ import com.diva.core.resources.previous
 import com.diva.core.resources.puerro
 import com.diva.core.resources.skip
 import com.diva.onboarding.presentation.events.OnboardingEvents
+import com.diva.onboarding.presentation.state.OnboardingState
 import com.diva.onboarding.presentation.viewmodel.OnboardingViewModel
 import io.github.juevigrace.diva.ui.components.layout.Screen
 import org.jetbrains.compose.resources.painterResource
@@ -49,8 +51,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(pageCount = { state.pages.size })
+    val state: OnboardingState by viewModel.state.collectAsStateWithLifecycle()
+    val pagerState: PagerState = rememberPagerState(pageCount = { state.pages.size })
 
     LaunchedEffect(state.page) {
         pagerState.animateScrollToPage(state.page)
@@ -170,7 +172,6 @@ fun OnboardingScreen(
                     ) {
                         Text(
                             text = stringResource(Res.string.skip),
-                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }

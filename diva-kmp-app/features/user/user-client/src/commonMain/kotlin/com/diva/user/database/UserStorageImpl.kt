@@ -5,6 +5,7 @@ import com.diva.database.user.UserStorage
 import com.diva.models.roles.Role
 import com.diva.models.user.User
 import com.diva.models.user.permissions.UserPermission
+import com.diva.models.user.preferences.UserPreferences
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.database.DatabaseAction
@@ -213,20 +214,154 @@ class UserStorageImpl(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun findLocalPreferences(): DivaResult<Option<UserPreferences>, DivaError> {
+        return db.getOne {
+            userPreferencesQueries.findLocal(mapper = { id, _, type, theme, onboardingCompleted, language, lastSyncAt, createdAt, updatedAt ->
+                UserPreferences(
+                    id = Uuid.parse(id),
+                    type = type,
+                    theme = theme,
+                    onboardingCompleted = onboardingCompleted,
+                    language = language,
+                    lastSyncAt = Instant.fromEpochMilliseconds(lastSyncAt),
+                    createdAt = Instant.fromEpochMilliseconds(createdAt),
+                    updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+                )
+            })
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun insertCloudPreferences(
+        userId: Uuid,
+        prefs: UserPreferences
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.insertCloud(
+                    id = prefs.id.toString(),
+                    user_id = userId.toString(),
+                    type = prefs.type,
+                    theme = prefs.theme,
+                    onboarding_completed = prefs.onboardingCompleted,
+                    language = prefs.language,
+                    last_sync_at = prefs.lastSyncAt.toEpochMilliseconds(),
+                    created_at = prefs.createdAt.toEpochMilliseconds(),
+                    updated_at = prefs.updatedAt.toEpochMilliseconds(),
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to insert")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun insertLocalPreferences(prefs: UserPreferences): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.insert(
+                    id = prefs.id.toString(),
+                    type = prefs.type,
+                    theme = prefs.theme,
+                    onboarding_completed = prefs.onboardingCompleted,
+                    language = prefs.language,
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.INSERT,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to insert")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updatePreferences(prefs: UserPreferences): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.update(
+                    id = prefs.id.toString(),
+                    theme = prefs.theme,
+                    onboarding_completed = prefs.onboardingCompleted,
+                    language = prefs.language,
+                    last_sync_at = prefs.lastSyncAt.toEpochMilliseconds(),
+                    updated_at = prefs.updatedAt.toEpochMilliseconds()
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to update")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    override suspend fun updatePreferenceUserId(
+        id: Uuid,
+        userId: Uuid
+    ): DivaResult<Unit, DivaError> {
+        return db.use {
+            val rows: Long = transactionWithResult {
+                userPreferencesQueries.updateUserId(
+                    id = id.toString(),
+                    user_id = userId.toString()
+                )
+            }
+            if (rows.toInt() == 0) {
+                return@use DivaResult.failure(
+                    DivaError(
+                        ErrorCause.Database.NoRowsAffected(
+                            action = DatabaseAction.UPDATE,
+                            table = Option.Some("diva_user_preferences"),
+                            details = Option.Some("Failed to update")
+                        )
+                    )
+                )
+            }
+            DivaResult.success(Unit)
+        }
+    }
+
     @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
     private fun mapToEntity(
-          id: String,
-      email: String,
-      username: String,
-      phoneNumber: String,
-      birthDate: Long,
-      alias: String,
-      avatar: String,
-      bio: String,
-      role: Role,
-      createdAt: Long,
-      updatedAt: Long,
-      deletedAt: Long?,
+        id: String,
+        email: String,
+        username: String,
+        phoneNumber: String,
+        birthDate: Long,
+        alias: String,
+        avatar: String,
+        bio: String,
+        role: Role,
+        createdAt: Long,
+        updatedAt: Long,
+        deletedAt: Long?,
     ): User {
         return User(
             id = Uuid.parse(id),

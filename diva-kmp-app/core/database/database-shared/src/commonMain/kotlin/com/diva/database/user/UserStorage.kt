@@ -2,6 +2,7 @@ package com.diva.database.user
 
 import com.diva.models.user.User
 import com.diva.models.user.permissions.UserPermission
+import com.diva.models.user.preferences.UserPreferences
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.errors.DivaError
@@ -64,4 +65,34 @@ interface UserStorage {
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun deletePermissions(userId: Uuid, permId: Uuid): DivaResult<Unit, DivaError>
+
+    suspend fun findLocalPreferences(): DivaResult<Option<UserPreferences>, DivaError> {
+        return DivaResult.failure(
+            DivaError(
+                cause = ErrorCause.Error.NotImplemented(Option.Some("database: client action only"))
+            )
+        )
+    }
+
+    suspend fun insertLocalPreferences(prefs: UserPreferences): DivaResult<Unit, DivaError> {
+        return DivaResult.failure(
+            DivaError(
+                cause = ErrorCause.Error.NotImplemented(Option.Some("database: client action only"))
+            )
+        )
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun insertCloudPreferences(userId: Uuid, prefs: UserPreferences): DivaResult<Unit, DivaError>
+
+    suspend fun updatePreferences(prefs: UserPreferences): DivaResult<Unit, DivaError>
+
+    @OptIn(ExperimentalUuidApi::class)
+    suspend fun updatePreferenceUserId(id: Uuid, userId: Uuid): DivaResult<Unit, DivaError> {
+        return DivaResult.failure(
+            DivaError(
+                cause = ErrorCause.Error.NotImplemented(Option.Some("database: client action only"))
+            )
+        )
+    }
 }
