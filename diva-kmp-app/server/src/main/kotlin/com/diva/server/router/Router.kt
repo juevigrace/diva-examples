@@ -29,42 +29,40 @@ import org.koin.ktor.ext.inject
 
 fun Routing.applicationRoutes() {
     val db: DivaDatabase<DivaDB> by inject()
-    route("/") {
-        sse("/see/hello") {
-            send(ServerSentEvent("world"))
-        }
-        webSocket("/ws") { // websocketSession
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    }
+    sse("/see/hello") {
+        send(ServerSentEvent("world"))
+    }
+    webSocket("/ws") { // websocketSession
+        for (frame in incoming) {
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                outgoing.send(Frame.Text("YOU SAID: $text"))
+                if (text.equals("bye", ignoreCase = true)) {
+                    close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
                 }
             }
         }
-        get("/health") {
-            db.checkHealth().fold(
-                onFailure = {
-                    call.respond(
-                        HttpStatusCode.InternalServerError,
-                        ApiResponse<Nothing>(message = it.message)
-                    )
-                },
-                onSuccess = { call.respond(HttpStatusCode.OK, ApiResponse(data = it, message = "OK")) }
-            )
-        }
-        route("/api") {
-            authRoutes()
-            chatApiRoutes()
-            collectionApiRoutes()
-            mediaApiRoutes()
-            permissionsApiRoutes()
-            postApiRoutes()
-            tagApiRoutes()
-            userApiRoutes()
-            verificationRoutes()
-        }
+    }
+    get("/health") {
+        db.checkHealth().fold(
+            onFailure = {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ApiResponse<Nothing>(message = it.message)
+                )
+            },
+            onSuccess = { call.respond(HttpStatusCode.OK, ApiResponse(data = it, message = "OK")) }
+        )
+    }
+    route("/api") {
+        authRoutes()
+        chatApiRoutes()
+        collectionApiRoutes()
+        mediaApiRoutes()
+        permissionsApiRoutes()
+        postApiRoutes()
+        tagApiRoutes()
+        userApiRoutes()
+        verificationRoutes()
     }
 }

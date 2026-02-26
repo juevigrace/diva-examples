@@ -229,6 +229,7 @@ class UserHandlerImpl(
         dto: UserPreferencesDto,
         session: Session
     ): DivaResult<ApiResponse<Unit>, DivaError> {
-        return preferencesService.updatePreferences(session.user.id, dto)
+        // todo: i changed this somewhere
+        return preferencesService.updatePreferences(dto)
     }
 }

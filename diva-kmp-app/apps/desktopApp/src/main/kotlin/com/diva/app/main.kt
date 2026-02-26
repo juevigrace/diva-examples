@@ -26,8 +26,8 @@ fun main(args: Array<String>) = application {
     }
 
     // Access parsed arguments
-    val debug: Boolean = argsMap["-D"]?.toBoolean() ?: false
-    val flavor: Flavors = Flavors.entries.find { it.name == argsMap["-F"] } ?: Flavors.PROD
+    val debug: Boolean = argsMap["-D"]?.toBoolean() ?: true
+    val flavor: Flavors = Flavors.entries.find { it.name == argsMap["-F"] } ?: Flavors.DEV
 
     startKoin {
         modules(

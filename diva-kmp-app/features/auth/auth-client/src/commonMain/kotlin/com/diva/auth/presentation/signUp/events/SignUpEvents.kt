@@ -1,8 +1,7 @@
-package com.diva.auth.presentation.signIn.events
+package com.diva.auth.presentation.signUp.events
 
 sealed interface SignUpEvents {
-    data class OnFirstNameChanged(val value: String) : SignUpEvents
-    data class OnLastNameChanged(val value: String) : SignUpEvents
+    data class OnAliasNameChanged(val value: String) : SignUpEvents
     data class OnPhoneChanged(val value: String) : SignUpEvents
     data class OnBirthDateChanged(val value: Long) : SignUpEvents
     data class OnEmailChanged(val value: String) : SignUpEvents
@@ -12,4 +11,5 @@ sealed interface SignUpEvents {
     data object TogglePrivacyPolicy : SignUpEvents
     data object ToggleTerms : SignUpEvents
     data object OnSubmit : SignUpEvents
+    data object OnNavigateToSignIn : SignUpEvents
 }

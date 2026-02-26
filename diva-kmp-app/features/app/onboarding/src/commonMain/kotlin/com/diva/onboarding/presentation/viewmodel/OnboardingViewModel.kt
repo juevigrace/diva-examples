@@ -46,7 +46,7 @@ class OnboardingViewModel(
                 )
             }
         }
-        navigator.navigate(SignInDestination)
+        navigator.replaceAll(SignInDestination)
     }
 
     private fun nextPage() {

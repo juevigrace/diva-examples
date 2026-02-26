@@ -22,6 +22,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import kotlin.time.Duration
 
 fun appModule(config: AppConfig): Module {
     return module {
@@ -30,7 +31,7 @@ fun appModule(config: AppConfig): Module {
             networkModule(
                 DivaClientConfig(
                     baseUrl = config.baseUrl,
-                    logLevel = if (config.debug) LogLevel.ALL else LogLevel.NONE
+                    logLevel = if (config.debug) LogLevel.ALL else LogLevel.NONE,
                 )
             ),
             uiModule(),

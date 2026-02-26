@@ -3,15 +3,12 @@ package com.diva.user.data
 import com.diva.database.user.UserStorage
 import com.diva.models.api.ApiResponse
 import com.diva.models.api.user.preferences.dtos.UserPreferencesDto
-import com.diva.models.safeValueOfTheme
 import com.diva.models.user.preferences.UserPreferences
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.toDivaError
 import io.github.juevigrace.diva.core.map
 import io.github.juevigrace.diva.core.tryResult
-import sun.jvm.hotspot.HelloWorld.e
-import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

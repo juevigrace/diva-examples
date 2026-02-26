@@ -5,13 +5,13 @@ import com.diva.models.api.user.dtos.CreateUserDto
 
 data class SignUpForm(
     val email: String = "",
-    val username: String = email,
+    val username: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val birthDate: Long = 0L,
     val phone: String = "",
     val alias: String = "",
-    val avatar: String = "",
+    val avatar: String = username,
     val bio: String = "",
     val termsAndConditions: Boolean = false,
     val privacyPolicy: Boolean = false,

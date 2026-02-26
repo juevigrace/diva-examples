@@ -8,7 +8,7 @@ data class CreateUserDto(
     @SerialName("email")
     val email: String,
     @SerialName("username")
-    val username: String = email,
+    val username: String,
     @SerialName("password")
     val password: String,
     @SerialName("birthDate")
@@ -16,7 +16,7 @@ data class CreateUserDto(
     @SerialName("phoneNumber")
     val phoneNumber: String,
     @SerialName("alias")
-    val alias: String,
+    val alias: String = username,
     @SerialName("avatar")
     val avatar: String = "",
     @SerialName("bio")

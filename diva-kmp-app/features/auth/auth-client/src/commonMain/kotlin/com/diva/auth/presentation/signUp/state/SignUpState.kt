@@ -1,0 +1,13 @@
+package com.diva.auth.presentation.signUp.state
+
+import com.diva.auth.data.validation.SignUpValidation
+import com.diva.models.auth.SignUpForm
+
+data class SignUpState(
+    val signUpForm: SignUpForm = SignUpForm(),
+    val formValidation: SignUpValidation = SignUpValidation(),
+
+    val submitLoading: Boolean = false,
+    val submitEnabled: Boolean = false,
+    val submitSuccess: Boolean = false,
+)

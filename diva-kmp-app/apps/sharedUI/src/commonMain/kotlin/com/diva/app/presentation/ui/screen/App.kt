@@ -20,6 +20,7 @@ import io.github.juevigrace.diva.ui.navigation.Navigator
 import io.github.juevigrace.diva.ui.theme.DivaThemeConfig
 import io.github.juevigrace.diva.ui.theme.ThemeScheme
 import io.github.juevigrace.diva.ui.toast.Toaster
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -33,6 +34,13 @@ fun App() {
 
     LaunchedEffect(Unit) {
         viewModel.initialize()
+    }
+
+    LaunchedEffect(state.shouldNavigate) {
+        delay(1000)
+        if (state.shouldNavigate) {
+            viewModel.handleNavigation()
+        }
     }
 
     DivaApp(

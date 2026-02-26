@@ -9,7 +9,7 @@ services:
     command: ["java", "-jar", "./bin/diva-server.jar"]
     restart: unless-stopped
     ports:
-      - "${PORT}:5432"
+      - "${PORT}:${PORT}"
     environment:
       DOMAIN: ${DOMAIN}
       PORT: ${PORT}

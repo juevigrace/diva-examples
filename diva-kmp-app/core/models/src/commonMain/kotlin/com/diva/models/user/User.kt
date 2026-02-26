@@ -22,7 +22,7 @@ data class User(
     val passwordHash: Option<String> = Option.None,
     val birthDate: Instant = Clock.System.now(),
     val phoneNumber: String = "",
-    val alias: String = username,
+    val alias: String = "",
     val avatar: String = "",
     val bio: String = "",
     val userVerified: Boolean = false,
