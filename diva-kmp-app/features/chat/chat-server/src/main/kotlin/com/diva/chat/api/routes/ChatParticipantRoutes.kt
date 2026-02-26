@@ -1,12 +1,11 @@
 package com.diva.chat.api.routes
 
 import com.diva.chat.api.handler.ChatParticipantHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.chat.dtos.AddParticipantDto
 import com.diva.models.api.chat.dtos.DeleteParticipantDto
 import com.diva.models.api.chat.dtos.UpdateParticipantDto
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -22,10 +21,8 @@ internal fun Route.chatParticipantApiRoutes() {
     route("/participant") {
         get("/{chatId}") {
             val chatId: String = call.pathParameters["chatId"]
-                ?: return@get call.respond(
-                    status = HttpStatusCode.BadRequest,
-                    message = ApiResponse(data = null, message = "Missing chatId")
-                )
+                ?: return@get call.respondBadRequest("missing chatId")
+
             val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
             handler.getChatParticipants(chatId, page, pageSize).respond(call)

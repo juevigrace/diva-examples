@@ -1,12 +1,11 @@
 package com.diva.chat.api.routes
 
 import com.diva.chat.api.handler.ChatHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.chat.dtos.CreateChatDto
 import com.diva.models.api.chat.dtos.UpdateChatDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -30,17 +29,13 @@ fun Route.chatApiRoutes() {
             }
             route("/{id}") {
                 get {
-                    val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@get call.respondBadRequest("missing chatId")
                     handler.getChat(id).respond(call)
                 }
                 delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing chatId")
                     handler.deleteChat(id).respond(call)
                 }
             }

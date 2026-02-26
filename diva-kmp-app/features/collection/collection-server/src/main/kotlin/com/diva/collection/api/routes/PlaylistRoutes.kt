@@ -1,11 +1,10 @@
 package com.diva.collection.api.routes
 
 import com.diva.collection.api.handler.PlaylistHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.collection.dtos.PlaylistDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -28,18 +27,14 @@ fun Route.playlistApiRoutes() {
         }
         route("/{id}") {
             get {
-                val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val id: String = call.pathParameters["id"]
+                    ?: return@get call.respondBadRequest("missing playlistId")
                 handler.getPlaylist(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
                 delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing playlistId")
                     handler.deletePlaylist(id).respond(call)
                 }
             }

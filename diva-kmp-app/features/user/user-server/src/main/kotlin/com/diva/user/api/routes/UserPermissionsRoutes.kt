@@ -1,11 +1,10 @@
 package com.diva.user.api.routes
 
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.user.permissions.dtos.DeleteUserPermissionDto
 import com.diva.models.api.user.permissions.dtos.UserPermissionDto
 import com.diva.user.api.handler.UserPermissionsHandler
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -21,10 +20,8 @@ internal fun Route.userPermissionsHandler() {
     route("/permissions") {
         // TODO: block access
         get("/{userId}") {
-            val userId: String = call.pathParameters["userId"] ?: return@get call.respond(
-                HttpStatusCode.BadRequest,
-                ApiResponse<Nothing>(message = "Missing id")
-            )
+            val userId: String = call.pathParameters["userId"]
+                ?: return@get call.respondBadRequest("missing userId")
             handler.getPermissions(userId).respond(call)
         }
         post {

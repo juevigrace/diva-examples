@@ -1,15 +1,13 @@
 package com.diva.collection.api.routes
 
 import com.diva.collection.api.handler.PlaylistSuggestionHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.collection.dtos.CreatePlaylistSuggestionDto
 import com.diva.models.api.collection.dtos.UpdatePlaylistSuggestionDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
-import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
@@ -22,10 +20,8 @@ internal fun Route.playlistSuggestionsApiRoutes() {
     val handler: PlaylistSuggestionHandler by inject()
     route("/suggestions") {
         get("/{playlistId}") {
-            val playlistId: String = call.pathParameters["playlistId"] ?: return@get call.respond(
-                HttpStatusCode.BadRequest,
-                ApiResponse(data = null, message = "Missing playlistId")
-            )
+            val playlistId: String = call.pathParameters["playlistId"]
+                ?: return@get call.respondBadRequest("missing playlistId")
             val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
             handler.getPlaylistSuggestions(playlistId, page, pageSize).respond(call)
@@ -40,10 +36,8 @@ internal fun Route.playlistSuggestionsApiRoutes() {
                 handler.updatePlaylistSuggestion(dto).respond(call)
             }
             delete("/{id}") {
-                val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val id: String = call.pathParameters["id"]
+                    ?: return@delete call.respondBadRequest("missing playlistSuggestionId")
                 handler.deletePlaylistSuggestion(id).respond(call)
             }
         }

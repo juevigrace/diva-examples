@@ -1,13 +1,12 @@
 package com.diva.collection.api.routes
 
 import com.diva.collection.api.handler.CollectionHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.collection.dtos.CreateCollectionDto
 import com.diva.models.api.collection.dtos.DeleteCollectionMedia
 import com.diva.models.api.collection.dtos.UpdateCollectionDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -29,18 +28,14 @@ fun Route.collectionApiRoutes() {
         }
         route("/{id}") {
             get {
-                val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val id: String = call.pathParameters["id"]
+                    ?: return@get call.respondBadRequest("missing collectionId")
                 handler.getCollection(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
                 delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing collectionId")
                     handler.deleteCollection(id).respond(call)
                 }
             }
@@ -57,10 +52,8 @@ fun Route.collectionApiRoutes() {
         }
         route("/media") {
             get("/{collectionId}") {
-                val collectionId: String = call.pathParameters["collectionId"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val collectionId: String = call.pathParameters["collectionId"]
+                    ?: return@get call.respondBadRequest("missing collectionId")
                 val page: Int = call.queryParameters["page"]?.toIntOrNull() ?: 1
                 val pageSize: Int = call.queryParameters["pageSize"]?.toIntOrNull() ?: 10
                 handler.getCollectionMedia(collectionId, page, pageSize).respond(call)

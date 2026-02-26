@@ -1,13 +1,12 @@
 package com.diva.media.api.routes
 
 import com.diva.media.api.handler.MediaHandler
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.media.dtos.CreateMediaDto
 import com.diva.models.api.media.dtos.DeleteMediaTagDto
 import com.diva.models.api.media.dtos.UpdateMediaDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -29,18 +28,14 @@ fun Route.mediaApiRoutes() {
         }
         route("/{id}") {
             get {
-                val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val id: String = call.pathParameters["id"]
+                    ?: return@get call.respondBadRequest("missing mediaId")
                 handler.getMedia(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
                 delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing mediaId")
                     handler.deleteMedia(id).respond(call)
                 }
             }
@@ -57,10 +52,8 @@ fun Route.mediaApiRoutes() {
         }
         route("/tag") {
             get("/{mediaId}") {
-                val mediaId: String = call.pathParameters["mediaId"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing mediaId")
-                )
+                val mediaId: String = call.pathParameters["mediaId"]
+                    ?: return@get call.respondBadRequest("missing mediaId")
                 handler.getMediaTagsByMediaId(mediaId).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {

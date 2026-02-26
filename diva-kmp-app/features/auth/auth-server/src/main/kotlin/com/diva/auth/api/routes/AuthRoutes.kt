@@ -39,7 +39,7 @@ fun Route.authRoutes() {
             post("/ping") {
                 call.attributes.getOrNull(SESSION_KEY)
                     ?: return@post call.respondUnauthorized()
-                call.sendResponse(ApiResponse(statusCode = HttpStatusCodes.OK.code, message = "Pong"))
+                call.sendResponse(ApiResponse<Unit>(statusCode = HttpStatusCodes.OK.code, message = "Pong"))
             }
             post("/refresh") {
                 val session: Session = call.attributes.getOrNull(SESSION_KEY)

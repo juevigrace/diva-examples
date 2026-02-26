@@ -1,6 +1,5 @@
 package com.diva.user.api.routes
 
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.user.dtos.CreateUserDto
 import com.diva.models.api.user.dtos.EmailTokenDto
@@ -11,8 +10,8 @@ import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.models.server.SESSION_KEY
 import com.diva.user.api.handler.UserHandler
 import com.diva.util.respond
+import com.diva.util.respondBadRequest
 import com.diva.util.respondUnauthorized
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -35,28 +34,22 @@ fun Route.userApiRoutes() {
         }
         route("/{id}") {
             get {
-                val idStr: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val idStr: String = call.pathParameters["id"]
+                    ?: return@get call.respondBadRequest("missing userId")
                 handler.getUser(idStr).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
                 put {
-                    val idStr: String = call.pathParameters["id"] ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val idStr: String = call.pathParameters["id"]
+                        ?: return@put call.respondBadRequest("missing userId")
                     val session: Session = call.attributes.getOrNull(SESSION_KEY)
                         ?: return@put call.respondUnauthorized()
                     val dto: UpdateUserDto = call.receive()
                     handler.updateUser(idStr, dto, session).respond(call)
                 }
                 delete {
-                    val idStr: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val idStr: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing userId")
                     val session: Session = call.attributes.getOrNull(SESSION_KEY)
                         ?: return@delete call.respondUnauthorized()
                     handler.deleteUser(idStr, session).respond(call)

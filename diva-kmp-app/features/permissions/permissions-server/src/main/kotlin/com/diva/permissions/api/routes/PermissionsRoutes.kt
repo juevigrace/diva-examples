@@ -1,12 +1,11 @@
 package com.diva.permissions.api.routes
 
-import com.diva.models.api.ApiResponse
 import com.diva.models.api.permissions.dtos.CreatePermissionDto
 import com.diva.models.api.permissions.dtos.UpdatePermissionDto
 import com.diva.models.server.AUTH_JWT_KEY
 import com.diva.permissions.api.handler.PermissionsHandler
 import com.diva.util.respond
-import io.ktor.http.HttpStatusCode
+import com.diva.util.respondBadRequest
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -28,18 +27,14 @@ fun Route.permissionsApiRoutes() {
         }
         route("/{id}") {
             get {
-                val id: String = call.pathParameters["id"] ?: return@get call.respond(
-                    HttpStatusCode.BadRequest,
-                    ApiResponse(data = null, message = "Missing id")
-                )
+                val id: String = call.pathParameters["id"]
+                    ?: return@get call.respondBadRequest("missing permissionId")
                 handler.getPermissionById(id).respond(call)
             }
             authenticate(AUTH_JWT_KEY) {
                 delete {
-                    val id: String = call.pathParameters["id"] ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        ApiResponse(data = null, message = "Missing id")
-                    )
+                    val id: String = call.pathParameters["id"]
+                        ?: return@delete call.respondBadRequest("missing permissionId")
                     handler.deletePermission(id).respond(call)
                 }
             }

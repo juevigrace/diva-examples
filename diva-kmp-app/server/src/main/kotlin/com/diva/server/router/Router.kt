@@ -10,6 +10,7 @@ import com.diva.models.api.ApiResponse
 import com.diva.permissions.api.routes.permissionsApiRoutes
 import com.diva.social.api.routes.postApiRoutes
 import com.diva.user.api.routes.userApiRoutes
+import com.diva.util.respondInternalServerError
 import com.diva.verification.api.routes.verificationRoutes
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.database.DivaDatabase
@@ -45,11 +46,8 @@ fun Routing.applicationRoutes() {
     }
     get("/health") {
         db.checkHealth().fold(
-            onFailure = {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    ApiResponse<Nothing>(message = it.message)
-                )
+            onFailure = { err ->
+                call.respondInternalServerError(err.message)
             },
             onSuccess = { call.respond(HttpStatusCode.OK, ApiResponse(data = it, message = "OK")) }
         )
