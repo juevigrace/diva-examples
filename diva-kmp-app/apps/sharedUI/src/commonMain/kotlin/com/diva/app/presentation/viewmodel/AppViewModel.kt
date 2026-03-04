@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class AppViewModel(
     private val uRepository: UserRepository,
@@ -66,7 +67,7 @@ class AppViewModel(
     fun handleNoLocalPreferences() {
         if (_state.value.panic) return
         scope.launch {
-            uRepository.createPreferences(_state.value.preferences).collect { res ->
+            uRepository.createPreferences(UserPreferences(id = Uuid.random())).collect { res ->
                 res.fold(
                     onFailure = { err ->
                         println(err)

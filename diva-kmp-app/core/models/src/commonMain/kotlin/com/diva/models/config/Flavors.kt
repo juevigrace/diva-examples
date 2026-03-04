@@ -1,4 +1,4 @@
-package com.diva.app.config
+package com.diva.models.config
 
 enum class Flavors {
     DEV,

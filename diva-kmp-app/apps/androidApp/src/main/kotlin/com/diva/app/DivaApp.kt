@@ -1,9 +1,10 @@
 package com.diva.app
 
 import android.app.Application
-import com.diva.app.config.AppConfig
-import com.diva.app.config.Flavors
+import android.os.Build
 import com.diva.app.di.appModule
+import com.diva.models.config.AppConfig
+import com.diva.models.config.Flavors
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,7 +22,10 @@ class DivaApp : Application() {
                     AppConfig(
                         debug = debug,
                         flavor = flavor,
-                        domain = domain
+                        domain = domain,
+                        version = BuildConfig.VERSION_NAME,
+                        deviceName = Build.MODEL,
+                        agent = "Diva/${BuildConfig.VERSION_NAME} (Linux; Android ${Build.VERSION.SDK_INT}; ${Build.MODEL})"
                     )
                 )
             )

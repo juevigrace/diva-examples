@@ -24,7 +24,6 @@ fun RequestValidationConfig.authRequestValidation() {
             dto.user.email.isBlank() -> ValidationResult.Invalid("Email cannot be blank")
             !isValidEmail(dto.user.email) -> ValidationResult.Invalid("Email format is invalid")
             dto.user.birthDate == 0L -> ValidationResult.Invalid("Birth date cannot be blank")
-            dto.user.phoneNumber.isBlank() -> ValidationResult.Invalid("Phone number cannot be blank")
             dto.user.bio.length > 200 -> ValidationResult.Invalid("Bio cannot be longer than 200 characters")
             dto.sessionData.device.isBlank() -> ValidationResult.Invalid("Device ID cannot be blank")
             else -> ValidationResult.Valid

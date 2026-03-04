@@ -38,7 +38,7 @@ class SessionStorageImpl(
             val rows: Long = transactionWithResult {
                 val expiresAt: OffsetDateTime = OffsetDateTime.ofInstant(
                     item.expiresAt.toJavaInstant(),
-                    ZoneOffset.systemDefault()
+                    ZoneOffset.UTC
                 )
                 sessionQueries.insert(
                     id = item.id.toJavaUuid(),
@@ -73,7 +73,7 @@ class SessionStorageImpl(
             val rows: Long = transactionWithResult {
                 val expiresAt: OffsetDateTime = OffsetDateTime.ofInstant(
                     item.expiresAt.toJavaInstant(),
-                    ZoneOffset.systemDefault()
+                    ZoneOffset.UTC
                 )
                 sessionQueries.update(
                     access_token = item.accessToken,

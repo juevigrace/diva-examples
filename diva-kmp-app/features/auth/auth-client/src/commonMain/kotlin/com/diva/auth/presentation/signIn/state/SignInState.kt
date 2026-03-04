@@ -9,6 +9,7 @@ data class SignInState(
     val formValidation: SignInValidation = SignInValidation(),
 
     val socialProviders: List<SocialProvider> = SocialProvider.defaultProviders,
+    val showPassword: Boolean = false,
 
     val submitLoading: Boolean = false,
     val submitEnabled: Boolean = false,

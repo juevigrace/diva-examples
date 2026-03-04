@@ -5,7 +5,10 @@ import com.diva.auth.data.validation.SignInValidation
 import com.diva.auth.data.validation.SignInValidator
 import com.diva.auth.presentation.signIn.events.SignInEvents
 import com.diva.auth.presentation.signIn.state.SignInState
+import com.diva.models.actions.Actions
+import com.diva.models.auth.SessionData
 import com.diva.models.auth.SignInForm
+import com.diva.models.config.AppConfig
 import com.diva.ui.messages.toToast
 import com.diva.ui.models.SocialProvider
 import com.diva.ui.navigation.Destination
@@ -31,6 +34,7 @@ class SignInViewModel(
     private val repository: AuthRepository,
     private val navigator: Navigator<Destination>,
     private val toaster: Toaster,
+    private val config: AppConfig,
 ) : DivaViewModel() {
     private val formState = MutableStateFlow(SignInForm())
 
@@ -78,6 +82,7 @@ class SignInViewModel(
             is SignInEvents.OnForgot -> navigateToForgot(event.action)
             SignInEvents.OnSignUp -> navigateToSignUp()
             SignInEvents.OnSubmit -> submit()
+            SignInEvents.TogglePassword -> togglePassword()
         }
     }
 
@@ -92,7 +97,17 @@ class SignInViewModel(
     }
 
     private fun handleSocialLogin(provider: SocialProvider) {
-        TODO()
+        when (provider) {
+            SocialProvider.Facebook -> {
+                // TODO:
+            }
+            SocialProvider.Google -> {
+                // TODO:
+            }
+            SocialProvider.Twitter -> {
+                // TODO:
+            }
+        }
     }
 
     private fun navigateToForgot(action: ForgotAction) {
@@ -112,8 +127,17 @@ class SignInViewModel(
             )
         }
 
+        formState.update { form ->
+            form.copy(
+                sessionData = SessionData(
+                    device = config.deviceName,
+                    agent = config.agent,
+                )
+            )
+        }
+
         scope.launch {
-            repository.signIn(_state.value.signInForm).collect { result ->
+            repository.signIn(formState.value).collect { result ->
                 result.fold(
                     onFailure = { err ->
                         toaster.show(err.toToast())
@@ -125,17 +149,31 @@ class SignInViewModel(
                             )
                         }
                     },
-                    onSuccess = {
+                    onSuccess = { actions ->
                         _state.update { state ->
                             state.copy(
                                 submitLoading = false,
                                 submitSuccess = true
                             )
                         }
+
+                        if (actions[Actions.EMAIL_VERIFICATION] != null) {
+                            // TODO: NAVIGATE TO VERIFICATION
+                            return@collect
+                        }
+
                         navigator.replaceAll(HomeDestination)
                     }
                 )
             }
+        }
+    }
+
+    private fun togglePassword() {
+        _state.update { state ->
+            state.copy(
+                showPassword = !state.showPassword
+            )
         }
     }
 }

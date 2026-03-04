@@ -22,6 +22,7 @@ import migrations.Diva_playlist_suggestions
 import migrations.Diva_post
 import migrations.Diva_session
 import migrations.Diva_user
+import migrations.Diva_user_preferences
 import kotlin.test.Test
 
 class DivaDBTest {
@@ -30,7 +31,7 @@ class DivaDBTest {
             JvmConf(
                 DriverConf.PostgresqlDriverConf(
                     host = "localhost",
-                    port = 5433,
+                    port = 5434,
                     username = "postgres",
                     password = "postgres",
                     database = "pg",
@@ -81,6 +82,9 @@ class DivaDBTest {
                     diva_userAdapter = Diva_user.Adapter(
                         roleAdapter = EnumColumnAdapter(),
                     ),
+                    diva_user_preferencesAdapter = Diva_user_preferences.Adapter(
+                        themeAdapter = EnumColumnAdapter(),
+                    )
                 )
             )
         }

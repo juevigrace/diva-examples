@@ -16,7 +16,7 @@ import io.github.juevigrace.diva.core.getOrElse
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
@@ -77,7 +77,7 @@ class UserStorageImpl(
                     password_hash = password,
                     birth_date = OffsetDateTime.ofInstant(
                         item.birthDate.toJavaInstant(),
-                        ZoneId.systemDefault()
+                        ZoneOffset.UTC
                     ),
                     phone_number = item.phoneNumber,
                     alias = item.alias,
@@ -214,12 +214,12 @@ class UserStorageImpl(
                     user_id = userId.toJavaUuid(),
                     permission_id = perm.permission.id.toJavaUuid(),
                     granted_by = perm.grantedBy.id.toJavaUuid(),
-                    granted_at = OffsetDateTime.ofInstant(perm.grantedAt.toJavaInstant(), ZoneId.systemDefault()),
+                    granted_at = OffsetDateTime.ofInstant(perm.grantedAt.toJavaInstant(), ZoneOffset.UTC),
                     expires_at = OffsetDateTime.ofInstant(
                         perm.expiresAt.getOrElse {
                             Clock.System.now().plus(10.minutes)
                         }.toJavaInstant(),
-                        ZoneId.systemDefault()
+                        ZoneOffset.UTC
                     ),
                     granted = perm.granted
 
@@ -253,7 +253,7 @@ class UserStorageImpl(
                         perm.expiresAt.getOrElse {
                             Clock.System.now().plus(10.minutes)
                         }.toJavaInstant(),
-                        ZoneId.systemDefault()
+                        ZoneOffset.UTC
                     ),
                     user_id = userId.toJavaUuid(),
                     permission_id = perm.permission.id.toJavaUuid(),
@@ -311,8 +311,14 @@ class UserStorageImpl(
                     theme = prefs.theme,
                     onboarding_completed = prefs.onboardingCompleted,
                     language = prefs.language,
-                    created_at = OffsetDateTime.ofInstant(prefs.createdAt.toJavaInstant(), ZoneId.systemDefault()),
-                    updated_at = OffsetDateTime.ofInstant(prefs.updatedAt.toJavaInstant(), ZoneId.systemDefault()),
+                    created_at = OffsetDateTime.ofInstant(
+                        prefs.createdAt.toJavaInstant(),
+                        ZoneOffset.UTC
+                    ),
+                    updated_at = OffsetDateTime.ofInstant(
+                        prefs.updatedAt.toJavaInstant(),
+                        ZoneOffset.UTC
+                    ),
                 ).value
             }
             if (rows.toInt() == 0) {
@@ -341,7 +347,10 @@ class UserStorageImpl(
                     theme = prefs.theme,
                     onboarding_completed = prefs.onboardingCompleted,
                     language = prefs.language,
-                    updated_at = OffsetDateTime.ofInstant(prefs.updatedAt.toJavaInstant(), ZoneId.systemDefault()),
+                    updated_at = OffsetDateTime.ofInstant(
+                        prefs.updatedAt.toJavaInstant(),
+                        ZoneOffset.UTC
+                    ),
                 ).value
             }
             if (rows.toInt() == 0) {

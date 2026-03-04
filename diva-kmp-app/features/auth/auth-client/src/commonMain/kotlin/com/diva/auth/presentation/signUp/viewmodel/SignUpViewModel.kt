@@ -5,29 +5,49 @@ import com.diva.auth.data.validation.SignUpValidation
 import com.diva.auth.data.validation.SignUpValidator
 import com.diva.auth.presentation.signUp.events.SignUpEvents
 import com.diva.auth.presentation.signUp.state.SignUpState
+import com.diva.core.resources.Res
+import com.diva.core.resources.error_unknown
+import com.diva.core.resources.error_verification_action_not_triggered
+import com.diva.models.actions.Actions
+import com.diva.models.auth.SessionData
 import com.diva.models.auth.SignUpForm
+import com.diva.models.config.AppConfig
+import com.diva.ui.messages.toToast
 import com.diva.ui.navigation.Destination
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.ui.navigation.Navigator
+import io.github.juevigrace.diva.ui.toast.ToastMessage
+import io.github.juevigrace.diva.ui.toast.Toaster
 import io.github.juevigrace.diva.ui.viewmodel.DivaViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
+import kotlin.time.Instant
 
 class SignUpViewModel(
     private val repository: AuthRepository,
-    private val navigator: Navigator<Destination>
+    private val navigator: Navigator<Destination>,
+    private val toaster: Toaster,
+    private val config: AppConfig,
 ) : DivaViewModel() {
     private val formState = MutableStateFlow(SignUpForm())
 
     private val formValidationState = MutableStateFlow(SignUpValidation())
 
+    @OptIn(FlowPreview::class)
     private val combinedValidationState: StateFlow<SignUpValidation> = combine(
         formState,
         formValidationState,
@@ -43,11 +63,18 @@ class SignUpViewModel(
             termsError = if (validation.showTermsError) valid.termsError else Option.None,
             privacyPolicyError = if (validation.showPrivacyPolicyError) valid.privacyPolicyError else Option.None,
         )
-    }.stateIn(
-        scope = scope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = formValidationState.value
-    )
+    }
+        .debounce(5000)
+        .map { state ->
+            state.copy(
+                phoneError = Option.None
+            )
+        }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = formValidationState.value
+        )
 
     private val _state: MutableStateFlow<SignUpState> = MutableStateFlow(SignUpState())
     val state: StateFlow<SignUpState> = combine(
@@ -55,10 +82,21 @@ class SignUpViewModel(
         formState,
         combinedValidationState,
     ) { state, form, validation ->
+        val formattedBirthDate = if (form.birthDate > 0) {
+            val instant = Instant.fromEpochMilliseconds(form.birthDate)
+            val localDate = instant.toLocalDateTime(TimeZone.UTC)
+            "${localDate.day.toString().padStart(
+                2,
+                '0'
+            )}/${localDate.month.number.toString().padStart(2, '0')}/${localDate.year}"
+        } else {
+            ""
+        }
         state.copy(
             signUpForm = form,
             formValidation = validation,
-            submitEnabled = validation.valid() && !state.submitLoading
+            submitEnabled = validation.valid() && !state.submitLoading,
+            formattedBirthDate = formattedBirthDate,
         )
     }
         .distinctUntilChanged()
@@ -80,6 +118,9 @@ class SignUpViewModel(
             SignUpEvents.OnSubmit -> submit()
             SignUpEvents.TogglePrivacyPolicy -> togglePrivacyPolicy()
             SignUpEvents.ToggleTerms -> toggleTerms()
+            SignUpEvents.TogglePasswordVisibility -> togglePasswordVisibility()
+            SignUpEvents.ToggleConfirmPasswordVisibility -> toggleConfirmPasswordVisibility()
+            SignUpEvents.ToggleDatePicker -> toggleDatePicker()
             SignUpEvents.OnNavigateToSignIn -> navigateToSignIn()
         }
     }
@@ -89,43 +130,64 @@ class SignUpViewModel(
     }
 
     private fun emailChanged(value: String) {
-        formState.update { it.copy(email = value) }
-        formValidationState.update { it.copy(showEmailError = true) }
+        formState.update { state -> state.copy(email = value) }
+        formValidationState.update { state -> state.copy(showEmailError = true) }
     }
 
     private fun usernameChanged(value: String) {
-        formState.update { it.copy(username = value) }
-        formValidationState.update { it.copy(showUsernameError = true) }
+        formState.update { state ->
+            state.copy(
+                username = value,
+                alias = state.alias.ifEmpty { value }
+            )
+        }
+        formValidationState.update { state -> state.copy(showUsernameError = true) }
     }
 
     private fun passwordChanged(value: String) {
-        formState.update { it.copy(password = value) }
-        formValidationState.update { it.copy(showPasswordError = true) }
+        formState.update { state -> state.copy(password = value) }
+        formValidationState.update { state -> state.copy(showPasswordError = true) }
     }
 
     private fun confirmPasswordChanged(value: String) {
-        formState.update { it.copy(confirmPassword = value) }
-        formValidationState.update { it.copy(showConfirmPasswordError = true) }
+        formState.update { state -> state.copy(confirmPassword = value) }
+        formValidationState.update { state -> state.copy(showConfirmPasswordError = true) }
     }
 
     private fun phoneChanged(value: String) {
-        formState.update { it.copy(phone = value) }
-        formValidationState.update { it.copy(showPhoneError = true) }
+        formState.update { state ->
+            state.copy(
+                phone = if (value.all { c -> c.isDigit() } || value.isEmpty()) value else state.phone
+            )
+        }
+        formValidationState.update { state -> state.copy(showPhoneError = true) }
     }
 
     private fun birthDateChanged(value: Long) {
-        formState.update { it.copy(birthDate = value) }
-        formValidationState.update { it.copy(showBirthDateError = true) }
+        formState.update { state -> state.copy(birthDate = value) }
+        formValidationState.update { state -> state.copy(showBirthDateError = true) }
     }
 
     private fun toggleTerms() {
-        formState.update { it.copy(termsAndConditions = !it.termsAndConditions) }
-        formValidationState.update { it.copy(showTermsError = true) }
+        formState.update { state -> state.copy(termsAndConditions = !state.termsAndConditions) }
+        formValidationState.update { state -> state.copy(showTermsError = true) }
     }
 
     private fun togglePrivacyPolicy() {
-        formState.update { it.copy(privacyPolicy = !it.privacyPolicy) }
-        formValidationState.update { it.copy(showPrivacyPolicyError = true) }
+        formState.update { state -> state.copy(privacyPolicy = !state.privacyPolicy) }
+        formValidationState.update { state -> state.copy(showPrivacyPolicyError = true) }
+    }
+
+    private fun togglePasswordVisibility() {
+        _state.update { state -> state.copy(passwordVisible = !state.passwordVisible) }
+    }
+
+    private fun toggleConfirmPasswordVisibility() {
+        _state.update { state -> state.copy(confirmPasswordVisible = !state.confirmPasswordVisible) }
+    }
+
+    private fun toggleDatePicker() {
+        _state.update { state -> state.copy(showDatePicker = !state.showDatePicker) }
     }
 
     private fun submit() {
@@ -137,11 +199,20 @@ class SignUpViewModel(
             )
         }
 
+        formState.update { form ->
+            form.copy(
+                sessionData = SessionData(
+                    device = config.deviceName,
+                    agent = config.agent,
+                )
+            )
+        }
+
         scope.launch {
-            repository.signUp(_state.value.signUpForm).collect { result ->
+            repository.signUp(formState.value).collect { result ->
                 result.fold(
                     onFailure = { err ->
-                        println(err)
+                        toaster.show(err.toToast())
                         _state.update { state ->
                             state.copy(
                                 submitLoading = false,
@@ -150,14 +221,23 @@ class SignUpViewModel(
                             )
                         }
                     },
-                    onSuccess = {
+                    onSuccess = { actions ->
                         _state.update { state ->
                             state.copy(
                                 submitLoading = false,
                                 submitSuccess = true
                             )
                         }
-                        navigator.navigate(Destination.HomeGraph.Home)
+
+                        if (actions[Actions.EMAIL_VERIFICATION] != null) {
+                            // TODO: navigate to verification screen
+                        } else {
+                            toaster.show(
+                                ToastMessage(
+                                    message = getString(Res.string.error_verification_action_not_triggered)
+                                )
+                            )
+                        }
                     }
                 )
             }

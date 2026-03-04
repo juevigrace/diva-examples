@@ -7,6 +7,7 @@ sealed interface SignInEvents {
     /* Input */
     data class OnUsernameChanged(val email: String) : SignInEvents
     data class OnPasswordChanged(val password: String) : SignInEvents
+    data object TogglePassword : SignInEvents
 
     /* Navigation */
     data class OnForgot(val action: ForgotAction) : SignInEvents

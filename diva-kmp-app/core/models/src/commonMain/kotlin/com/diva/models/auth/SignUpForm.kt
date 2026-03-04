@@ -2,13 +2,14 @@ package com.diva.models.auth
 
 import com.diva.models.api.auth.dtos.SignUpDto
 import com.diva.models.api.user.dtos.CreateUserDto
+import kotlin.time.Clock
 
 data class SignUpForm(
     val email: String = "",
     val username: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    val birthDate: Long = 0L,
+    val birthDate: Long = Clock.System.now().toEpochMilliseconds(),
     val phone: String = "",
     val alias: String = "",
     val avatar: String = username,

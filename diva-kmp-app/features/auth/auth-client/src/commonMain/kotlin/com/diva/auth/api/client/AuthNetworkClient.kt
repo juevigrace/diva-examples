@@ -4,6 +4,7 @@ import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.models.api.auth.dtos.SignUpDto
+import com.diva.models.api.auth.response.AuthResponse
 import com.diva.models.api.auth.response.SessionResponse
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.Option
@@ -20,8 +21,8 @@ import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
 interface AuthNetworkClient {
-    suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError>
-    suspend fun signUp(dto: SignUpDto): DivaResult<SessionResponse, DivaError>
+    suspend fun signIn(dto: SignInDto): DivaResult<AuthResponse, DivaError>
+    suspend fun signUp(dto: SignUpDto): DivaResult<AuthResponse, DivaError>
     suspend fun signOut(token: String): DivaResult<Unit, DivaError>
     suspend fun ping(token: String): DivaResult<Unit, DivaError>
     suspend fun refresh(dto: SessionDataDto, token: String): DivaResult<SessionResponse, DivaError>
@@ -30,7 +31,7 @@ interface AuthNetworkClient {
 class AuthNetworkClientImpl(
     private val client: DivaClient
 ) : AuthNetworkClient {
-    override suspend fun signIn(dto: SignInDto): DivaResult<SessionResponse, DivaError> {
+    override suspend fun signIn(dto: SignInDto): DivaResult<AuthResponse, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -38,7 +39,7 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/signIn",
                 body = dto
             ).flatMap { response ->
-                val body: ApiResponse<SessionResponse> = response.body()
+                val body: ApiResponse<AuthResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
                         body.data?.let { data -> DivaResult.success(data) }
@@ -68,7 +69,7 @@ class AuthNetworkClientImpl(
         }
     }
 
-    override suspend fun signUp(dto: SignUpDto): DivaResult<SessionResponse, DivaError> {
+    override suspend fun signUp(dto: SignUpDto): DivaResult<AuthResponse, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -76,7 +77,7 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/signUp",
                 body = dto
             ).flatMap { response ->
-                val body: ApiResponse<SessionResponse> = response.body()
+                val body: ApiResponse<AuthResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.Created -> {
                         body.data?.let { data -> DivaResult.success(data) }

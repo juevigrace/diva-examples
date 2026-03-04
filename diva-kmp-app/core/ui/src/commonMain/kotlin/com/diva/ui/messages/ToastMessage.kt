@@ -34,6 +34,7 @@ suspend inline fun DivaError.toToast(): ToastMessage {
             is ErrorCause.Validation.Parse -> getString(Res.string.error_validation_parse)
             is ErrorCause.Validation.UnexpectedValue -> getString(Res.string.error_validation_unexpected_value)
             is ErrorCause.Validation.Used -> getString(Res.string.error_validation_used)
+            is ErrorCause.Actions<*> -> ""
         },
         isError = true,
         details = Option.of(message)

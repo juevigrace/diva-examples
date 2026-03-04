@@ -2,6 +2,7 @@ package com.diva.auth.data.validation
 
 import com.diva.core.resources.Res
 import com.diva.core.resources.field_required
+import com.diva.core.resources.invalid_phone_number
 import com.diva.core.resources.password_mismatch
 import com.diva.core.resources.password_too_short
 import com.diva.core.resources.privacy_required
@@ -45,7 +46,7 @@ object SignUpValidator : Validator<SignUpForm, SignUpValidation> {
     private fun validatePassword(password: String): Option<StringResource> {
         return if (password.isBlank()) {
             Option.Some(Res.string.field_required)
-        } else if (password.length < 6) {
+        } else if (password.length < 4) {
             Option.Some(Res.string.password_too_short)
         } else {
             Option.None
@@ -71,8 +72,8 @@ object SignUpValidator : Validator<SignUpForm, SignUpValidation> {
     }
 
     private fun validatePhone(phone: String): Option<StringResource> {
-        return if (phone.isBlank()) {
-            Option.Some(Res.string.field_required)
+        return if (phone.isNotEmpty() && !phone.all { it.isDigit() }) {
+            Option.Some(Res.string.invalid_phone_number)
         } else {
             Option.None
         }

@@ -55,7 +55,7 @@ class VerificationStorageImpl(
             val rows: Long = transactionWithResult {
                 val expiresAt: OffsetDateTime = OffsetDateTime.ofInstant(
                     item.expiresAt.toJavaInstant(),
-                    ZoneOffset.systemDefault()
+                    ZoneOffset.UTC
                 )
 
                 emailVerificationTokensQueries.insert(

@@ -17,7 +17,7 @@ import io.github.juevigrace.diva.core.getOrElse
 import io.github.juevigrace.diva.database.DivaDatabase
 import kotlinx.coroutines.flow.Flow
 import java.time.OffsetDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -190,7 +190,7 @@ class ChatStorageImpl(
                     role = item.role,
                     last_read_at = OffsetDateTime.ofInstant(
                         item.lastReadAt.getOrElse { Clock.System.now() }.toJavaInstant(),
-                        ZoneId.systemDefault()
+                        ZoneOffset.UTC
                     ),
                     chat_id = chatId.toJavaUuid(),
                     user_id = item.user.id.toJavaUuid()

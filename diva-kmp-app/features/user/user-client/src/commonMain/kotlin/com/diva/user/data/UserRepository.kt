@@ -266,7 +266,7 @@ class UserRepositoryImpl(
     override fun createPreferences(prefs: UserPreferences): Flow<DivaResult<Unit, DivaError>> {
         return flow {
             val res = when (prefs.type) {
-                PreferenceType.LOCAL -> userStorage.insertLocalPreferences(prefs.copy(id = Uuid.random()))
+                PreferenceType.LOCAL -> userStorage.insertLocalPreferences(prefs)
                 PreferenceType.CLOUD -> {
                     val session: Option<Session> = sessionStorage.getCurrentSession().getOrThrow()
                     session.fold(

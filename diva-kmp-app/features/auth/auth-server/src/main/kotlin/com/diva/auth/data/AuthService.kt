@@ -1,10 +1,13 @@
 package com.diva.auth.data
 
 import com.diva.database.session.SessionStorage
+import com.diva.models.actions.AppActions
 import com.diva.models.api.ApiResponse
+import com.diva.models.api.action.ActionResponse
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.models.api.auth.dtos.SignUpDto
+import com.diva.models.api.auth.response.AuthResponse
 import com.diva.models.api.auth.response.SessionResponse
 import com.diva.models.auth.Session
 import com.diva.models.session.SessionStatus
@@ -38,13 +41,13 @@ interface AuthService {
     suspend fun signIn(
         dto: SignInDto,
         user: User,
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError>
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError>
 
     @OptIn(ExperimentalUuidApi::class)
     suspend fun signUp(
         dto: SignUpDto,
         userId: Uuid,
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError>
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError>
 
     suspend fun signOut(session: Session): DivaResult<ApiResponse<Unit>, DivaError>
 }
@@ -97,7 +100,7 @@ class AuthServiceImpl(
     override suspend fun signIn(
         dto: SignInDto,
         user: User,
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError> {
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -114,19 +117,6 @@ class AuthServiceImpl(
                         )
                     )
                 }
-                !user.userVerified -> {
-                    // TODO: TRIGGER VERIFICATION IF ONE IS NOT CURRENTLY VALID
-                    DivaResult.failure(
-                        DivaError(
-                            cause = ErrorCause.Network.Error(
-                                method = HttpRequestMethod.POST,
-                                url = "/api/auth/signIn",
-                                status = HttpStatusCodes.Unauthorized,
-                                details = Option.Some("user not verified")
-                            ),
-                        )
-                    )
-                }
                 else -> {
                     val sessionId: Uuid = Uuid.random()
                     val session: Session = createSession(sessionId, user.id, dto.sessionData)
@@ -136,7 +126,18 @@ class AuthServiceImpl(
                         }
                         .map {
                             ApiResponse(
-                                data = session.toResponse(),
+                                data = AuthResponse(
+                                    session = session.toResponse(),
+                                    actions = if (!user.userVerified) {
+                                        listOf(
+                                            ActionResponse(
+                                                actionName = AppActions.EmailVerification.key,
+                                            )
+                                        )
+                                    } else {
+                                        emptyList()
+                                    }
+                                ),
                                 message = "Sign in successful"
                             )
                         }
@@ -149,7 +150,7 @@ class AuthServiceImpl(
     override suspend fun signUp(
         dto: SignUpDto,
         userId: Uuid
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError> {
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
         ) {
@@ -157,7 +158,14 @@ class AuthServiceImpl(
             val session: Session = createSession(sessionId, userId, dto.sessionData)
             storage.insert(session).map {
                 ApiResponse(
-                    data = session.toResponse(),
+                    data = AuthResponse(
+                        session = session.toResponse(),
+                        actions = listOf(
+                            ActionResponse(
+                                actionName = AppActions.EmailVerification.key,
+                            )
+                        )
+                    ),
                     message = "Sign up successful"
                 )
             }

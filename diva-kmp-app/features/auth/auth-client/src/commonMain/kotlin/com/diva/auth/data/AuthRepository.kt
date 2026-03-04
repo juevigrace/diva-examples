@@ -3,6 +3,9 @@ package com.diva.auth.data
 import com.diva.auth.api.client.AuthNetworkClient
 import com.diva.database.session.SessionStorage
 import com.diva.models.Repository
+import com.diva.models.actions.Actions
+import com.diva.models.actions.AppActions
+import com.diva.models.actions.toAction
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.auth.Session
 import com.diva.models.auth.SignInForm
@@ -19,8 +22,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 interface AuthRepository : Repository {
-    fun signIn(form: SignInForm): Flow<DivaResult<Unit, DivaError>>
-    fun signUp(form: SignUpForm): Flow<DivaResult<Unit, DivaError>>
+    fun signIn(form: SignInForm): Flow<DivaResult<Map<Actions, AppActions>, DivaError>>
+    fun signUp(form: SignUpForm): Flow<DivaResult<Map<Actions, AppActions>, DivaError>>
     fun signOut(): Flow<DivaResult<Unit, DivaError>>
     fun ping(): Flow<DivaResult<Unit, DivaError>>
     fun refresh(device: String): Flow<DivaResult<Unit, DivaError>>
@@ -31,28 +34,38 @@ class AuthRepositoryImpl(
     private val authClient: AuthNetworkClient,
 ) : AuthRepository {
     @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
-    override fun signIn(form: SignInForm): Flow<DivaResult<Unit, DivaError>> {
+    override fun signIn(form: SignInForm): Flow<DivaResult<Map<Actions, AppActions>, DivaError>> {
         return flow {
             authClient.signIn(form.toSignInDto())
                 .onFailure { err -> emit(DivaResult.failure(err)) }
                 .onSuccess { res ->
                     sessionStorage
-                        .insert(Session.fromResponse(res))
+                        .insert(Session.fromResponse(res.session))
                         .onFailure { err -> emit(DivaResult.failure(err)) }
-                        .onSuccess { emit(DivaResult.success(Unit)) }
+                        .onSuccess {
+                            val actions = res.actions.map { aRes -> aRes.toAction() }
+                            emit(
+                                DivaResult.success(actions.associateWith { AppActions.fromAction(it) })
+                            )
+                        }
                 }
         }.flowOn(Dispatchers.Default)
     }
 
-    override fun signUp(form: SignUpForm): Flow<DivaResult<Unit, DivaError>> {
+    override fun signUp(form: SignUpForm): Flow<DivaResult<Map<Actions, AppActions>, DivaError>> {
         return flow {
             authClient.signUp(form.toSignUpDto())
                 .onFailure { err -> emit(DivaResult.failure(err)) }
                 .onSuccess { res ->
                     sessionStorage
-                        .insert(Session.fromResponse(res))
+                        .insert(Session.fromResponse(res.session))
                         .onFailure { err -> emit(DivaResult.failure(err)) }
-                        .onSuccess { emit(DivaResult.success(Unit)) }
+                        .onSuccess {
+                            val actions = res.actions.map { aRes -> aRes.toAction() }
+                            emit(
+                                DivaResult.success(actions.associateWith { AppActions.fromAction(it) })
+                            )
+                        }
                 }
         }.flowOn(Dispatchers.Default)
     }

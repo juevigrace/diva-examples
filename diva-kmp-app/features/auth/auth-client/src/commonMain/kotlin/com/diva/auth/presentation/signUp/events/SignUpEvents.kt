@@ -10,6 +10,9 @@ sealed interface SignUpEvents {
     data class OnConfirmPasswordChanged(val value: String) : SignUpEvents
     data object TogglePrivacyPolicy : SignUpEvents
     data object ToggleTerms : SignUpEvents
+    data object TogglePasswordVisibility : SignUpEvents
+    data object ToggleConfirmPasswordVisibility : SignUpEvents
+    data object ToggleDatePicker : SignUpEvents
     data object OnSubmit : SignUpEvents
     data object OnNavigateToSignIn : SignUpEvents
 }

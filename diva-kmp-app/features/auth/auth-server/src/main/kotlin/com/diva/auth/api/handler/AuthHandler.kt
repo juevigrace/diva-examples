@@ -7,6 +7,7 @@ import com.diva.models.api.ApiResponse
 import com.diva.models.api.auth.dtos.SessionDataDto
 import com.diva.models.api.auth.dtos.SignInDto
 import com.diva.models.api.auth.dtos.SignUpDto
+import com.diva.models.api.auth.response.AuthResponse
 import com.diva.models.api.auth.response.SessionResponse
 import com.diva.models.auth.Session
 import com.diva.models.user.User
@@ -30,8 +31,8 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 interface AuthHandler {
-    suspend fun signIn(dto: SignInDto): DivaResult<ApiResponse<SessionResponse>, DivaError>
-    suspend fun signUp(dto: SignUpDto): DivaResult<ApiResponse<SessionResponse>, DivaError>
+    suspend fun signIn(dto: SignInDto): DivaResult<ApiResponse<AuthResponse>, DivaError>
+    suspend fun signUp(dto: SignUpDto): DivaResult<ApiResponse<AuthResponse>, DivaError>
     suspend fun signOut(session: Session): DivaResult<ApiResponse<Unit>, DivaError>
     suspend fun refresh(
         dto: SessionDataDto,
@@ -47,9 +48,10 @@ class AuthHandlerImpl(
 ) : AuthHandler {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun signIn(
         dto: SignInDto
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError> {
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError> {
         val user: User = userService.getUserByUsername(dto.username)
             .fold(
                 onFailure = { err ->
@@ -57,13 +59,26 @@ class AuthHandlerImpl(
                 },
                 onSuccess = { u -> u }
             )
+        if (!user.userVerified) {
+            verificationService.createVerificationCode(user.id)
+                .onFailure { err ->
+                    return DivaResult.failure(err)
+                }
+                .onSuccess { v ->
+                    kMail.sendEmail(
+                        to = user.email,
+                        subject = "Email Verification",
+                        html = buildCodeVerificationEmail(v)
+                    )
+                }
+        }
         return service.signIn(dto, user)
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun signUp(
         dto: SignUpDto
-    ): DivaResult<ApiResponse<SessionResponse>, DivaError> {
+    ): DivaResult<ApiResponse<AuthResponse>, DivaError> {
         // TODO: try avoid checking for conflicts, handle them in the validation layer
         userService.getUserByUsername(dto.user.username)
             .map { _ ->
