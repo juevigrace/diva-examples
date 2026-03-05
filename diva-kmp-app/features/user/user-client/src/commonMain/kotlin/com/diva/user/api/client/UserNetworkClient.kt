@@ -74,9 +74,9 @@ class UserNetworkClientImpl(
             onError = { e -> e.toDivaError() }
         ) {
             client.get(path = "/api/user").flatMap { response ->
-                val body: ApiResponse<PaginationResponse<UserResponse>> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<PaginationResponse<UserResponse>> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -85,6 +85,7 @@ class UserNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -106,9 +107,9 @@ class UserNetworkClientImpl(
             onError = { e -> e.toDivaError() }
         ) {
             client.get(path = "/api/user/$id").flatMap { response ->
-                val body: ApiResponse<UserResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<UserResponse> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -117,6 +118,7 @@ class UserNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -145,9 +147,9 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<String> = response.body()
                 when (response.status) {
                     HttpStatusCode.Created -> {
+                        val body: ApiResponse<String> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -156,6 +158,7 @@ class UserNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -185,10 +188,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -213,10 +216,10 @@ class UserNetworkClientImpl(
                 path = "/api/user/$id",
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.NoContent -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -242,10 +245,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -270,10 +273,10 @@ class UserNetworkClientImpl(
                 path = "/api/user/me",
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.NoContent -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -302,10 +305,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -334,10 +337,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -366,10 +369,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -398,10 +401,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -430,10 +433,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -458,10 +461,10 @@ class UserNetworkClientImpl(
                 path = "/api/user/forgot/password/request",
                 body = dto,
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -486,10 +489,10 @@ class UserNetworkClientImpl(
                 path = "/api/user/forgot/password/request",
                 body = dto,
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -518,10 +521,10 @@ class UserNetworkClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token"),
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(

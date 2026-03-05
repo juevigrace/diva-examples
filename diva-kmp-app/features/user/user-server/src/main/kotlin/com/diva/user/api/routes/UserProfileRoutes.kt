@@ -9,12 +9,11 @@ import com.diva.models.server.SESSION_KEY
 import com.diva.user.api.handler.UserHandler
 import com.diva.util.respond
 import com.diva.util.respondUnauthorized
-import io.ktor.http.HttpStatusCode
+import com.diva.util.sendResponse
+import io.github.juevigrace.diva.core.network.HttpStatusCodes
 import io.ktor.server.request.receive
-import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
@@ -34,15 +33,19 @@ internal fun Route.userProfileRoutes() {
         }
         route("/email") {
             post("/request") {
-                call.respond(
-                    HttpStatusCode.NotImplemented,
-                    ApiResponse(data = null, message = "Not implemented")
+                call.sendResponse(
+                    ApiResponse<Unit>(
+                        statusCode = HttpStatusCodes.NotImplemented.code,
+                        message = "Not implemented"
+                    )
                 )
             }
             post("/confirm") {
-                call.respond(
-                    HttpStatusCode.NotImplemented,
-                    ApiResponse(data = null, message = "Not implemented")
+                call.sendResponse<Unit>(
+                    ApiResponse(
+                        statusCode = HttpStatusCodes.NotImplemented.code,
+                        message = "Not implemented"
+                    )
                 )
             }
             patch {

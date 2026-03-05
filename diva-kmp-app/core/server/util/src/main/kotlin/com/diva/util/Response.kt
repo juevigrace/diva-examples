@@ -1,10 +1,9 @@
 package com.diva.util
 
 import com.diva.models.api.ApiResponse
-import com.diva.models.api.action.ActionResponse
+import com.diva.util.sendResponse
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
-import io.github.juevigrace.diva.core.errors.ErrorCause
 import io.github.juevigrace.diva.core.errors.toHttpStatusCodes
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.network.HttpStatusCodes
@@ -21,26 +20,8 @@ suspend inline fun <reified T> DivaResult<ApiResponse<T>, DivaError>.respond(cal
         onSuccess = { res -> call.sendResponse(res) },
         onFailure = { err ->
             call.sendResponse(
-                ApiResponse<T>(
+                ApiResponse<Unit>(
                     statusCode = err.cause.toHttpStatusCodes().code,
-                    message = err.message
-                )
-            )
-        }
-    )
-}
-
-suspend inline fun <reified T, reified R> DivaResult<ApiResponse<T>, DivaError>.respond(
-    call: ApplicationCall,
-    transform: (ErrorCause) -> R = { Unit as R }
-) {
-    fold(
-        onSuccess = { res -> call.sendResponse(res) },
-        onFailure = { err ->
-            call.sendResponse<R>(
-                ApiResponse(
-                    statusCode = err.cause.toHttpStatusCodes().code,
-                    data = transform(err.cause),
                     message = err.message
                 )
             )

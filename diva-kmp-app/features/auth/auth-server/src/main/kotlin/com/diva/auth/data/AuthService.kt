@@ -121,9 +121,6 @@ class AuthServiceImpl(
                     val sessionId: Uuid = Uuid.random()
                     val session: Session = createSession(sessionId, user.id, dto.sessionData)
                     storage.insert(session)
-                        .mapError { err ->
-                            err
-                        }
                         .map {
                             ApiResponse(
                                 data = AuthResponse(
@@ -180,7 +177,7 @@ class AuthServiceImpl(
             storage
                 .update(session.copy(status = SessionStatus.CLOSED))
                 .mapError { err -> err }
-                .map { ApiResponse(message = "Sign out successful") }
+                .map { ApiResponse(data = Unit, message = "Sign out successful") }
         }
     }
 

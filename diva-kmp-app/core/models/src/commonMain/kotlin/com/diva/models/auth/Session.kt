@@ -5,12 +5,11 @@ import com.diva.models.session.SessionStatus
 import com.diva.models.session.safeSessionStatus
 import com.diva.models.user.User
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalUuidApi::class)
 data class Session(
     val id: Uuid,
     val user: User,

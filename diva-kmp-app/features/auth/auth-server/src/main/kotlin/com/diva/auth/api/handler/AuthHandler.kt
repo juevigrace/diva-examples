@@ -62,14 +62,19 @@ class AuthHandlerImpl(
         if (!user.userVerified) {
             verificationService.createVerificationCode(user.id)
                 .onFailure { err ->
-                    return DivaResult.failure(err)
+                    // TODO: duplicated keys are Exceptions and are not handled the way they should.
+                    if (err.cause !is ErrorCause.Error.Ex) {
+                        return DivaResult.failure(err)
+                    }
                 }
                 .onSuccess { v ->
                     kMail.sendEmail(
                         to = user.email,
                         subject = "Email Verification",
                         html = buildCodeVerificationEmail(v)
-                    )
+                    ).onFailure { err ->
+                        return DivaResult.failure(err)
+                    }
                 }
         }
         return service.signIn(dto, user)

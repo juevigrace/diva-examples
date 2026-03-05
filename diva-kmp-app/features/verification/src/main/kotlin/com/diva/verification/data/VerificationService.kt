@@ -11,6 +11,9 @@ import io.github.juevigrace.diva.core.flatMap
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.isPresent
 import io.github.juevigrace.diva.core.tryResult
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
@@ -42,7 +45,7 @@ class VerificationServiceImpl(
             val item = UserVerification(
                 userId = userId,
                 token = generateToken(),
-                expiresAt = Clock.System.now().plus(15.minutes),
+                expiresAt = Clock.System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC) + 15.minutes,
                 createdAt = Clock.System.now(),
             )
 

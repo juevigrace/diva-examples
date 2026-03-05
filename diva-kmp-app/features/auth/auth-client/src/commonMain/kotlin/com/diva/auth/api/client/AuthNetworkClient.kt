@@ -39,9 +39,9 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/signIn",
                 body = dto
             ).flatMap { response ->
-                val body: ApiResponse<AuthResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<AuthResponse> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -53,6 +53,7 @@ class AuthNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -77,9 +78,9 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/signUp",
                 body = dto
             ).flatMap { response ->
-                val body: ApiResponse<AuthResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.Created -> {
+                        val body: ApiResponse<AuthResponse> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -91,6 +92,7 @@ class AuthNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -115,10 +117,10 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/signOut",
                 headers = mapOf("Authorization" to "Bearer $token"),
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -143,10 +145,10 @@ class AuthNetworkClientImpl(
                 path = "/api/auth/ping",
                 headers = mapOf("Authorization" to "Bearer $token"),
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -175,9 +177,9 @@ class AuthNetworkClientImpl(
                 headers = mapOf("Authorization" to "Bearer $token"),
                 body = dto,
             ).flatMap { response ->
-                val body: ApiResponse<SessionResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<SessionResponse> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -189,6 +191,7 @@ class AuthNetworkClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(

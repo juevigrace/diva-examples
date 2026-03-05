@@ -51,9 +51,9 @@ class PermissionsClientImpl(
             onError = { e -> e.toDivaError() }
         ) {
             client.get(path = "/api/permissions").flatMap { response ->
-                val body: ApiResponse<PaginationResponse<PermissionResponse>> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<PaginationResponse<PermissionResponse>> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -65,6 +65,7 @@ class PermissionsClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -86,9 +87,9 @@ class PermissionsClientImpl(
             onError = { e -> e.toDivaError() }
         ) {
             client.get(path = "/api/permissions/$id").flatMap { response ->
-                val body: ApiResponse<PermissionResponse> = response.body()
                 when (response.status) {
                     HttpStatusCode.OK -> {
+                        val body: ApiResponse<PermissionResponse> = response.body()
                         body.data?.let { data -> DivaResult.success(data) }
                             ?: DivaResult.failure(
                                 DivaError(
@@ -100,6 +101,7 @@ class PermissionsClientImpl(
                             )
                     }
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -128,10 +130,10 @@ class PermissionsClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Created -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -160,10 +162,10 @@ class PermissionsClientImpl(
                 body = dto,
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.Accepted -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
@@ -188,10 +190,10 @@ class PermissionsClientImpl(
                 path = "/api/permissions/$id",
                 headers = mapOf("Authorization" to "Bearer $token")
             ).flatMap { response ->
-                val body: ApiResponse<Nothing> = response.body()
                 when (response.status) {
                     HttpStatusCode.NoContent -> DivaResult.success(Unit)
                     else -> {
+                        val body: ApiResponse<Nothing> = response.body()
                         DivaResult.failure(
                             DivaError(
                                 cause = ErrorCause.Network.Error(
