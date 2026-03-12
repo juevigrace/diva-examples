@@ -17,6 +17,7 @@ data class Session(
     val refreshToken: String,
     val device: String,
     val status: SessionStatus,
+    val isCurrent: Boolean = false,
     val ipAddress: String,
     val userAgent: String,
     val expiresAt: Instant,

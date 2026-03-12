@@ -15,7 +15,9 @@ import com.diva.ui.navigation.Destination
 import com.diva.ui.navigation.ForgotDestination
 import com.diva.ui.navigation.HomeDestination
 import com.diva.ui.navigation.SignUpDestination
+import com.diva.ui.navigation.VerificationDestination
 import com.diva.ui.navigation.arguments.ForgotAction
+import com.diva.ui.navigation.arguments.VerificationAction
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.ui.navigation.Navigator
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,13 +67,11 @@ class SignInViewModel(
             formValidation = validation,
             submitEnabled = validation.valid() && !state.submitLoading
         )
-    }
-        .distinctUntilChanged()
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _state.value,
-        )
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = _state.value,
+    )
 
     fun onEvent(event: SignInEvents) {
         when (event) {
@@ -158,7 +157,7 @@ class SignInViewModel(
                         }
 
                         if (actions[Actions.EMAIL_VERIFICATION] != null) {
-                            // TODO: NAVIGATE TO VERIFICATION
+                            navigator.navigate(VerificationDestination(VerificationAction.UserVerification))
                             return@collect
                         }
 

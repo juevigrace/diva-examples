@@ -22,6 +22,7 @@ fun Application.configureSecurity() {
     val jwtHelper: JwtHelper by inject { parametersOf(secret, issuer, audience) }
     val sessionStorage: SessionStorage by inject()
 
+    // TODO: create a verification middleware for authentication or just restrict access for non verified users
     authentication {
         jwt(AUTH_JWT_KEY) {
             realm = jwtRealm

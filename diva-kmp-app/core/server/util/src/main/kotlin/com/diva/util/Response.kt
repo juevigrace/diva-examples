@@ -1,7 +1,6 @@
 package com.diva.util
 
 import com.diva.models.api.ApiResponse
-import com.diva.util.sendResponse
 import io.github.juevigrace.diva.core.DivaResult
 import io.github.juevigrace.diva.core.errors.DivaError
 import io.github.juevigrace.diva.core.errors.toHttpStatusCodes

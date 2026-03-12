@@ -22,6 +22,7 @@ kotlin {
             implementation(projects.features.permissions.permissionsClient)
             implementation(projects.features.social.socialClient)
             implementation(projects.features.user.userClient)
+            implementation(projects.features.verification.verificationClient)
 
             implementation(libs.diva.network.client)
             api(libs.koin.core)

@@ -8,7 +8,7 @@ dependencies {
     implementation(projects.core.server.util)
 
     implementation(projects.features.user.userServer)
-    implementation(projects.features.verification)
+    implementation(projects.features.verification.verificationServer)
 
     implementation(projects.features.session.sessionServer)
 

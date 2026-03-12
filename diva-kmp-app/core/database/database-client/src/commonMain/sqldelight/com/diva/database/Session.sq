@@ -7,7 +7,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE diva_session 
-SET access_token = ?, refresh_token = ?, device = ?, status = ?, ip_address = ?, user_agent = ?, expires_at = ?, updated_at = (strftime('%s', 'now')) 
+SET access_token = ?, refresh_token = ?, device = ?, status = ?, ip_address = ?, is_current = ?, user_agent = ?, expires_at = ?, updated_at = (strftime('%s', 'now'))
 WHERE id = ?;
 
 deleteByUserId:
@@ -73,12 +73,6 @@ SELECT
   s.user_agent AS userAgent,
   s.expires_at AS expiresAt,
   s.created_at AS createdAt,
-  s.updated_at AS updatedAt,
-  u.id AS userId,
-  u.email,
-  u.username,
-  u.created_at AS uCreatedAt,
-  u.updated_at AS uUpdatedAt
+  s.updated_at AS updatedAt
 FROM diva_session s
-JOIN diva_user u ON s.user_id = u.id
 WHERE s.is_current = 1;

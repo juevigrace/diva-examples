@@ -52,7 +52,6 @@ import com.diva.core.resources.email_placeholder
 import com.diva.core.resources.forgot_password
 import com.diva.core.resources.go_back
 import com.diva.core.resources.hide_password
-import com.diva.core.resources.ic_arrow_left
 import com.diva.core.resources.ic_chevron_left
 import com.diva.core.resources.ic_eye
 import com.diva.core.resources.ic_eye_off
@@ -67,15 +66,18 @@ import com.diva.core.resources.show_password
 import com.diva.core.resources.sign_in
 import com.diva.core.resources.verification_code
 import com.diva.core.resources.verification_code_placeholder
+import com.diva.ui.navigation.arguments.ForgotAction
 import io.github.juevigrace.diva.ui.components.layout.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotScreen(
-    viewModel: ForgotViewModel = koinViewModel()
+    action: ForgotAction,
+    viewModel: ForgotViewModel = koinViewModel(parameters = { parametersOf(action) })
 ) {
     val state: ForgotState by viewModel.state.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current

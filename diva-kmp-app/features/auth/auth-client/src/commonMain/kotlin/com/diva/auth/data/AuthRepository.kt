@@ -39,10 +39,17 @@ class AuthRepositoryImpl(
             authClient.signIn(form.toSignInDto())
                 .onFailure { err -> emit(DivaResult.failure(err)) }
                 .onSuccess { res ->
+                    val session = Session.fromResponse(res.session)
                     sessionStorage
-                        .insert(Session.fromResponse(res.session))
+                        .insert(session)
                         .onFailure { err -> emit(DivaResult.failure(err)) }
                         .onSuccess {
+                            sessionStorage.update(session.copy(isCurrent = true))
+                                .onFailure { err ->
+                                    sessionStorage.delete(session.id)
+                                        .onFailure { err -> println("panik: ${err.message}") }
+                                    emit(DivaResult.failure(err))
+                                }
                             val actions = res.actions.map { aRes -> aRes.toAction() }
                             emit(
                                 DivaResult.success(actions.associateWith { AppActions.fromAction(it) })
@@ -52,15 +59,23 @@ class AuthRepositoryImpl(
         }.flowOn(Dispatchers.Default)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun signUp(form: SignUpForm): Flow<DivaResult<Map<Actions, AppActions>, DivaError>> {
         return flow {
             authClient.signUp(form.toSignUpDto())
                 .onFailure { err -> emit(DivaResult.failure(err)) }
                 .onSuccess { res ->
+                    val session = Session.fromResponse(res.session)
                     sessionStorage
-                        .insert(Session.fromResponse(res.session))
+                        .insert(session)
                         .onFailure { err -> emit(DivaResult.failure(err)) }
                         .onSuccess {
+                            sessionStorage.update(session.copy(isCurrent = true))
+                                .onFailure { err ->
+                                    sessionStorage.delete(session.id)
+                                        .onFailure { err -> println("panik: ${err.message}") }
+                                    emit(DivaResult.failure(err))
+                                }
                             val actions = res.actions.map { aRes -> aRes.toAction() }
                             emit(
                                 DivaResult.success(actions.associateWith { AppActions.fromAction(it) })
@@ -97,6 +112,7 @@ class AuthRepositoryImpl(
             authClient.refresh(SessionDataDto(device), value.refreshToken)
                 .onFailure { err -> emit(DivaResult.failure(err)) }
                 .onSuccess { res ->
+                    // TODO: this is wrong?
                     sessionStorage
                         .insert(Session.fromResponse(res))
                         .onFailure { err -> emit(DivaResult.failure(err)) }

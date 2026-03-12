@@ -7,6 +7,7 @@ import com.diva.media.api.validation.mediaRequestValidation
 import com.diva.permissions.api.validation.permissionsRequestValidation
 import com.diva.social.api.validation.socialRequestValidation
 import com.diva.user.api.validation.userRequestValidation
+import com.diva.verification.api.validation.verificationRequestValidation
 import io.ktor.server.plugins.requestvalidation.RequestValidationConfig
 
 fun RequestValidationConfig.appRequestValidation() {
@@ -17,4 +18,5 @@ fun RequestValidationConfig.appRequestValidation() {
     permissionsRequestValidation()
     socialRequestValidation()
     userRequestValidation()
+    verificationRequestValidation()
 }

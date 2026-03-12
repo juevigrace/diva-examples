@@ -6,7 +6,6 @@ import com.diva.auth.data.validation.SignUpValidator
 import com.diva.auth.presentation.signUp.events.SignUpEvents
 import com.diva.auth.presentation.signUp.state.SignUpState
 import com.diva.core.resources.Res
-import com.diva.core.resources.error_unknown
 import com.diva.core.resources.error_verification_action_not_triggered
 import com.diva.models.actions.Actions
 import com.diva.models.auth.SessionData
@@ -14,6 +13,8 @@ import com.diva.models.auth.SignUpForm
 import com.diva.models.config.AppConfig
 import com.diva.ui.messages.toToast
 import com.diva.ui.navigation.Destination
+import com.diva.ui.navigation.VerificationDestination
+import com.diva.ui.navigation.arguments.VerificationAction
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.ui.navigation.Navigator
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -98,13 +98,11 @@ class SignUpViewModel(
             submitEnabled = validation.valid() && !state.submitLoading,
             formattedBirthDate = formattedBirthDate,
         )
-    }
-        .distinctUntilChanged()
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _state.value,
-        )
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = _state.value,
+    )
 
     fun onEvent(event: SignUpEvents) {
         when (event) {
@@ -230,7 +228,7 @@ class SignUpViewModel(
                         }
 
                         if (actions[Actions.EMAIL_VERIFICATION] != null) {
-                            // TODO: navigate to verification screen
+                            navigator.navigate(VerificationDestination(VerificationAction.UserVerification))
                         } else {
                             toaster.show(
                                 ToastMessage(

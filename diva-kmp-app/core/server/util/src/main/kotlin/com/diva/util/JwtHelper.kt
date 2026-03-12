@@ -84,6 +84,7 @@ class JwtHelper(
                 userId == null -> null
                 else -> {
                     val parsedId = UUID.fromString(sessionId)
+                    println("Session ID: $parsedId")
                     sessionCallBack(parsedId).fold(
                         onFailure = { err ->
                             println(err.toString())
@@ -91,13 +92,12 @@ class JwtHelper(
                         },
                         onSuccess = { option ->
                             option.fold(
-                                onNone = { null },
+                                onNone = {
+                                    println("Session not found")
+                                    null
+                                },
                                 onSome = { session ->
-                                    // TODO: TRIGGER VERIFICATION
                                     return when {
-                                        !session.user.userVerified -> {
-                                            null
-                                        }
                                         session.user.deletedAt.isPresent() -> {
                                             null
                                         }

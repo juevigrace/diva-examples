@@ -28,8 +28,26 @@ class SessionStorageImpl(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun getCurrentSession(): DivaResult<Option<Session>, DivaError> {
-        return db.getOne { sessionQueries.findCurrent(mapper = ::mapToEntity) }
+        return db.getOne {
+            sessionQueries.findCurrent(mapper = { id, accessToken, refreshToken, device, status, ipAddress, userAgent, expiresAt, createdAt, updatedAt ->
+                Session(
+                    id = Uuid.parse(id),
+                    user = User(id = Uuid.NIL),
+                    accessToken = accessToken,
+                    refreshToken = refreshToken,
+                    device = device,
+                    status = status,
+                    ipAddress = ipAddress,
+                    userAgent = userAgent,
+                    expiresAt = Instant.fromEpochMilliseconds(expiresAt),
+                    expired = expiresAt < Clock.System.now().toEpochMilliseconds(),
+                    createdAt = Instant.fromEpochMilliseconds(createdAt),
+                    updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+                )
+            })
+        }
     }
 
     override fun getAllFlow(
@@ -92,6 +110,7 @@ class SessionStorageImpl(
                     status = item.status,
                     ip_address = item.ipAddress,
                     user_agent = item.userAgent,
+                    is_current = item.isCurrent,
                     expires_at = item.expiresAt.toEpochMilliseconds(),
                 )
             }
@@ -164,11 +183,11 @@ class SessionStorageImpl(
         expiresAt: Long,
         createdAt: Long,
         updatedAt: Long,
-        userId: String?,
-        email: String?,
-        username: String?,
-        uCreatedAt: Long?,
-        uUpdatedAt: Long?,
+        userId: String? = null,
+        email: String? = null,
+        username: String? = null,
+        uCreatedAt: Long? = null,
+        uUpdatedAt: Long? = null,
     ): Session {
         require(userId != null) { "User ID cannot be null" }
         require(email != null) { "Email cannot be null" }

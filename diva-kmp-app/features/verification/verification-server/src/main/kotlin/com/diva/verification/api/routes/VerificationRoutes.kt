@@ -14,6 +14,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
+// TODO: create flow for verification request
 fun Route.verificationRoutes() {
     val handler: VerificationHandler by inject()
     route("/verify") {

@@ -18,6 +18,8 @@
     <string name="send_verification_code">Send Verification Code</string>
     <string name="verification_code">Verification Code</string>
     <string name="verification_code_placeholder">Enter code</string>
+    <string name="verification_code_description">Enter the verification code sent to your email</string>
+    <string name="verify">Verify</string>
     <string name="back">Back</string>
     <string name="verification_code_sent">Verification code sent to your email</string>
     <string name="password_reset_success">Password reset successfully</string>

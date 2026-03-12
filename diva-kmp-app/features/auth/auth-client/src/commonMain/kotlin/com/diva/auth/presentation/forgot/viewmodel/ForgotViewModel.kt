@@ -11,6 +11,7 @@ import com.diva.core.resources.verification_code_sent
 import com.diva.ui.messages.toToast
 import com.diva.ui.navigation.Destination
 import com.diva.ui.navigation.SignInDestination
+import com.diva.ui.navigation.arguments.ForgotAction
 import com.diva.user.data.UserRepository
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.fold
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 
 class ForgotViewModel(
+    private val action: ForgotAction,
     private val userRepository: UserRepository,
     private val navigator: Navigator<Destination>,
     private val toaster: Toaster,

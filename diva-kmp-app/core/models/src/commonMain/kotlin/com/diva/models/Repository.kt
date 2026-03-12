@@ -32,10 +32,12 @@ interface Repository {
                 .onSuccess { option ->
                     option.fold(
                         onNone = {
-                            DivaResult.failure(
-                                DivaError(
-                                    cause = ErrorCause.Validation.MissingValue(
-                                        field = "session",
+                            emit(
+                                DivaResult.failure(
+                                    DivaError(
+                                        cause = ErrorCause.Validation.MissingValue(
+                                            field = "session",
+                                        )
                                     )
                                 )
                             )

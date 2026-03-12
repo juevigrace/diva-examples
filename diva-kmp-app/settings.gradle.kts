@@ -67,6 +67,7 @@ if (shouldIncludeClientProjects()) {
         ":features:session:session-client",
         ":features:social:social-client",
         ":features:user:user-client",
+        ":features:verification:verification-client",
     )
 }
 
@@ -89,7 +90,7 @@ include(
     ":features:session:session-server",
     ":features:social:social-server",
     ":features:user:user-server",
-    ":features:verification",
+    ":features:verification:verification-server",
 )
 
 // Shared projects

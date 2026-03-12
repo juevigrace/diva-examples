@@ -22,7 +22,7 @@ dependencies {
     implementation(projects.core.modelsServer)
 
     implementation(projects.features.auth.authServer)
-    implementation(projects.features.verification)
+    implementation(projects.features.verification.verificationServer)
     implementation(projects.features.chat.chatServer)
     implementation(projects.features.collection.collectionServer)
     implementation(projects.features.media.mediaServer)

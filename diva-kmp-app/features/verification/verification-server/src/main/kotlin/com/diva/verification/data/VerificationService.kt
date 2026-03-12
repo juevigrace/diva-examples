@@ -17,7 +17,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -37,7 +36,7 @@ interface VerificationService {
 class VerificationServiceImpl(
     private val storage: VerificationStorage,
 ) : VerificationService {
-    @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun createVerificationCode(userId: Uuid): DivaResult<UserVerification, DivaError> {
         return tryResult(
             onError = { e -> e.toDivaError() }
@@ -54,7 +53,6 @@ class VerificationServiceImpl(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun verify(token: String): DivaResult<Unit, DivaError> {
         return storage
             .getByToken(token)

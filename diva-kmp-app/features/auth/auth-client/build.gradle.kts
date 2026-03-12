@@ -18,6 +18,7 @@ kotlin {
 
             implementation(projects.features.session.sessionClient)
             implementation(projects.features.user.userClient)
+            implementation(projects.features.verification.verificationClient)
 
             implementation(libs.diva.network.client)
 

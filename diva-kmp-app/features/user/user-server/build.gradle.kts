@@ -7,7 +7,7 @@ dependencies {
     implementation(projects.core.modelsServer)
     implementation(projects.core.server.util)
 
-    implementation(projects.features.verification)
+    implementation(projects.features.verification.verificationServer)
 
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
