@@ -1,9 +1,9 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.application)
+    alias(libs.plugins.secrets.gradle)
 }
 
 dependencies {
@@ -16,8 +16,8 @@ android {
     compileSdk {
         version = release(
             libs.versions.android.compileSdk
-            .get()
-            .toInt()
+                .get()
+                .toInt()
         )
     }
 
@@ -78,9 +78,6 @@ android {
         create("production")
 
         all {
-            val properties = gradleLocalProperties(project.rootDir, providers)
-            buildConfigField("String", "DOMAIN", "\"${properties.getProperty("DOMAIN")}\"")
-            buildConfigField("String", "PORT", "\"${properties.getProperty("PORT")}\"")
             dimension = "environment"
             applicationIdSuffix = ".$name"
             versionNameSuffix = "-$name"
@@ -102,3 +99,7 @@ kotlin {
     compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
 }
 
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "secrets.defaults.properties"
+}

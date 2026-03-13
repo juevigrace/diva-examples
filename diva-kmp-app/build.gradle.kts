@@ -9,3 +9,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.sqldelight) apply false
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.secrets.gradle)
+    }
+}

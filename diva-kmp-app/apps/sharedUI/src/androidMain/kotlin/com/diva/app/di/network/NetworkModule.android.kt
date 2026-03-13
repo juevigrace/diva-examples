@@ -2,14 +2,15 @@ package com.diva.app.di.network
 
 import io.github.juevigrace.diva.network.client.factory.AndroidDivaClientFactory
 import io.github.juevigrace.diva.network.client.factory.DivaClientFactory
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-actual fun networkFactoryModule(): Module {
+actual fun networkFactoryModule(config: HttpClientConfig<*>.() -> Unit): Module {
     return module {
         single<DivaClientFactory> {
-            AndroidDivaClientFactory(OkHttp)
+            AndroidDivaClientFactory(OkHttp, config)
         }
     }
 }

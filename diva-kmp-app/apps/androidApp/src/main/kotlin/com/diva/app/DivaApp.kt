@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import com.diva.app.di.appModule
 import com.diva.models.config.AppConfig
+import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.config.Environment
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -12,25 +13,26 @@ import org.koin.core.context.startKoin
 class DivaApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        val debug = BuildConfig.DEBUG
         val environment = Environment.entries.find {
-            BuildConfig.FLAVOR == it.name.uppercase()
+            BuildConfig.FLAVOR.uppercase() == it.name
         } ?: Environment.PRODUCTION
-        val domain = BuildConfig.DOMAIN
+
+        val config = AppConfig(
+            debug = BuildConfig.DEBUG,
+            environment = environment,
+            domain = BuildConfig.DOMAIN,
+            version = BuildConfig.VERSION_NAME,
+            deviceName = Build.MODEL,
+            port = if (environment != Environment.DEVELOPMENT) {
+                Option.None
+            } else {
+                Option.Some(BuildConfig.PORT.toInt())
+            },
+            agent = "Diva/${BuildConfig.VERSION_NAME} (Linux; Android ${Build.VERSION.SDK_INT}; ${Build.MODEL})"
+        )
 
         startKoin {
-            modules(
-                appModule(
-                    AppConfig(
-                        debug = debug,
-                        environment = environment,
-                        domain = domain,
-                        version = BuildConfig.VERSION_NAME,
-                        deviceName = Build.MODEL,
-                        agent = "Diva/${BuildConfig.VERSION_NAME} (Linux; Android ${Build.VERSION.SDK_INT}; ${Build.MODEL})"
-                    )
-                )
-            )
+            modules(appModule(config))
             androidContext(this@DivaApp)
             androidLogger()
         }

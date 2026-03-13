@@ -14,6 +14,7 @@ fun main() = application {
                 AppConfig(
                     version = "1.0",
                     deviceName = "Desktop",
+                    domain = "0.0.0.0",
                     agent = "Diva/1.0 (Desktop)"
                 )
             )

@@ -3,6 +3,8 @@ package com.diva.models.config
 import io.github.juevigrace.diva.core.Option
 import io.github.juevigrace.diva.core.config.DivaAppConfig
 import io.github.juevigrace.diva.core.config.Environment
+import io.github.juevigrace.diva.core.getOrElse
+import io.github.juevigrace.diva.core.map
 
 data class AppConfig(
     override val debug: Boolean = true,
@@ -17,9 +19,5 @@ data class AppConfig(
     override val version: String = "1.0",
     override val deviceName: String = "Unknown",
     override val agent: String = "Diva/$version (Unknown)",
-    override val baseUrl: String = if (environment == Environment.DEVELOPMENT) {
-        "$protocol://$domain:$port"
-    } else {
-        "https://$domain"
-    },
+    override val baseUrl: String = "$protocol://$domain${port.map { ":$it" }.getOrElse { "" }}",
 ) : DivaAppConfig

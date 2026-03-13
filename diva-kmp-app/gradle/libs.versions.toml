@@ -18,6 +18,7 @@ kbcrypt = "1.0.9"
 resend = "4.12.0"
 sqlite = "3.45.3.0"
 postgresql = "42.7.10"
+secrets = "2.0.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -29,6 +30,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 [libraries]
@@ -46,6 +48,7 @@ diva-ui = { group = "io.github.juevigrace", name = "diva-ui", version.ref = "div
 
 ######### [GRADLE DEPENDENCIES] #########
 
+secrets-gradle = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secrets" }
 android-tools-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin", version.ref = "kotlin" }
 jetbrains-compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-multiplatform" }
