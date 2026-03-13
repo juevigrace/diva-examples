@@ -4,7 +4,7 @@ import android.app.Application
 import android.os.Build
 import com.diva.app.di.appModule
 import com.diva.models.config.AppConfig
-import com.diva.models.config.Flavors
+import io.github.juevigrace.diva.core.config.Environment
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -13,7 +13,9 @@ class DivaApp : Application() {
     override fun onCreate() {
         super.onCreate()
         val debug = BuildConfig.DEBUG
-        val flavor = Flavors.entries.find { BuildConfig.FLAVOR == it.name } ?: Flavors.PROD
+        val environment = Environment.entries.find {
+            BuildConfig.FLAVOR == it.name.uppercase()
+        } ?: Environment.PRODUCTION
         val domain = BuildConfig.DOMAIN
 
         startKoin {
@@ -21,7 +23,7 @@ class DivaApp : Application() {
                 appModule(
                     AppConfig(
                         debug = debug,
-                        flavor = flavor,
+                        environment = environment,
                         domain = domain,
                         version = BuildConfig.VERSION_NAME,
                         deviceName = Build.MODEL,

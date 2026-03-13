@@ -18,8 +18,6 @@ import com.diva.permissions.di.permissionsModule
 import com.diva.social.di.socialModule
 import com.diva.user.di.userModule
 import com.diva.verification.di.verificationModule
-import io.github.juevigrace.diva.network.client.config.DivaClientConfig
-import io.ktor.client.plugins.logging.LogLevel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -30,12 +28,7 @@ fun appModule(config: AppConfig): Module {
 
         includes(
             databaseModule(),
-            networkModule(
-                DivaClientConfig(
-                    baseUrl = config.baseUrl,
-                    logLevel = if (config.debug) LogLevel.ALL else LogLevel.NONE,
-                )
-            ),
+            networkModule(config),
             uiModule(),
         )
         includes(

@@ -1,19 +1,26 @@
 package com.diva.app.di.network
 
+import com.diva.models.config.AppConfig
 import io.github.juevigrace.diva.network.client.DivaClient
-import io.github.juevigrace.diva.network.client.config.DivaClientConfig
 import io.github.juevigrace.diva.network.client.factory.DivaClientFactory
+import io.ktor.client.plugins.defaultRequest
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-expect fun networkFactoryModule(config: DivaClientConfig): Module
+expect fun networkFactoryModule(): Module
 
-fun networkModule(config: DivaClientConfig): Module {
+fun networkModule(config: AppConfig): Module {
     return module {
-        includes(networkFactoryModule(config))
+        includes(networkFactoryModule())
         single<DivaClient> {
             val factory: DivaClientFactory = get()
-            factory.create()
+            val client = factory.create()
+            client.config {
+                defaultRequest {
+                    url(config.baseUrl)
+                }
+            }
+            client
         }
     }
 }

@@ -2,10 +2,10 @@ package com.diva.auth.data.validation
 
 import com.diva.core.resources.Res
 import com.diva.core.resources.field_required
-import com.diva.models.ValidationResult
-import com.diva.models.Validator
 import com.diva.models.auth.SignInForm
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.validation.ValidationResult
+import io.github.juevigrace.diva.core.validation.Validator
 import org.jetbrains.compose.resources.StringResource
 
 object SignInValidator : Validator<SignInForm, SignInValidation> {

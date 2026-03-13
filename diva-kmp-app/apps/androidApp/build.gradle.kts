@@ -71,13 +71,16 @@ android {
 
     flavorDimensions += "environment"
     productFlavors {
-        create("prod")
+        create("development")
 
-        create("dev")
+        create("staging")
+
+        create("production")
 
         all {
             val properties = gradleLocalProperties(project.rootDir, providers)
             buildConfigField("String", "DOMAIN", "\"${properties.getProperty("DOMAIN")}\"")
+            buildConfigField("String", "PORT", "\"${properties.getProperty("PORT")}\"")
             dimension = "environment"
             applicationIdSuffix = ".$name"
             versionNameSuffix = "-$name"

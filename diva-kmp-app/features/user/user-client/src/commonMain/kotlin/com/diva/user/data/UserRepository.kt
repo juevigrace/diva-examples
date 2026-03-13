@@ -2,7 +2,6 @@ package com.diva.user.data
 
 import com.diva.database.session.SessionStorage
 import com.diva.database.user.UserStorage
-import com.diva.models.Pagination
 import com.diva.models.Repository
 import com.diva.models.api.auth.dtos.PasswordUpdateDto
 import com.diva.models.api.user.dtos.EmailTokenDto
@@ -22,6 +21,7 @@ import io.github.juevigrace.diva.core.fold
 import io.github.juevigrace.diva.core.getOrThrow
 import io.github.juevigrace.diva.core.onFailure
 import io.github.juevigrace.diva.core.onSuccess
+import io.github.juevigrace.diva.core.pagination.Pagination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.async
@@ -29,7 +29,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid

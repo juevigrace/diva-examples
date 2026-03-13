@@ -5,36 +5,13 @@ import androidx.compose.ui.window.application
 import com.diva.app.di.appModule
 import com.diva.app.presentation.ui.screen.App
 import com.diva.models.config.AppConfig
-import com.diva.models.config.Flavors
 import org.koin.core.context.GlobalContext.startKoin
 
-fun main(args: Array<String>) = application {
-    // Parse arguments
-    val argsMap: Map<String, String> = args.let { arguments ->
-        mutableMapOf<String, String>().apply {
-            for (i in arguments.indices) {
-                when {
-                    arguments[i].startsWith("--") && i + 1 < arguments.size -> {
-                        put(arguments[i].substring(2), arguments[i + 1])
-                    }
-                    arguments[i].startsWith("-") && i + 1 < arguments.size -> {
-                        put(arguments[i].substring(1), arguments[i + 1])
-                    }
-                }
-            }
-        }.toMap()
-    }
-
-    // Access parsed arguments
-    val debug: Boolean = argsMap["-D"]?.toBoolean() ?: true
-    val flavor: Flavors = Flavors.entries.find { it.name == argsMap["-F"] } ?: Flavors.DEV
-
+fun main() = application {
     startKoin {
         modules(
             appModule(
                 AppConfig(
-                    debug = debug,
-                    flavor = flavor,
                     version = "1.0",
                     deviceName = "Desktop",
                     agent = "Diva/1.0 (Desktop)"

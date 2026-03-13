@@ -7,10 +7,10 @@ import com.diva.core.resources.password_mismatch
 import com.diva.core.resources.password_too_short
 import com.diva.core.resources.privacy_required
 import com.diva.core.resources.terms_required
-import com.diva.models.ValidationResult
-import com.diva.models.Validator
 import com.diva.models.auth.SignUpForm
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.validation.ValidationResult
+import io.github.juevigrace.diva.core.validation.Validator
 import org.jetbrains.compose.resources.StringResource
 
 object SignUpValidator : Validator<SignUpForm, SignUpValidation> {

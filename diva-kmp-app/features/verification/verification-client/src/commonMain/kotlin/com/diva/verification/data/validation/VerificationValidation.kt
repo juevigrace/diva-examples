@@ -2,10 +2,10 @@ package com.diva.verification.data.validation
 
 import com.diva.core.resources.Res
 import com.diva.core.resources.field_required
-import com.diva.models.ValidationResult
-import com.diva.models.Validator
 import com.diva.models.verification.VerificationForm
 import io.github.juevigrace.diva.core.Option
+import io.github.juevigrace.diva.core.validation.ValidationResult
+import io.github.juevigrace.diva.core.validation.Validator
 import org.jetbrains.compose.resources.StringResource
 
 object VerificationValidator : Validator<VerificationForm, VerificationValidation> {

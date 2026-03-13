@@ -6,14 +6,13 @@ android-compileSdk = "36"
 android-targetSdk = "36"
 android-minSdk = "24"
 compose-hot-reload = "1.0.0"
-compose-multiplatform = "1.10.1"
-diva = "0.0.14"
-datastore = "1.2.0"
+compose-multiplatform = "1.10.2"
+diva = "0.0.15"
 koin = "4.1.1"
 kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
-ktor = "3.4.0"
+ktor = "3.4.1"
 sqldelight = "2.2.1"
 kbcrypt = "1.0.9"
 resend = "4.12.0"
@@ -105,11 +104,6 @@ kbcrypt = { group = "com.ToxicBakery.library.bcrypt", name = "bcrypt", version.r
 ######### [MAIL DEPENDENCIES] #########
 
 resend = { group = "com.resend", name = "resend-java", version.ref = "resend" }
-
-######### [DATASTORE DEPENDENCIES] #########
-
-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 ######### [DRIVER DEPENDENCIES] #########
 
